@@ -1,4 +1,4 @@
-FROM node:14-alpine as stage-build
+FROM harbor.dev.rdev.tech/calico/node:14-buster as stage-build
 WORKDIR /data
 
 
@@ -10,7 +10,7 @@ RUN npm install
 COPY . /data
 RUN npm run-script build
 
-FROM nginx:alpine
+FROM harbor.dev.rdev.tech/common/nginx:1.13
 
 COPY --from=stage-build /data/dist /opt/neeko
 COPY nginx.conf /etc/nginx/conf.d/default.conf
