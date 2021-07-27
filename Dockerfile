@@ -1,5 +1,5 @@
 FROM harbor.dev.rdev.tech/calico/node:14-buster as stage-build
-WORKDIR /data
+#WORKDIR /data
 
 
 #RUN apk add python2 make gcc g++
