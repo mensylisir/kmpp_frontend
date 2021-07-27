@@ -7,7 +7,7 @@ FROM harbor.dev.rdev.tech/calico/node:14-buster as stage-build
 COPY ./package.json /data/package.json
 COPY ./package-lock.json /data/package-lock.json
 RUN npm install
-COPY . /data
+#COPY . /data
 RUN npm run-script build
 
 FROM harbor.dev.rdev.tech/common/nginx:1.13
