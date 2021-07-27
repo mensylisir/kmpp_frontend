@@ -1,16 +1,13 @@
-FROM harbor.dev.rdev.tech/calico/node:14-buster as stage-build
-#WORKDIR /data
+# 设置基础镜像
+FROM harbor.dev.rdev.tech/nginx-base/nginx:19
 
+# 将dist文件中的内容复制到 /usr/share/nginx/html/ 这个目录下面
+COPY dist/  /usr/share/nginx/html/
 
-#RUN apk add python2 make gcc g++
+#删除default.conf
+RUN rm /etc/nginx/conf.d/default.conf
 
-COPY ./package.json /data/package.json
-COPY ./package-lock.json /data/package-lock.json
-#RUN npm install
-#COPY . /data
-#RUN npm run-script build
+#用本地的 default.conf 配置来替换nginx镜像里的默认配置
+COPY default.conf /etc/nginx/conf.d/default.conf
 
-FROM harbor.dev.rdev.tech/common/nginx:1.13
-
-COPY --from=stage-build /data/dist /opt/neeko
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
