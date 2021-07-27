@@ -2,7 +2,7 @@ FROM harbor.dev.rdev.tech/calico/node:14-buster as stage-build
 WORKDIR /data
 
 
-RUN apk add python2 make gcc g++
+#RUN apk add python2 make gcc g++
 
 COPY ./package.json /data/package.json
 COPY ./package-lock.json /data/package-lock.json
