@@ -30,7 +30,7 @@ export default {
 .layout-container {
   min-width: 1024px;
   height: 100%;
-  background-color: $layout-bg-color;
+  background-color: #F4F5F7;
 }
 
 .main-container {
@@ -42,8 +42,8 @@ export default {
   transition: width 0.28s;
   width: $sidebar-open-width;
   min-width: $sidebar-open-width;
-  background-color: $sidebar-bg-color;
-  background-image: $sidebar-bg-gradient;
+  background-color: #222740;
+  // background-image: $sidebar-bg-gradient;
 
   &.is-collapse {
     width: $sidebar-close-width;
@@ -52,8 +52,8 @@ export default {
 }
 
 .header-container {
-  height: $header-height;
-  padding: 0 $header-padding;
+  height: 56px;
+  padding: 0 15px;
 }
 
 .view-container {
@@ -61,6 +61,6 @@ export default {
   flex: auto;
   overflow: auto;
   box-sizing: border-box;
-  padding: $view-padding;
+  padding: 8px 15px 15px 15px;
 }
 </style>

@@ -73,15 +73,15 @@ a:hover {
 
 .input-error {
   font-size: 4px;
-  word-break:break-all;
-  color:red;
+  word-break: break-all;
+  color: red;
 }
 
 .el-message__content {
   padding: 0;
   font-size: 14px;
   line-height: 2;
-  word-break:break-all;
+  word-break: break-all;
 }
 
 .el-step__title.is-finish {
@@ -116,13 +116,14 @@ a:hover {
   color: #606266;
   height: 23px;
 }
+
 .myTable th {
   border: 1px solid #DFE6EC;
   color: #909399;
   height: 30px;
 }
 
-.myTable tr:hover{
+.myTable tr:hover {
   background-color: #f3f3f3;
 }
 
@@ -137,31 +138,41 @@ a:hover {
 .el-table thead {
   color: #57595f;
   font-weight: bold;
+  th{
+    background: #f9fafc;
+  }
 }
 
 .ko-dialog {
   font-size: 12px;
   font-weight: 400;
   line-height: 25px;
+
   .el-dialog__header {
     padding: 0;
   }
+
   .el-dialog__body {
     padding: 0;
   }
+
   .el-link.el-link--default {
     color: unset;
   }
+
   .iconfont {
     font-size: 14px;
   }
+
   .iconStarStar:before {
     color: #FDBF16;
   }
+
   .aboutBackground {
     background: url("~@/assets/KubeOperator-about-background.png") no-repeat;
     background-size: cover;
   }
+
   .el-link--inner {
     padding-left: 5px;
   }
@@ -187,12 +198,15 @@ a:hover {
   .el-collapse {
     border-top: revert !important;
   }
+
   .el-collapse-item__header {
     border-bottom: revert !important;
   }
+
   .el-collapse-item__arrow {
     margin: 0;
   }
+
   .el-collapse-item__wrap {
     border-bottom: revert !important;
   }
