@@ -259,6 +259,7 @@ export default {
         let isExit = false
         let isAmdExit = false
         let isArmExit = false
+        console.log(row, '1111')
         switch (row.spec.architectures) {
           case "amd64":
             for (const repo of repoList) {

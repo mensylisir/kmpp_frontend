@@ -25,9 +25,9 @@ export default {
 
 <style lang="scss" scoped>
 .sidebar-toggle-button.el-button {
-  font-size: 18px;
+  font-size: 16px;
   background-color: white;
-  color: #FA5D50;
+  color: #5B5D78;
 }
 
 </style>

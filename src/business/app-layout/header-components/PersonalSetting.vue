@@ -1,7 +1,7 @@
 <template>
   <el-dropdown trigger="click" @command="handleCommand">
     <span class="el-dropdown-link">
-        <i class="el-icon-user-solid" style="color: #FA5D50;margin-right: 3px"></i>
+        <i class="el-icon-user-solid" style="color: #5B5D78;margin-right: 3px"></i>
         <span>{{ name }}</span>
         <i class="el-icon-arrow-down el-icon--right"></i>
     </span>

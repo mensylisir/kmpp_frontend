@@ -1,6 +1,6 @@
 <template>
   <div class="sidebar">
-    <logo :collapse="isCollapse"/>
+    <logo :collapse="isCollapse" />
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
         :default-active="activeMenu"
@@ -8,43 +8,42 @@
         :collapse-transition="false"
         :unique-opened="false"
         mode="vertical"
-        active-text-color="#fa5d50"
+        active-text-color="white"
       >
-        <sidebar-item v-for="route in permission_routes"
-                      :key="route.path"
-                      :item="route"
-                      :base-path="route.path"/>
+        <sidebar-item
+          v-for="route in permission_routes"
+          :key="route.path"
+          :item="route"
+          :base-path="route.path"
+        />
       </el-menu>
     </el-scrollbar>
   </div>
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
-import SidebarItem from './SidebarItem'
+import { mapGetters } from "vuex";
+import SidebarItem from "./SidebarItem";
 import Logo from "@/components/layout/sidebar/Logo";
 
 export default {
   name: "Sidebar",
-  components: {Logo, SidebarItem},
+  components: { Logo, SidebarItem },
   computed: {
-    ...mapGetters([
-      'permission_routes',
-      'sidebar'
-    ]),
+    ...mapGetters(["permission_routes", "sidebar"]),
     activeMenu() {
-      const route = this.$route
-      const {meta, path} = route
+      const route = this.$route;
+      const { meta, path } = route;
       if (meta.activeMenu) {
-        return meta.activeMenu
+        return meta.activeMenu;
       }
-      return path
+      return path;
     },
     isCollapse() {
-      return !this.sidebar.opened
+      return !this.sidebar.opened;
     },
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss">
@@ -76,10 +75,16 @@ export default {
 
 @mixin menu-item-active {
   font-weight: 600;
-  color: $menu-active-color;
-  background-color: $menu-active-bg-color;
+  // color: white !important;
+  background-color: #5354bb;
   &:hover {
     background-color: $menu-bg-color-hover;
+  }
+  .sub-el-icon {
+    opacity: 0.85;
+    + span {
+      opacity: 0.85;
+    }
   }
 }
 
@@ -94,13 +99,13 @@ export default {
 
 @mixin menu-active-prefix {
   &:after {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 1px;
-    bottom: 1px;
-    width: $menu-active-prefix-width;
-    background-color: $menu-active-prefix-color;
+    // content: "";
+    // position: absolute;
+    // left: 0;
+    // top: 1px;
+    // bottom: 1px;
+    // width: $menu-active-prefix-width;
+    // background-color: $menu-active-prefix-color;
   }
 }
 
@@ -110,7 +115,7 @@ export default {
   .el-scrollbar {
     box-sizing: border-box;
     padding: 10px 0;
-    height: calc(100% - #{$header-height});
+    height: calc(100% - 80px);
 
     .el-scrollbar__bar {
       &.is-vertical {
@@ -149,7 +154,7 @@ export default {
       @include menu-item;
 
       &:hover {
-        background-color: $menu-bg-color-hover;
+        background-color: #2c3354;
       }
 
       &.is-active {
@@ -177,8 +182,9 @@ export default {
         .el-submenu__title {
           @include menu-item-active;
 
-          .sub-el-icon, span {
-            color: #FFF;
+          .sub-el-icon,
+          span {
+            color: #fff;
           }
         }
       }
@@ -197,16 +203,21 @@ export default {
       }
     }
 
-    .nest-menu, .el-submenu__title, .submenu-title-no-dropdown {
+    .nest-menu,
+    .el-submenu__title,
+    .submenu-title-no-dropdown {
       span {
         padding-left: 30px;
       }
 
       .sub-el-icon {
         margin-right: 10px;
-
+        opacity: 0.65;
+        color: white;
         + span {
+          opacity: 0.65;
           padding-left: 0;
+          color: white;
         }
       }
     }
@@ -222,7 +233,8 @@ export default {
         padding-left: 20px !important;
       }
 
-      .submenu-title-no-dropdown, .el-submenu__title {
+      .submenu-title-no-dropdown,
+      .el-submenu__title {
         max-width: 60px;
         text-align: center;
 
@@ -257,7 +269,8 @@ export default {
     }
   }
 
-  .nest-menu .el-submenu > .el-submenu__title, .el-menu-item {
+  .nest-menu .el-submenu > .el-submenu__title,
+  .el-menu-item {
     &.is-active {
       color: $submenu-active-color;
       @include menu-active-prefix;
