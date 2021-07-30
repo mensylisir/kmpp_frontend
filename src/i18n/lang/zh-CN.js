@@ -178,7 +178,7 @@ const message = {
   route: {
     project_management: "项目管理",
     cluster: "集群管理",
-    host: "主机",
+    host: "资源管理",
     system_setting: "系统设置",
     manifest: "版本管理",
     message_center: "消息中心",
@@ -545,7 +545,7 @@ const message = {
   },
   host: {
     detail: "详情",
-    host: "主机",
+    host: "资源管理",
     memory: "内存(MB)",
     os: "操作系统",
     architecture: "架构",
