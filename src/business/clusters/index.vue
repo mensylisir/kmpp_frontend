@@ -3,7 +3,7 @@
     <complex-table local-key="cluster_columns" :selects.sync="clusterSelection" @selection-change="selectChange" :search-config="searchConfig" :data="data" :pagination-config="paginationConfig" @search="search" v-loading="loading">
       <template #header>
         <el-button-group>
-          <el-button size="small" @click="onCreate()" v-permission="['ADMIN','PROJECT_MANAGER']">
+          <el-button size="small" @click="onCreate()" v-permission="['ADMIN','PROJECT_MANAGER']" :disabled="true">
             {{ $t("commons.button.create") }}
           </el-button>
           <el-button size="small" @click="onImport()" v-permission="['ADMIN','PROJECT_MANAGER']">
