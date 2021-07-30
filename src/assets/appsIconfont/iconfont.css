@@ -1,0 +1,54 @@
+@font-face {
+  font-family: "iconfont";
+  src: url('iconfont.eot'); /* IE9 */
+  src: url('iconfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('iconfont.woff') format('woff2'),
+  url('iconfont.woff') format('woff'), /* chrome、firefox */
+  url('iconfont.ttf') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
+  url('iconfont.svg#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-logo:before {
+  content: "\e001";
+}
+.icon-logo-white:before {
+  content: "\e002";
+}
+.icon-resourcemanage:before {
+  content: "\e003";
+}
+.icon-notification:before {
+  content: "\e004";
+}
+.icon-safemanage:before {
+  content: "\e005";
+}
+.icon-apps-manage:before {
+  content: "\e007";
+}
+.icon-certificationmanage:before {
+  content: "\e009";
+}
+.icon-middleware:before {
+  content: "\e00a";
+}
+.icon-task:before {
+  content: "\e00c";
+}
+.icon-servicemesh:before {
+  content: "\e00d";
+}
+.icon-clustermanage:before {
+  content: "\e00e";
+}
+.icon-audit:before {
+  content: "\e00f";
+}

@@ -160,7 +160,7 @@ const message = {
   login: {
     username: "用户名",
     password: "密码",
-    title: "欢迎登录容器管理平台",
+    title: "欢迎登录太初容器平台",
     welcome: "欢迎回来，请输入用户名和密码登录",
     expires: "认证信息已过期，请重新登录",
     captcha: "验证码",
@@ -177,7 +177,7 @@ const message = {
   },
   route: {
     project_management: "项目管理",
-    cluster: "集群",
+    cluster: "集群管理",
     host: "主机",
     system_setting: "系统设置",
     manifest: "版本管理",

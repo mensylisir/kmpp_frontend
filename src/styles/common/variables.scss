@@ -1,9 +1,9 @@
 /* Element 变量 */
 $--color-primary: #5354bb;
-$--color-success: #87CB16;
-$--color-warning: #FFA534;
-$--color-danger: #FB404B;
-$--color-info: #0033FF;
+$--color-success: #36B37E;
+$--color-warning: #F59326;
+$--color-danger: #CF0A1E;
+$--color-info: #0A59CC ;
 $--color-ko: #9393E0;
 
 $--box-shadow-light: 0 1px 4px 0 rgba(0, 0, 0, .14);
@@ -22,11 +22,11 @@ $sidebar-bg-gradient: linear-gradient(to bottom right, #30373D, #3E3E3D);
 /* menu */
 $menu-height: 50px; // 菜单项高度
 $menu-bg-color: transparent; // 菜单项背景
-$menu-bg-color-hover: mix($sidebar-bg-color, #000, 90%); // 菜单项hover背景
+$menu-bg-color-hover: #2c3354; // 菜单项hover背景
 $menu-color: #B6C0CD; // 菜单项字体颜色
 $menu-open-bg-color: #252B2F; // 菜单项展开背景
 $menu-active-color: #FFF; // 菜单项激活时颜色
-$menu-active-bg-color: transparent; // 菜单项激活时背景
+$menu-active-bg-color: #5354bb; // 菜单项激活时背景
 
 $submenu-height: 40px; // 子菜单项高度
 $submenu-bg-color-hover: mix($menu-open-bg-color, #000, 80%); // 子菜单项hover背景
@@ -64,12 +64,12 @@ $view-padding: 15px;
 //}
 
 .koLink {
-  color: #0033FF;
+  color: #0A59CC;
   text-decoration: underline;
 }
 
 .linkStyle {
-  color: #0033FF;
+  color: #0A59CC;
 }
 
 
