@@ -7,12 +7,12 @@
       <div class="navbar-item" v-permission="['PROJECT_MANAGER','CLUSTER_MANAGER']">
         <project-switch/>
       </div>
-      <div class="navbar-item">
+      <!-- <div class="navbar-item">
         <help/>
       </div>
       <div class="navbar-item">
         <language-switch/>
-      </div>
+      </div> -->
       <div class="navbar-item">
         <personal-setting/>
       </div>
@@ -22,14 +22,14 @@
 
 <script>
   import SidebarToggleButton from "@/components/layout/sidebar/SidebarToggleButton";
-  import LanguageSwitch from "@/business/app-layout/header-components/LanguageSwitch";
+  // import LanguageSwitch from "@/business/app-layout/header-components/LanguageSwitch";
   import PersonalSetting from "@/business/app-layout/header-components/PersonalSetting";
   import ProjectSwitch from "../header-components/ProjectSwitch";
-  import Help from "@/business/app-layout/header-components/Help";
+  // import Help from "@/business/app-layout/header-components/Help";
 
   export default {
     name: "HorizontalHeader",
-    components: {ProjectSwitch, PersonalSetting, LanguageSwitch, SidebarToggleButton, Help}
+    components: {ProjectSwitch, PersonalSetting, SidebarToggleButton, }
   }
 </script>
 
