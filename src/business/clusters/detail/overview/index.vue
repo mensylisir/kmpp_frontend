@@ -220,14 +220,14 @@ export default {
       listNodesUsage(this.clusterName).then((data) => {
         let metrics = data.items
         metrics.forEach((me) => {
-          const c = me.usage.cpu.replace("n", "")
+          const c = me.usage.cpu.replace("m", "")
           this.cpuUsage = this.cpuUsage + Number(c)
           const m = me.usage.memory.replace("Ki", "")
           this.memUsage = this.memUsage + Number(m)
         })
-        this.cpuUsage = this.cpuUsage / (1000 * 1000 * 1000)
+        // this.cpuUsage = this.cpuUsage / (1000 * 1000 * 1000)
         this.memUsagePercent = Math.round((this.memUsage / this.memTotal) * 100)
-        this.cpuUsagePercent = Math.round((this.cpuUsage / this.cpuTotal) * 100)
+        this.cpuUsagePercent = Math.round((this.cpuUsage / (this.cpuTotal*1000)) * 100)
         this.loading_chart = false
       })
     },
