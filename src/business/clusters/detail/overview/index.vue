@@ -212,7 +212,7 @@ export default {
       })
     },
     loadDeployments() {
-      listDeployment(this.clusterName).then((data) => {
+      listDeployment(this.clusterName).then((data) => {   
         this.deployments = data.items
       })
     },

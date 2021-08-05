@@ -79,7 +79,7 @@ export default {
     width: auto;
 
     & .sidebar-logo {
-      height: 36px;
+      height: 27px;
       vertical-align: middle;
     }
   }
