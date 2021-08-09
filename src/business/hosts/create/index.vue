@@ -15,22 +15,22 @@
             <el-form-item :label="$t('host.port')" prop="port">
               <el-input-number :step="1" :max="65535" step-strictly v-model.number="form.port" clearable></el-input-number>
             </el-form-item>
-            <el-form-item :label="$t('host.project_auth')" prop="project">
+            <!-- <el-form-item :label="$t('host.project_auth')" prop="project">
               <el-select style="width:100%" v-model="form.project" @change="getClusters" clearable filterable>
                 <el-option v-for="pro in projectList" :key="pro.id" :value="pro.name" :label="pro.name" />
               </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('host.cluster_auth')" prop="cluster">
+            </el-form-item> -->
+            <!-- <el-form-item :label="$t('host.cluster_auth')" prop="cluster">
               <el-select style="width:100%" v-model="form.cluster" clearable filterable>
                 <el-option v-for="(item,index) in clusterList" :key="index" :value="item" :label="item" />
               </el-select>
               <div><span class="input-help">{{$t('host.cluster_auth_help')}}</span></div>
 
-            </el-form-item>
+            </el-form-item> -->
 
             <el-form-item :label="$t('credential.type')" required>
               <el-radio-group v-model="credentialType" @change="updateCredentialType">
-                <el-radio label="exists">{{$t('host.exists_credential')}}</el-radio>
+                <!-- <el-radio label="exists">{{$t('host.exists_credential')}}</el-radio> -->
                 <el-radio label="new">{{$t('host.new_credential')}}</el-radio>
               </el-radio-group>
             </el-form-item>
@@ -84,12 +84,12 @@ export default {
   components: { LayoutContent },
   data() {
     return {
-      credentialType: "exists",
+      credentialType: "new",
       form: {
         name: "",
         ip: "",
         port: 22,
-        project: "",
+        project: "kubeoperator",
         cluster: "",
         credentialId: "",
         credential: {
@@ -104,7 +104,7 @@ export default {
         name: [Rule.NameRule],
         ip: [Rule.RequiredRule],
         port: [Rule.NumberRule],
-        project: [Rule.RequiredRule],
+        // project: [Rule.RequiredRule],
         credentialId: [Rule.RequiredRule],
         credential: {
           username: [Rule.RequiredRule],

@@ -52,7 +52,6 @@ export default {
 }
 
 .header-container {
-  height: 56px;
   padding: 0 15px;
 }
 
@@ -61,6 +60,6 @@ export default {
   flex: auto;
   overflow: auto;
   box-sizing: border-box;
-  padding: 8px 15px 15px 15px;
+  padding: 0 15px 15px 15px;
 }
 </style>

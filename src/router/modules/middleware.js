@@ -2,7 +2,7 @@ import Layout from "@/business/app-layout/horizontal-layout"
 
 const Manifest = {
   path: "/middleware",
-  sort: 7,
+  sort: 6,
   component: Layout,
   name: "Manifest",
   meta: {
