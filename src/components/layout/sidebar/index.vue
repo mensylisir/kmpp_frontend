@@ -17,6 +17,7 @@
           :base-path="route.path"
         />
       </el-menu>
+      <sidebar-toggle-button/>
     </el-scrollbar>
   </div>
 </template>
@@ -25,10 +26,12 @@
 import { mapGetters } from "vuex";
 import SidebarItem from "./SidebarItem";
 import Logo from "@/components/layout/sidebar/Logo";
+import SidebarToggleButton from "@/components/layout/sidebar/SidebarToggleButton";
+
 
 export default {
   name: "Sidebar",
-  components: { Logo, SidebarItem },
+  components: { Logo, SidebarItem, SidebarToggleButton },
   computed: {
     ...mapGetters(["permission_routes", "sidebar"]),
     activeMenu() {

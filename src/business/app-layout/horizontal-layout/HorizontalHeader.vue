@@ -1,7 +1,6 @@
 <template>
   <div class="horizontal-header">
     <div class="header-left">
-      <sidebar-toggle-button/>
     </div>
     <div class="header-right">
       <div class="navbar-item" v-permission="['PROJECT_MANAGER','CLUSTER_MANAGER']">
@@ -21,7 +20,6 @@
 </template>
 
 <script>
-  import SidebarToggleButton from "@/components/layout/sidebar/SidebarToggleButton";
   // import LanguageSwitch from "@/business/app-layout/header-components/LanguageSwitch";
   import PersonalSetting from "@/business/app-layout/header-components/PersonalSetting";
   import ProjectSwitch from "../header-components/ProjectSwitch";
@@ -29,7 +27,7 @@
 
   export default {
     name: "HorizontalHeader",
-    components: {ProjectSwitch, PersonalSetting, SidebarToggleButton, }
+    components: {ProjectSwitch, PersonalSetting, }
   }
 </script>
 

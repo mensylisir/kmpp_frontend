@@ -906,6 +906,12 @@ const message = {
     selected_clusters: "选择集群",
     relation_management: "关联管理",
     log: "日志"
+  },
+  serviceMesh: {
+    title: "服务网格"
+  },
+  notification: {
+    title: "消息中心"
   }
 }
 

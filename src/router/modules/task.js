@@ -2,7 +2,7 @@ import Layout from "@/business/app-layout/horizontal-layout"
 
 const Manifest = {
   path: "/task",
-  sort: 9,
+  sort: 8,
   component: Layout,
   name: "Manifest",
   meta: {
