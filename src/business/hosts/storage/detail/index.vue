@@ -2,14 +2,12 @@
   <div>
     <el-alert v-if="provider === ''" :title="$t('cluster.detail.storage.operator_help')" type="info" />
     <div style="margin-top: 20px">
-      <el-tabs v-model="activeName" tab-position="left" @tab-click="handleClick()" style="margin-bottom: 30px;">
+      <el-tabs v-model="activeName" @tab-click="handleClick()" style="margin-bottom: 30px;">
         <el-tab-pane :label="$t('cluster.detail.storage.pv')" name="pv">
           <el-card>
             <template>
-              <el-button-group>
-                <el-button size="small" @click="pvCreate()" :disabled="true">{{$t('commons.button.create')}}</el-button>
+                <el-button type="primary"  icon="el-icon-plus" size="small" @click="pvCreate()" :disabled="true">{{$t('commons.button.create')}}</el-button>
                 <el-button size="small" :disabled="pvSelection.length < 1" @click="onBatchDelete('pv')">{{$t('commons.button.delete')}}</el-button>
-              </el-button-group>
             </template>
             <complex-table style="margin-top: 20px" v-loading="loading" :selects.sync="pvSelection" :data="pvDatas">
               <el-table-column type="selection" fix></el-table-column>
@@ -57,11 +55,11 @@
         <el-tab-pane :label="$t('cluster.detail.storage.provisioner')" name="provisioner">
           <el-card>
             <template>
-              <el-button-group>
-                <el-button size="small" :disabled="provider === ''" @click="provisionerCreate()">{{$t('commons.button.create')}}</el-button>
+              <div>
+                <el-button size="small"  type="primary"  icon="el-icon-plus" :disabled="provider === ''" @click="provisionerCreate()">{{$t('commons.button.create')}}</el-button>
                 <el-button size="small" :disabled="provisionerSelection.length < 1" @click="onSync()">{{$t('commons.button.sync')}}</el-button>
                 <el-button size="small" :disabled="provisionerSelection.length < 1" @click="onBatchDelete('provisioner')">{{$t('commons.button.delete')}}</el-button>
-              </el-button-group>
+              </div>
             </template>
             <complex-table style="margin-top: 20px" v-loading="loading" :selects.sync="provisionerSelection" :data="provisionerDatas">
               <el-table-column type="selection" fix></el-table-column>
