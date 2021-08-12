@@ -10,10 +10,15 @@
       :search-config="searchConfig"
     >
       <template #header>
-        <el-button-group v-permission="['ADMIN']">
-          <el-button size="small" @click="create()">{{
-            $t("commons.button.create")
-          }}</el-button>
+        <div>
+          <el-button
+            size="small"
+            type="primary"
+            @click="create()"
+            v-permission="['ADMIN']"
+            icon="el-icon-plus"
+            >{{ $t("commons.button.create") }}</el-button
+          >
           <!-- <el-button size="small" @click="onImport()">{{
             $t("commons.button.batch_import")
           }}</el-button> -->
@@ -27,13 +32,14 @@
             >{{ $t("commons.button.sync") }}</el-button
           > -->
           <el-button
+            v-permission="['ADMIN']"
             :disabled="hostSelections.length < 1"
             size="small"
             @click="onDelete()"
           >
             {{ $t("commons.button.delete") }}
           </el-button>
-        </el-button-group>
+        </div>
       </template>
       <el-table-column type="selection" fix></el-table-column>
       <el-table-column
@@ -151,8 +157,69 @@
         }}</el-button>
       </div>
     </el-dialog>
+    <el-drawer
+      :title="$t('host.detail')"
+      :visible.sync="dialogDetailVisible"
+      size="51%"
+      class="node-detail"
+    >
+      <div>
+        <span>{{ $t("host.base_info") }}</span>
+        <div  style="margin-top: 15px">
+          <table style="width: 100%" class="myTable">
+            <tr>
+              <td>IP</td>
+              <td>{{ currentHost.ip }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t("host.cpu") }}</td>
+              <td>{{ currentHost.cpuCore }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t("host.gpu") }}</td>
+              <td>{{ currentHost.gpuNum }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t("host.memory") }}</td>
+              <td>{{ currentHost.memory }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t("host.os") }}</td>
+              <td>{{ currentHost.os }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t("host.architecture") }}</td>
+              <td>{{ currentHost.architecture }}</td>
+            </tr>
+            <tr>
+              <td>{{ $t("commons.table.create_time") }}</td>
+              <td>{{ currentHost.createdAt | datetimeFormat }}</td>
+            </tr>
+          </table>
+        </div>
+        <br />
+        <span>{{ $t("host.disk_size") }}</span>
+        <div style="margin-top: 15px">
+          <el-table :data="currentHost.volumes" border style="width: 100%">
+            <el-table-column prop="name" :label="$t('commons.table.name')" />
+            <el-table-column prop="size" :label="$t('host.disk_size')" />
+          </el-table>
+        </div>
+        <div v-if="currentHost.hasGpu">
+          <span>{{ $t("host.disk_size") }}</span>
+          <div  style="margin-top: 15px">
+            <el-table :data="currentHost.hasGpu" border style="width: 100%">
+              <el-table-column
+                prop="gpuInfo"
+                :label="$t('commons.table.name')"
+              />
+            </el-table>
+          </div>
+        </div>
+      </div>
+    </el-drawer>
 
-    <el-dialog
+    <!-- <el-dialog
       :title="$t('host.detail')"
       width="50%"
       :visible.sync="dialogDetailVisible"
@@ -216,7 +283,7 @@
           $t("commons.button.cancel")
         }}</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
 
     <el-dialog
       :title="$t('host.err_title')"
@@ -597,6 +664,62 @@ export default {
         font-weight: 400;
       }
     }
+  }
+}
+.node-detail {
+  .dialog {
+    height: 100%;
+  }
+  /deep/ .el-drawer__header {
+    font-size: 14px;
+    color: #2c2e33;
+    line-height: 22px;
+    font-weight: 500;
+    box-shadow: 0 1px 0 0 #e4e7f0;
+    padding: 17px;
+    margin-bottom: 24px;
+  }
+  /deep/ .el-drawer__body {
+    padding: 0 24px;
+    span {
+      font-size: 16px;
+      color: #2c2e33;
+      line-height: 24px;
+      font-weight: 400;
+    }
+  }
+  .myTable {
+    td {
+      &:nth-child(2n) {
+        font-weight: 500;
+        font-size: 14px;
+        color: #2c2e33;
+        line-height: 22px;
+      }
+      &:nth-child(2n + 1) {
+        font-size: 14px;
+        color: #2c2e33;
+        line-height: 22px;
+        font-weight: 400;
+      }
+    }
+  }
+  /deep/ .el-table {
+    td div {
+      font-size: 14px;
+      color: #2c2e33;
+      line-height: 22px;
+      font-weight: 400;
+    }
+    th div {
+      font-size: 14px;
+      color: #2c2e33;
+      line-height: 22px;
+      font-weight: 500;
+    }
+  }
+  /deep/ .complex-table__header{
+    display: block;
   }
 }
 </style>
