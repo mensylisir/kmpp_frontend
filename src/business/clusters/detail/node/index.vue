@@ -14,9 +14,10 @@
       :pagination-config="paginationConfig"
     >
       <template #header>
+        <div>
           <el-button
-          type="primary"
-          icon="el-icon-plus"
+            type="primary"
+            icon="el-icon-plus"
             size="small"
             :disabled="provider === '' || buttonDisabled()"
             @click="create()"
@@ -42,7 +43,7 @@
             @click="onCordon('uncordon')"
             >{{ $t("commons.button.active") }}</el-button
           >
-       
+        </div>
       </template>
 
       <el-table-column type="selection" fix></el-table-column>
@@ -1034,7 +1035,7 @@ export default {
   created() {
     this.clusterName = this.name;
     this.projectName = this.project;
-    console.log(this.project)
+    console.log(this.project);
     this.getCluster();
     this.search();
     this.polling();
@@ -1105,7 +1106,7 @@ export default {
       font-weight: 500;
     }
   }
-  /deep/ .complex-table__header{
+  /deep/ .complex-table__header {
     display: block;
   }
 }

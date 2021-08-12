@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding-top: 24px">
     <el-tabs v-model="activeName" tab-position="left" @tab-click="handleClick()" style="margin-bottom: 30px;"
              v-loading="loading">
       <el-tab-pane :label="$t('cluster.detail.backup.backup_recover')"
