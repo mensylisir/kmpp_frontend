@@ -6,7 +6,7 @@ html {
 }
 
 body {
-  font-family: Roboto, Helvetica, PingFang SC, Arial, sans-serif;
+  font-family: "PingFang Regular";
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -177,6 +177,19 @@ a:hover {
     padding-left: 5px;
   }
 }
+.el-menu.el-menu--horizontal{
+  border-bottom: unset;
+}
+.el-menu-item.is-active{
+  color: #5354bb !important;
+}
+.el-card__header{
+border-bottom: unset;
+font-size: 16px;
+color: #2C2E33;
+line-height: 24px;
+font-weight: 500;
+}
 
 .ko-tips {
   .el-dialog__body {
@@ -184,8 +197,21 @@ a:hover {
   }
 }
 
-.el-dialog__headerbtn .el-dialog__close {
-  color: #fa5d50;
+.el-dialog__wrapper {
+  .el-dialog__header{
+    padding: 16px 24px;
+    font-size: 16px;
+    color: #2C2E33;
+    line-height: 24px;
+    font-weight: 500;
+    box-shadow: 0 1px 0 0 #E4E7F0;
+  }
+  .el-dialog__body{
+    padding: 24px;
+  }
+  .el-dialog__footer{
+    box-shadow: 0 -1px 0 0 #E4E7F0;
+  }
 }
 
 .ko-status {

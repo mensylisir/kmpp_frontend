@@ -14,7 +14,7 @@ module.exports = {
       errors: true
     },
     proxy: {
-      '/api': {
+      '/api/v1': {
         target: 'http://172.30.1.98:8080',
         ws: true,
         secure: false,
@@ -23,6 +23,12 @@ module.exports = {
         target: 'http://172.30.1.98:8080',
         ws: true,
         secure: false,
+      },
+      '/api/project': {
+        target: 'http://192.168.80.32:32058',
+      },
+      '/auth': {
+        target: 'http://192.168.80.32:31492',
       },
     }
   },

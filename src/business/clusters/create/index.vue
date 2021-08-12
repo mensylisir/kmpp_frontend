@@ -572,9 +572,11 @@ export default {
       listProjectResourcesAll(this.form.projectName, "HOST").then((data) => {
         this.allHosts = []
         if (data.items !== null) {
+          
           for (const h of data.items) {
             if (h.status === "Running" && !h.clusterId) {
               this.allHosts.push({ name: h.name, architecture: h.architecture })
+
             }
           }
         }

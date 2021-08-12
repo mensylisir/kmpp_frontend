@@ -1,11 +1,9 @@
 <template>
-  <layout-content :header="$t('cluster.cluster')">
+  <layout-content header="集群管理">
     <complex-table local-key="cluster_columns" :selects.sync="clusterSelection" @selection-change="selectChange" :search-config="searchConfig" :data="data" :pagination-config="paginationConfig" @search="search" v-loading="loading">
       <template #header>
-        <el-button-group>
-          <el-button size="small" @click="onCreate()" v-permission="['ADMIN','PROJECT_MANAGER']" :disabled="true">
-            {{ $t("commons.button.create") }}
-          </el-button>
+        <div>
+          <el-button type="primary"  @click="onCreate()" v-permission="['ADMIN','PROJECT_MANAGER']" icon="el-icon-plus">{{ $t("commons.button.create") }}</el-button>
           <el-button size="small" @click="onImport()" v-permission="['ADMIN','PROJECT_MANAGER']">
             {{ $t("commons.button.import") }}
           </el-button>
@@ -18,7 +16,7 @@
           <el-button size="small" :disabled="clusterSelection.length < 1 || isDeleteButtonDisable" @click="onDelete()">
             {{ $t("commons.button.delete") }}
           </el-button>
-        </el-button-group>
+        </div>
       </template>
 
       <el-table-column type="selection" fix></el-table-column>
@@ -34,15 +32,15 @@
       <el-table-column :label="$t('commons.table.status')" min-width="100" prop="status">
         <template v-slot:default="{row}">
           <div v-if="row.status ==='Running'">
-            <span class="iconfont iconduihao" style="color: #32B350"></span>
+            <span class="iconfont icon-checkbox-circle-fill2" style="color: #32B350"></span>
             {{ $t("commons.status.running") }}
           </div>
           <div v-if="row.status === 'Failed'">
-            <span class="iconfont iconerror" style="color: #FA4147"></span> &nbsp; &nbsp; &nbsp;
+            <span class="iconfont icon-checkbox-circle-fill" style="color: #FA4147"></span> &nbsp; &nbsp; &nbsp;
             <el-link type="info" @click="getStatus(row)">{{ $t("commons.status.failed") }}</el-link>
           </div>
           <div v-if="row.status === 'Initializing'">
-            <i class="el-icon-loading" />&nbsp; &nbsp; &nbsp;
+            <i class="iconfont icon-refresh-fill" />&nbsp; &nbsp; &nbsp;
             <el-link type="info" @click="getStatus(row)"> {{ $t("commons.status.initializing") }}</el-link>
           </div>
           <div v-if="row.status === 'Upgrading' ">
@@ -145,7 +143,7 @@ export default {
       buttons: [
         {
           label: this.$t("commons.button.upgrade"),
-          icon: "el-icon-upload2",
+          icon: "iconfont icon-update-line",
           click: (row) => {
             this.onUpgrade(row)
           },
@@ -155,7 +153,7 @@ export default {
         },
         {
           label: this.$t("commons.button.check"),
-          icon: "el-icon-data-line",
+          icon: "iconfont icon-diagnostics-line",
           click: (row) => {
             this.onHealthCheck(row)
           },
@@ -165,7 +163,7 @@ export default {
         },
         {
           label: this.$t("commons.button.delete"),
-          icon: "el-icon-delete",
+          icon: "iconfont icon-delete-line",
           click: (row) => {
             this.onDelete(row)
           },
@@ -259,7 +257,6 @@ export default {
         let isExit = false
         let isAmdExit = false
         let isArmExit = false
-        console.log(row, '1111')
         switch (row.spec.architectures) {
           case "amd64":
             for (const repo of repoList) {
@@ -494,10 +491,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.dialog{
-  /deep/ .el-scrollbar__wrap {
-    height: 100%;
-    overflow-x: hidden;
+.complex-table__header{
+  justify-content: space-between;
+}
+/deep/ .el-button--mini.is-circle{
+  border: none;
+  i{
+    color: #BCC0CC;
   }
 }
 </style>

@@ -2,15 +2,13 @@
   <div>
     <complex-table :selects.sync="nsSelection" v-loading="loading" :data="data">
       <template #header>
-        <el-button-group>
-          <el-button size="small" @click="create()" :disabled="true">{{
+          <el-button size="small" type="primary" @click="create()" :disabled="true" icon="el-icon-plus">{{
             $t("commons.button.create")
           }}</el-button>
           <el-button size="small" :disabled="true">{{
             $t("commons.button.delete")
           }}</el-button>
           <!-- <el-button size="small" :disabled="nsSelection.length < 1" @click="onDelete()">{{$t('commons.button.delete')}}</el-button> -->
-        </el-button-group>
       </template>
 
       <el-table-column
@@ -106,6 +104,7 @@ import Rule from "@/utils/rules";
 export default {
   name: "ClusterNamespace",
   components: { ComplexTable },
+  props: ["name"],
   data() {
     return {
       loading: false,
@@ -296,7 +295,7 @@ export default {
     },
   },
   created() {
-    this.clusterName = this.$route.params.name;
+    this.clusterName = this.name;
     this.search();
     this.loadTools();
     this.polling();
