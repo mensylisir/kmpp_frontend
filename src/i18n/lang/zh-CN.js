@@ -328,7 +328,7 @@ const message = {
         log: "日志",
         tool: "工具",
         backup: "备份",
-        security: "CIS扫描",
+        security: "脆弱分析",
         grade: "集群评分",
       },
       overview: {
@@ -521,7 +521,7 @@ const message = {
         code: "编号",
         description: "描述",
         advise: "建议",
-        start_cis: "是否开始CIS扫描任务？",
+        start_cis: "是否开始脆弱分析任务？",
       },
       f5: {
         big_ip_addr: "BIG-IP 地址",

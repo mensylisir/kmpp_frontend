@@ -1,5 +1,5 @@
 <template>
-  <layout-content :header="$t('commons.button.import')" :back-to="{ name: 'ClusterList' }">
+  <layout-content header="导入集群" :back-to="{ name: 'ClusterList' }">
     <el-row>
       <el-col :span="4"><br /></el-col>
       <el-col :span="10">
