@@ -2,12 +2,15 @@
   <div>
     <complex-table :selects.sync="nsSelection" v-loading="loading" :data="data">
       <template #header>
-          <el-button size="small" type="primary" @click="create()" :disabled="true" icon="el-icon-plus">{{
+        <div>
+ <el-button size="small" type="primary" @click="create()" :disabled="true" icon="el-icon-plus">{{
             $t("commons.button.create")
           }}</el-button>
           <el-button size="small" :disabled="true">{{
             $t("commons.button.delete")
           }}</el-button>
+        </div>
+         
           <!-- <el-button size="small" :disabled="nsSelection.length < 1" @click="onDelete()">{{$t('commons.button.delete')}}</el-button> -->
       </template>
 
