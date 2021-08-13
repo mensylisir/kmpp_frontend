@@ -1,7 +1,7 @@
 <template>
   <layout-content>
     <div>
-      <el-collapse v-model="activeNames">
+      <el-collapse v-model="activeNames" style="margin-bottom: 24px">
         <el-collapse-item title="Istio-Pilot" name="1">
           <el-form :model="pilotCfg" ref="pilotCfg" label-width="200px">
             <el-form-item v-if="pilotCfg.cluster_istio.message">
