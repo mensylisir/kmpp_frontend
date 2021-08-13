@@ -78,8 +78,7 @@ export default {
 
 @mixin menu-item-active {
   font-weight: 600;
-  // color: white !important;
-  background-color: #5354bb;
+  background-color: #DCDFE9;
   &:hover {
     background-color: $menu-bg-color-hover;
   }
@@ -133,6 +132,7 @@ export default {
     .scrollbar-wrapper {
       height: 100%;
       overflow-x: hidden;
+      margin-left: 12px;
     }
   }
 
@@ -157,7 +157,7 @@ export default {
       @include menu-item;
 
       &:hover {
-        background-color: #2c3354;
+        background-color: #DCDFE9;
       }
 
       &.is-active {
@@ -187,7 +187,6 @@ export default {
 
           .sub-el-icon,
           span {
-            color: #fff;
           }
         }
       }
@@ -215,12 +214,8 @@ export default {
 
       .sub-el-icon {
         margin-right: 10px;
-        opacity: 0.65;
-        color: white;
         + span {
-          opacity: 0.65;
           padding-left: 0;
-          color: white;
         }
       }
     }
