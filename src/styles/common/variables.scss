@@ -16,22 +16,22 @@ $layout-bg-color: #F2F2F2;
 /* sidebar */
 $sidebar-open-width: 200px;
 $sidebar-close-width: 60px;
-$sidebar-bg-color: #30373d;
+$sidebar-bg-color: #F4F5F7;
 $sidebar-bg-gradient: linear-gradient(to bottom right, #30373D, #3E3E3D);
 
 /* menu */
 $menu-height: 50px; // 菜单项高度
-$menu-bg-color: transparent; // 菜单项背景
-$menu-bg-color-hover: #2c3354; // 菜单项hover背景
-$menu-color: #B6C0CD; // 菜单项字体颜色
-$menu-open-bg-color: #252B2F; // 菜单项展开背景
+$menu-bg-color: #F4F5F7; // 菜单项背景
+$menu-bg-color-hover: #DCDFE9; // 菜单项hover背景
+$menu-color: #4B5059; // 菜单项字体颜色
+$menu-open-bg-color: #F4F5F7; // 菜单项展开背景
 $menu-active-color: #FFF; // 菜单项激活时颜色
-$menu-active-bg-color: #5354bb; // 菜单项激活时背景
+$menu-active-bg-color: #DCDFE9; // 菜单项激活时背景
 
 $submenu-height: 40px; // 子菜单项高度
-$submenu-bg-color-hover: mix($menu-open-bg-color, #000, 80%); // 子菜单项hover背景
+$submenu-bg-color-hover: #DCDFE9; // 子菜单项hover背景
 $submenu-active-color: $menu-active-color; // 子菜单项激活时颜色
-$submenu-active-bg-color: transparent; // 子菜单项激活时背景
+$submenu-active-bg-color: #F4F5F7; // 子菜单项激活时背景
 
 $menu-active-prefix-color: $--color-ko; // 菜单激活前缀颜色
 $menu-active-prefix-width: 4px; // 菜单激活前缀宽度

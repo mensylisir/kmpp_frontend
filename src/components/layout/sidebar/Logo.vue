@@ -45,7 +45,7 @@ export default {
   data() {
     return {
       title: "FIT2CLOUD",
-      logo: require("@/assets/KubeOperator-white.svg"),
+      logo: require("@/assets/logo.svg"),
       collapseLogo: require("@/assets/favicon.svg"),
     };
   },
@@ -57,9 +57,10 @@ export default {
 
 .sidebar-logo-container {
   position: relative;
-  height: 80px;
+  height: 56px;
   line-height: $header-height;
   overflow: hidden;
+  box-shadow: inset 0 -1px 0 0 #dcdee4;
 
   &:after {
     content: "";

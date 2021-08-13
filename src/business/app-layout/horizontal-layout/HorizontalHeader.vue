@@ -37,7 +37,7 @@
   .horizontal-header {
     @include flex-row(flex-start, center);
     position: relative;
-    height: 100%;
+    height: 56px;
 
     .header-left {
       @include flex-row(flex-start, center);

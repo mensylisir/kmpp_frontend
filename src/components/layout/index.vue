@@ -42,7 +42,7 @@ export default {
   transition: width 0.28s;
   width: $sidebar-open-width;
   min-width: $sidebar-open-width;
-  background-color: #222740;
+  // background-color: #222740;
   // background-image: $sidebar-bg-gradient;
 
   &.is-collapse {
@@ -52,7 +52,8 @@ export default {
 }
 
 .header-container {
-  padding: 0 15px;
+  // padding: 0 15px;
+  box-shadow: inset 0 -1px 0 0 #DCDEE4;
 }
 
 .view-container {
@@ -60,6 +61,6 @@ export default {
   flex: auto;
   overflow: auto;
   box-sizing: border-box;
-  padding: 0 15px 15px 15px;
+  padding: 0 0 0 12px;
 }
 </style>
