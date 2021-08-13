@@ -6,12 +6,18 @@ const Manifest = {
   component: Layout,
   name: "Manifest",
   meta: {
-    title: "任务管理",
     icon: "iconfont icon-task",
     roles: ["ADMIN","PROJECT_MANAGER"]
   },
   children: [
-
+    {
+      path: 'list',
+      component: () => import('@/business/task'),
+      name: "taskList",
+      meta: {
+        title: "任务管理",
+      },
+    },
   ]
 }
 export default Manifest
