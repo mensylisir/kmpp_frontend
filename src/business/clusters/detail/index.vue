@@ -72,7 +72,7 @@
           </el-menu-item>
         </el-menu>
       </div>
-      <div class="separate"></div>
+      <!-- <div class="separate"></div> -->
       <div>
         <router-view></router-view>
       </div>

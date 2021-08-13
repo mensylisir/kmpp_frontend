@@ -76,4 +76,7 @@ export default {
     overflow-x: hidden;
   }
 }
+/deep/ .el-tabs__nav-wrap::after{
+  height: 0;
+}
 </style>
