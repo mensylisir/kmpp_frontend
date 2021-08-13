@@ -6,12 +6,18 @@ const Manifest = {
   component: Layout,
   name: "Manifest",
   meta: {
-    title: "证书管理",
     icon: "iconfont icon-certificationmanage",
     roles: ["ADMIN","PROJECT_MANAGER"]
   },
   children: [
-
+    {
+      path: 'list',
+      component: () => import('@/business/certificationManage'),
+      name: "list",
+      meta: {
+        title: "证书管理",
+      },
+    },
   ]
 }
 export default Manifest

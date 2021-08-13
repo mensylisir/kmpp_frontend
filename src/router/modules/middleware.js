@@ -11,7 +11,14 @@ const Manifest = {
     roles: ["ADMIN","PROJECT_MANAGER"]
   },
   children: [
-
+    {
+      path: 'list',
+      component: () => import('@/business/middleware'),
+      name: "middlewareList",
+      meta: {
+        title: "中间件管理",
+      },
+    },
   ]
 }
 export default Manifest
