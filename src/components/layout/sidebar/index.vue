@@ -133,6 +133,7 @@ export default {
       height: 100%;
       overflow-x: hidden;
       margin-left: 12px;
+      margin-right: 12px !important;
     }
   }
 

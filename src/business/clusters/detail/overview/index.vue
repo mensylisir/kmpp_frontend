@@ -107,7 +107,7 @@
         </el-col>
       </el-row>
     </div>
-    <div class="separate"></div>
+    <!-- <div class="separate"></div> -->
 
     <el-tabs v-model="activeName" class="bottom">
       <el-tab-pane name="Nodes">
@@ -325,7 +325,9 @@ export default {
 /deep/ .el-card {
   border: 1px solid #e4e7f0;
   border-left: 0;
+  border-bottom: 0;
   box-shadow: unset;
+  border-radius:unset;
   .el-card__header {
     padding: 24px 20px 5px 0;
     font-size: 16px;
@@ -426,5 +428,8 @@ export default {
 .empty {
   text-align: center;
   padding: 150px;
+}
+/deep/ .el-tabs__nav-wrap::after{
+  height: 1px;
 }
 </style>
