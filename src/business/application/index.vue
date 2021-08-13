@@ -61,7 +61,7 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="paginationConfig.currentPage"
-      :page-sizes="[20, 30, 40, 50]"
+      :page-sizes="[15,20, 30, 40, 50]"
       :page-size="paginationConfig.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="paginationConfig.total"
@@ -82,7 +82,7 @@ export default {
       tableData: [],
       paginationConfig: {
         currentPage: 1,
-        pageSize: 20,
+        pageSize: 15,
         total: 0,
       },
       // 项目类型
@@ -193,7 +193,7 @@ export default {
 
 <style lang="scss" scoped>
 /deep/ .el-table {
-  height: calc(100% - 100px);
+  // height: calc(100% - 100px);
   overflow: auto;
 }
 /deep/ .el-pagination {
