@@ -140,9 +140,34 @@
             }}</span></span
           >
         </div>
-        <div class="empty">
-          <img src="@/assets/images/data-empty.svg" /><br />
-          <span>暂无数据~</span>
+        <div>
+          <complex-table
+            v-loading="loading"
+            @search="search1"
+            v-if="deployments.length > 0"
+            :data="deploymentList"
+            :pagination-config="paginationConfig"
+          >
+            <el-table-column prop="name" label="名称">
+              <template v-slot:default="{ row }">
+                <span>{{ row.metadata.name }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="ready" width="120">
+              <template v-slot:default="{ row }">
+                {{ row.status.availableReplicas }}/{{ row.spec.replicas }}
+              </template>
+            </el-table-column>
+            <el-table-column label="创建时间" width="180">
+              <template v-slot:default="{ row }">
+                {{ rTime(row.metadata.creationTimestamp) }}
+              </template>
+            </el-table-column>
+          </complex-table>
+          <div class="empty" v-else>
+            <img src="@/assets/images/data-empty.svg" /><br />
+            <span>暂无数据~</span>
+          </div>
         </div>
       </el-tab-pane>
       <el-tab-pane label="Pods" name="Pods">
@@ -152,9 +177,32 @@
             >Pods<br /><span class="number">{{ pods.length }}</span></span
           >
         </div>
-        <div class="empty">
-          <img src="@/assets/images/data-empty.svg" /><br />
-          <span>暂无数据~</span>
+        <div>
+          <complex-table
+            v-if="pods.length > 0"
+            :data="podsList"
+            :pagination-config="paginationConfig1"
+          >
+            <el-table-column prop="name" label="名称">
+              <template slot-scope="scope">
+                <span>{{ scope.row.metadata.name }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="状态" width="120">
+              <template slot-scope="scope">
+                <span>{{ scope.row.status.phase }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="创建时间" width="180">
+              <template slot-scope="scope">
+                {{ rTime(scope.row.metadata.creationTimestamp) }}
+              </template>
+            </el-table-column>
+          </complex-table>
+          <div class="empty" v-else>
+            <img src="@/assets/images/data-empty.svg" /><br />
+            <span>暂无数据~</span>
+          </div>
         </div></el-tab-pane
       >
     </el-tabs>
@@ -172,10 +220,11 @@ import { listNamespace } from "@/api/cluster/namespace";
 import { getClusterByName } from "@/api/cluster";
 import node from "../node/index.vue";
 import namespace from "../namespace/index.vue";
+import ComplexTable from "@/components/complex-table";
 
 export default {
   name: "ClusterOverview",
-  components: { node, namespace },
+  components: { node, namespace, ComplexTable },
   data() {
     return {
       loading_chart: false,
@@ -212,14 +261,60 @@ export default {
       activeName: "",
       project: "",
       name: "",
+      paginationConfig: {
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
+      },
+      paginationConfig1: {
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
+      },
+      loading: false,
     };
   },
   watch: {
     activeName: function () {},
   },
+  computed: {
+    deploymentList() {
+      let result = this.deployments.filter((item, index) => {
+        return (
+          this.paginationConfig.pageSize *
+            (this.paginationConfig.currentPage - 1) <=
+            index &&
+          index <
+            this.paginationConfig.pageSize * this.paginationConfig.currentPage
+        );
+      });
+      return result;
+    },
+    podsList() {
+      let result = this.pods.filter((item, index) => {
+        return (
+          this.paginationConfig1.pageSize *
+            (this.paginationConfig1.currentPage - 1) <=
+            index &&
+          index <
+            this.paginationConfig1.pageSize * this.paginationConfig1.currentPage
+        );
+      });
+      return result;
+    },
+  },
   methods: {
+    rTime(timestamp) {
+      let date = new Date(new Date(timestamp).getTime() + 8 * 3600 * 1000);
+      date = date.toJSON();
+      date = date.substring(0, 19).replace("T", " ");
+      return date;
+    },
     downloadKubeConfig() {
       window.open(`/api/v1/clusters/kubeconfig/${this.clusterName}`, "_blank");
+    },
+    search1() {
+      // const { currentPage, pageSize } = this.paginationConfig;
     },
     search() {
       this.loading_chart = true;
@@ -265,6 +360,7 @@ export default {
         this.podUsagePercent = Math.round(
           (this.pods.length / this.podLimit) * 100
         );
+        this.paginationConfig1.total = data.items.length
       });
     },
     loadNodes() {
@@ -283,24 +379,40 @@ export default {
     loadDeployments() {
       listDeployment(this.clusterName).then((data) => {
         this.deployments = data.items;
+        this.paginationConfig.total = data.items.length;
       });
     },
     loadNodesUsages() {
       listNodesUsage(this.clusterName).then((data) => {
         let metrics = data.items;
+        let unit = "";
         metrics.forEach((me) => {
-          const c = me.usage.cpu.replace("m", "");
+          let c = "";
+          if (me.usage.cpu.indexOf("m") > -1) {
+            c = me.usage.cpu.replace("m", "");
+            unit = "m";
+          }
+          if (me.usage.cpu.indexOf("n") > -1) {
+            c = me.usage.cpu.replace("n", "");
+            unit = "n";
+          }
           this.cpuUsage = this.cpuUsage + Number(c);
           const m = me.usage.memory.replace("Ki", "");
           this.memUsage = this.memUsage + Number(m);
         });
-        // this.cpuUsage = this.cpuUsage / (1000 * 1000 * 1000)
         this.memUsagePercent = Math.round(
           (this.memUsage / this.memTotal) * 100
         );
-        this.cpuUsagePercent = Math.round(
-          (this.cpuUsage / (this.cpuTotal * 1000)) * 100
-        );
+        if (unit === "n") {
+          this.cpuUsage = this.cpuUsage / (1000 * 1000 * 1000);
+          this.cpuUsagePercent = Math.round(
+            (this.cpuUsage / this.cpuTotal) * 100
+          );
+        } else if (unit === "m") {
+          this.cpuUsagePercent = Math.round(
+            (this.cpuUsage / (this.cpuTotal * 1000)) * 100
+          );
+        }
         this.loading_chart = false;
       });
     },
@@ -327,7 +439,7 @@ export default {
   border-left: 0;
   border-bottom: 0;
   box-shadow: unset;
-  border-radius:unset;
+  border-radius: unset;
   .el-card__header {
     padding: 24px 20px 5px 0;
     font-size: 16px;
@@ -429,7 +541,7 @@ export default {
   text-align: center;
   padding: 150px;
 }
-/deep/ .el-tabs__nav-wrap::after{
+/deep/ .el-tabs__nav-wrap::after {
   height: 1px;
 }
 </style>

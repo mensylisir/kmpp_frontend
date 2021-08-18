@@ -1,17 +1,27 @@
 <template>
   <div>
-    <complex-table :selects.sync="nsSelection" v-loading="loading" :data="data">
+    <complex-table
+      :selects.sync="nsSelection"
+      v-loading="loading"
+      :data="nameSpaceList"
+      :pagination-config="paginationConfig"
+    >
       <template #header>
         <div>
- <el-button size="small" type="primary" @click="create()" :disabled="true" icon="el-icon-plus">{{
-            $t("commons.button.create")
-          }}</el-button>
+          <el-button
+            size="small"
+            type="primary"
+            @click="create()"
+            :disabled="true"
+            icon="el-icon-plus"
+            >{{ $t("commons.button.create") }}</el-button
+          >
           <el-button size="small" :disabled="true">{{
             $t("commons.button.delete")
           }}</el-button>
         </div>
-         
-          <!-- <el-button size="small" :disabled="nsSelection.length < 1" @click="onDelete()">{{$t('commons.button.delete')}}</el-button> -->
+
+        <!-- <el-button size="small" :disabled="nsSelection.length < 1" @click="onDelete()">{{$t('commons.button.delete')}}</el-button> -->
       </template>
 
       <el-table-column
@@ -140,7 +150,26 @@ export default {
       data: [],
       ps: [],
       timer: {},
+      paginationConfig: {
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
+      },
     };
+  },
+    computed: {
+    nameSpaceList() {
+      let result = this.data.filter((item, index) => {
+        return (
+          this.paginationConfig.pageSize *
+            (this.paginationConfig.currentPage - 1) <=
+            index &&
+          index <
+            this.paginationConfig.pageSize * this.paginationConfig.currentPage
+        );
+      });
+      return result;
+    },
   },
   methods: {
     search() {
@@ -148,6 +177,8 @@ export default {
       listNamespace(this.clusterName)
         .then((data) => {
           this.data = data.items;
+          this.paginationConfig.total = data.items.length;
+
           this.loading = false;
         })
         .catch(() => {
