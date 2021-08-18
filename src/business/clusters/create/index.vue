@@ -14,11 +14,11 @@
                         <div v-if="!nameValid"><span class="input-error">{{$t('cluster.creation.name_invalid_err')}}</span></div>
                         <div><span class="input-help">{{$t('cluster.creation.name_help')}}</span></div>
                       </el-form-item>
-                      <el-form-item :label="$t('project.project')" prop="projectName">
+                      <!-- <el-form-item :label="$t('project.project')" prop="projectName">
                         <el-select filterable style="width: 100%" @change="loadProjectResource" v-model.number="form.projectName" clearable>
                           <el-option v-for="item of projects" :key="item.name" :value="item.name">{{item.name}}</el-option>
                         </el-select>
-                      </el-form-item>
+                      </el-form-item> -->
                       <el-form-item :label="$t('cluster.creation.provider')" prop="provider">
                         <el-select style="width: 100%" v-model="form.provider" clearable>
                           <el-option value="bareMetal" :label="$t('cluster.creation.provide_bare_metal')">{{$t('cluster.creation.provide_bare_metal')}}</el-option>
@@ -139,9 +139,9 @@
                 <el-card>
                   <el-form-item :label="$t ('cluster.creation.network_type')" prop="networkType">
                     <el-select @change="getDefaultFlannelBackend" style="width: 100%" v-model="form.networkType" clearable>
-                      <el-option value="flannel">flannel</el-option>
+                      <!-- <el-option value="flannel">flannel</el-option> -->
                       <el-option value="calico">calico</el-option>
-                      <el-option v-if="form.architectures === 'amd64'" value="cilium">cilium</el-option>
+                      <!-- <el-option v-if="form.architectures === 'amd64'" value="cilium">cilium</el-option> -->
                     </el-select>
                     <div v-if="form.networkType==='cilium'"><span class="input-help">{{$t('cluster.creation.cilium_help')}}</span></div>
                   </el-form-item>
@@ -178,7 +178,7 @@
                     <el-form-item :label="$t('cluster.creation.flannel_backend')" prop="calicoIpv4PoolIpip">
                       <el-select style="width: 100%" v-model="form.calicoIpv4PoolIpip" clearable>
                         <el-option value="off" label="bgp">bgp</el-option>
-                        <el-option value="Always" label="ipip">ipip</el-option>
+                        <!-- <el-option value="Always" label="ipip">ipip</el-option> -->
                       </el-select>
                       <div v-if="form.calicoIpv4PoolIpip === 'off'">
                         <div><span class="input-help">{{$t('cluster.creation.flannel_backend_help_route_base')}}</span></div>
@@ -242,13 +242,13 @@
                   <el-form-item label="helm:" prop="helmVersion">
                     <el-select style="width: 100%" v-model="form.helmVersion" clearable>
                       <el-option value="v3">v3</el-option>
-                      <el-option value="v2">v2</el-option>
+                      <!-- <el-option value="v2">v2</el-option> -->
                     </el-select>
                   </el-form-item>
                   <el-form-item :label="$t ('cluster.creation.ingress_type')" prop="ingressControllerType">
                     <el-select style="width: 100%" v-model="form.ingressControllerType" clearable>
                       <el-option value="nginx">nginx</el-option>
-                      <el-option v-if="versionHigher206() || form.enableDnsCache === 'disable'" value="traefik">traefik</el-option>
+                      <!-- <el-option v-if="versionHigher206() || form.enableDnsCache === 'disable'" value="traefik">traefik</el-option> -->
                     </el-select>
                   </el-form-item>
                   <el-form-item :label="$t ('cluster.creation.support_gpu')" prop="supportGpu">
@@ -440,7 +440,7 @@ export default {
   data() {
     return {
       form: {
-        projectName: "",
+        projectName: "kubeoperator",
         name: "",
         provider: "bareMetal",
         version: "",
@@ -462,9 +462,9 @@ export default {
 
         networkInterface: "",
         networkCidr: "",
-        networkType: "flannel",
+        networkType: "calico",
         flannelBackend: "vxlan",
-        calicoIpv4PoolIpip: "Always",
+        calicoIpv4PoolIpip: "bgp",
         ciliumVersion: "v1.9.5",
         ciliumNativeRoutingCidr: "10.244.0.0/18",
         ciliumTunnelMode: "",
@@ -517,13 +517,13 @@ export default {
       validateCluster: false,
       loading: false,
       helmVersions: ["v3", "v2"],
-      part1Options: ["192", "172", "10"],
-      part2Options: [],
-      part3Options: [],
-      parts: ["192", "168", "0", "0", "16"],
+      part1Options: ["10"],
+      part2Options: ["233"],
+      part3Options: ["64"],
+      parts: ["10", "233", "64", "0", "18"],
       podMaxNumOptions: [32, 64, 128, 256],
       serviceMaxNumOptions: [32, 64, 128, 256, 512, 1024, 2048, 4096],
-      maskOptions: [],
+      maskOptions: ["18"],
       maxNodesNum: 255,
       multi_network: "disable",
       masters: [],
@@ -643,70 +643,70 @@ export default {
       }
     },
     onPart1Change() {
-      this.part2Options = []
-      switch (this.parts[0]) {
-        case "192":
-          this.part2Options = ["168"]
-          this.parts[1] = this.part2Options[0]
-          this.maskOptions = [].concat(["16", "17", "18", "19"])
-          this.parts[4] = this.maskOptions[0]
-          break
-        case "172":
-          for (let i = 16; i < 32; i++) {
-            if (i !== 17) {
-              this.part2Options.push(i + "")
-            }
-          }
-          this.parts[1] = this.part2Options[0]
-          this.maskOptions = [].concat(["16", "17", "18", "19"])
-          this.parts[4] = this.maskOptions[0]
-          break
-        case "10":
-          this.parts[1] = this.part2Options[0]
-          this.maskOptions = [].concat(["14", "15", "16", "17", "18", "19"])
-          this.parts[4] = this.maskOptions[0]
-          break
-      }
-      this.onMaskChange()
+      // this.part2Options = ['233']
+      // switch (this.parts[0]) {
+      //   case "192":
+      //     this.part2Options = ["168"]
+      //     this.parts[1] = this.part2Options[0]
+      //     this.maskOptions = [].concat(["16", "17", "18", "19"])
+      //     this.parts[4] = this.maskOptions[0]
+      //     break
+      //   case "172":
+      //     for (let i = 16; i < 32; i++) {
+      //       if (i !== 17) {
+      //         this.part2Options.push(i + "")
+      //       }
+      //     }
+      //     this.parts[1] = this.part2Options[0]
+      //     this.maskOptions = [].concat(["16", "17", "18", "19"])
+      //     this.parts[4] = this.maskOptions[0]
+      //     break
+      //   case "10":
+      //     this.parts[1] = this.part2Options[0]
+      //     this.maskOptions = [].concat(["14", "15", "16", "17", "18", "19"])
+      //     this.parts[4] = this.maskOptions[0]
+      //     break
+      // }
+      // this.onMaskChange()
     },
     onMaskChange() {
-      this.part3Options = []
-      const mask = Number(this.parts[4])
-      if (this.parts[0] === "192" || this.parts[0] === "172") {
-        const a = Math.pow(2, 32 - mask - 8)
-        const selects = []
-        for (let i = 0; i < 256; i += a) {
-          selects.push(i)
-        }
-        this.part3Options = selects
-        this.parts[2] = this.part3Options[0]
-      }
-      if (this.parts[0] === "10") {
-        if (mask < 16) {
-          const a = Math.pow(2, 32 - mask - 16)
-          const selects = []
-          for (let i = 0; i < 256; i += a) {
-            selects.push(i)
-          }
-          this.part2Options = selects
-          this.parts[1] = this.part2Options[0]
-        } else {
-          const select1 = []
-          for (let i = 0; i < 256; i++) {
-            select1.push(i)
-          }
-          this.part2Options = select1
-          this.parts[1] = this.part2Options[0]
-          const a = Math.pow(2, 32 - mask - 8)
-          const selects = []
-          for (let i = 0; i < 256; i += a) {
-            selects.push(i)
-          }
-          this.part3Options = selects
-          this.parts[2] = this.part3Options[0]
-        }
-      }
-      this.getNodeNum()
+      // this.part3Options = []
+      // const mask = Number(this.parts[4])
+      // if (this.parts[0] === "192" || this.parts[0] === "172") {
+      //   const a = Math.pow(2, 32 - mask - 8)
+      //   const selects = []
+      //   for (let i = 0; i < 256; i += a) {
+      //     selects.push(i)
+      //   }
+      //   this.part3Options = selects
+      //   this.parts[2] = this.part3Options[0]
+      // }
+      // if (this.parts[0] === "10") {
+      //   if (mask < 16) {
+      //     const a = Math.pow(2, 32 - mask - 16)
+      //     const selects = []
+      //     for (let i = 0; i < 256; i += a) {
+      //       selects.push(i)
+      //     }
+      //     this.part2Options = selects
+      //     this.parts[1] = this.part2Options[0]
+      //   } else {
+      //     const select1 = []
+      //     for (let i = 0; i < 256; i++) {
+      //       select1.push(i)
+      //     }
+      //     this.part2Options = select1
+      //     this.parts[1] = this.part2Options[0]
+      //     const a = Math.pow(2, 32 - mask - 8)
+      //     const selects = []
+      //     for (let i = 0; i < 256; i += a) {
+      //       selects.push(i)
+      //     }
+      //     this.part3Options = selects
+      //     this.parts[2] = this.part3Options[0]
+      //   }
+      // }
+      // this.getNodeNum()
     },
     getDefaultTunnelMode() {
       if (this.form.flannelBackend === "Overlay") {
