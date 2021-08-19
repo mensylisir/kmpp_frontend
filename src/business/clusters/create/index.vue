@@ -559,7 +559,7 @@ export default {
       allProjects().then((data) => {
         this.projects = data.items
         if (data.items !== null && data.items.length > 0) {
-          this.form.projectName = data.items[0].name
+          // this.form.projectName = data.items[0].name
           this.loadProjectResource()
         }
       })
