@@ -61,6 +61,33 @@ const Host = {
         roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"]
       }
     },
+    {
+      path: 'middle',
+      component: () => import('@/business/hosts/middleware/index'),
+      name: "middle",
+      meta: {
+        title: "中间件",
+        roles: ['ADMIN', "PROJECT_MANAGER"]
+      },
+    },
+    {
+      path: 'tool',
+      component: () => import('@/business/hosts/tool/index'),
+      name: "tool",
+      meta: {
+        title: "工具",
+        roles: ['ADMIN', "PROJECT_MANAGER"]
+      },
+    },
+    {
+      path: 'certification',
+      component: () => import('@/business/hosts/certification/index'),
+      name: "certification",
+      meta: {
+        title: "证书",
+        roles: ['ADMIN', "PROJECT_MANAGER"]
+      },
+    },
   ]
 }
 export default Host

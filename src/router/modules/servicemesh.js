@@ -6,7 +6,7 @@ const serviceMesh = {
   component: Layout,
   name: "serviceMesh",
   meta: {
-    title: "服务网格",
+    title: "ServiceMesh",
     icon: "iconfont icon-servicemesh",
   },
   children: [

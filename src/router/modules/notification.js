@@ -2,11 +2,11 @@ import Layout from "@/business/app-layout/horizontal-layout"
 
 const notification = {
   path: "/notification",
-  sort: 7,
+  sort: 3,
   component: Layout,
   name: "Manifest",
   meta: {
-    title: "消息中心",
+    title: "日志中心",
     icon: "iconfont icon-notification",
   },
   children: [
