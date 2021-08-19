@@ -1,5 +1,5 @@
 <template>
-  <layout-content header="任务管理">
+  <layout-content header="授权中心">
 
   </layout-content>
 </template>

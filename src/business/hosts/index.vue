@@ -421,6 +421,7 @@ export default {
       loading: false,
       isAdmin: checkPermission("ADMIN"),
       timer: {},
+      cluster: ""
     };
   },
   methods: {

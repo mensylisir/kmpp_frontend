@@ -2,7 +2,7 @@ import Layout from "@/business/app-layout/horizontal-layout"
 
 const Manifest = {
   path: "/certificationmanage",
-  sort: 4,
+  sort: 2,
   component: Layout,
   name: "Manifest",
   meta: {
@@ -15,7 +15,7 @@ const Manifest = {
       component: () => import('@/business/certificationManage'),
       name: "list",
       meta: {
-        title: "证书管理",
+        title: "监控中心",
       },
     },
   ]

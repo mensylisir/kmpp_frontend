@@ -1,5 +1,5 @@
 <template>
-  <layout-content header="证书管理">
+  <layout-content header="监控中心">
 
   </layout-content>
 </template>

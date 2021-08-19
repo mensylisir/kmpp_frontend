@@ -15,7 +15,7 @@ const Manifest = {
       component: () => import('@/business/certification'),
       name: "certificationList",
       meta: {
-        title: "认证授权",
+        title: "Serverless",
       },
     },
   ]

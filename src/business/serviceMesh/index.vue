@@ -1,5 +1,5 @@
 <template>
-  <layout-content :header="$t('serviceMesh.title')">
+  <layout-content header="serviceMesh">
     <span>集群名称：</span>
     <el-select
       v-model="cluster"

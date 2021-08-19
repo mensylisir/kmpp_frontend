@@ -1,5 +1,5 @@
 <template>
-  <layout-content :header="$t('notification.title')">
+  <layout-content header="日志中心">
     <span>集群名称：</span>
     <el-select
       v-model="cluster"
