@@ -88,6 +88,15 @@ const Host = {
         roles: ['ADMIN', "PROJECT_MANAGER"]
       },
     },
+    {
+      path: 'apiNetWork',
+      component: () => import('@/business/hosts/apiNetWork/index'),
+      name: "certification",
+      meta: {
+        title: "api网关",
+        roles: ['ADMIN', "PROJECT_MANAGER"]
+      },
+    },
   ]
 }
 export default Host
