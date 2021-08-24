@@ -71,7 +71,7 @@
                       <el-option
                         disabled
                         label="选择备份账号"
-                        value=""
+                        value="label"
                         class="label"
                       >
                       </el-option>
@@ -86,9 +86,9 @@
                         </el-option>
                       </div>
                       <div v-else class="empty">暂无数据</div>
-                      <el-option label="" value="" class="created" @click="goCreated">
+                      <div class="created" @click="goCreated">
                         + 新建备份账号
-                      </el-option>
+                      </div>
                     </el-select>
                     <div>
                       <span class="input-help">{{
@@ -314,6 +314,11 @@
         </complex-table>
       </el-tab-pane>
     </el-tabs>
+    <Created
+      :dialogFormVisible="dialogFormVisible"
+      @cancel="cancel"
+      :clusterName="clusterName"
+    ></Created>
   </div>
 </template>
 
@@ -331,10 +336,11 @@ import {
   deleteBackupFile,
 } from "@/api/cluster/backup";
 import Rule from "@/utils/rules";
+import Created from "./created.vue";
 
 export default {
   name: "ClusterBackup",
-  components: { ComplexTable },
+  components: { ComplexTable, Created },
   data() {
     return {
       loading: false,
@@ -367,12 +373,21 @@ export default {
       logs: [],
       selects: [],
       timer: {},
+      dialogFormVisible: false,
     };
   },
   methods: {
     // 创建账号
-    goCreated(){
-
+    goCreated() {
+      this.dialogFormVisible = true;
+    },
+    cancel(val) {
+      if (val) {
+        listBackupAccounts(this.clusterName).then((res) => {
+          this.backupAccounts = res;
+        });
+      }
+      this.dialogFormVisible = false;
     },
     search() {
       if (this.activeName === this.$t("cluster.detail.backup.backup_recover")) {
@@ -570,6 +585,11 @@ export default {
 }
 .created {
   border-top: 1px solid #d9dee9;
+  cursor: pointer;
+  line-height: 34px;
+  padding-left: 20px;
+  color: #5354bb;
+  font-weight: bold;
 }
 .empty {
   color: #606266;

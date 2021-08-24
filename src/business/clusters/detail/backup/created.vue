@@ -1,16 +1,15 @@
 <template>
   <div class="dialog">
-    <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
+    <el-dialog title="新建备份账号" :visible.sync="visible" @close="onCancel()">
       <el-form
-        ref="form"
-        v-loading="loading"
+        ref="createForm"
         label-position="left"
         :rules="rules"
         :model="form"
         label-width="160px"
       >
         <el-form-item :label="$t('commons.table.name')" prop="name">
-          <el-input v-model="form.name"></el-input>
+          <el-input v-model="form.name" @blur="getBucketOption"></el-input>
           <div>
             <span class="input-help">{{
               $t("commons.validate.name_help")
@@ -22,6 +21,7 @@
             style="width: 100%"
             v-model="form.type"
             :placeholder="$t('commons.validate.select')"
+            @change="getBucketOption"
           >
             <el-option
               v-for="item in typeOptions"
@@ -34,19 +34,20 @@
           </el-select>
         </el-form-item>
         <el-form-item
-          v-if="form.type === 'OSS' || form.type === 'S3'"
+          v-if="form.type === 'OSS' || form.type === 'MINIO'"
           label="AccessKey"
           prop="credentialVars.accessKey"
         >
-          <el-input v-model="form.credentialVars['accessKey']"></el-input>
+          <el-input v-model="form.credentialVars['accessKey']" @blur="getBucketOption"></el-input>
         </el-form-item>
         <el-form-item
-          v-if="form.type === 'OSS' || form.type === 'S3'"
+          v-if="form.type === 'OSS' || form.type === 'MINIO'"
           label="SecretKey"
           prop="credentialVars.secretKey"
         >
           <el-input
             type="password"
+            @blur="getBucketOption"
             v-model="form.credentialVars['secretKey']"
           ></el-input>
         </el-form-item>
@@ -55,7 +56,7 @@
           :label="$t('backup_account.table.accountName')"
           prop="credentialVars.accountName"
         >
-          <el-input v-model="form.credentialVars['accountName']"></el-input>
+          <el-input v-model="form.credentialVars['accountName']" @blur="getBucketOption"></el-input>
         </el-form-item>
         <el-form-item
           v-if="form.type === 'AZURE'"
@@ -65,21 +66,22 @@
           <el-input
             type="password"
             v-model="form.credentialVars['accountKey']"
+            @blur="getBucketOption"
           ></el-input>
         </el-form-item>
         <el-form-item
-          v-if="form.type === 'S3'"
+          v-if="form.type === 'MINIO'"
           :label="$t('backup_account.table.region')"
           prop="credentialVars.region"
         >
-          <el-input v-model="form.credentialVars['region']"></el-input>
+          <el-input v-model="form.credentialVars['region']" @blur="getBucketOption"></el-input>
         </el-form-item>
         <el-form-item
           v-if="form.type !== 'SFTP'"
           :label="$t('backup_account.table.endpoint')"
           prop="credentialVars.endpoint"
         >
-          <el-input v-model="form.credentialVars['endpoint']"></el-input>
+          <el-input v-model="form.credentialVars['endpoint']" @blur="getBucketOption"></el-input>
         </el-form-item>
         <el-form-item
           v-if="form.type !== 'SFTP'"
@@ -90,6 +92,7 @@
             style="width: 100%"
             v-model="form.bucket"
             :placeholder="$t('commons.validate.select')"
+            :disabled="!bucketShow"
           >
             <el-option v-for="item in buckets" :key="item" :value="item">
             </el-option>
@@ -136,7 +139,7 @@
           </el-form-item>
         </div>
         <!-- SFTP Option end-->
-        <el-form-item :label="$t('host.project_auth')" prop="projects" required>
+        <!-- <el-form-item :label="$t('host.project_auth')" prop="projects" required>
           <el-select
             v-model="form.projects"
             multiple
@@ -153,7 +156,7 @@
             >
             </el-option>
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item :label="$t('host.cluster_auth')" prop="clusters">
           <el-select
             v-model="form.clusters"
@@ -162,16 +165,10 @@
             filterable
             reserve-keyword
           >
-            <el-option
-              v-for="(item, index) in clusters"
-              :key="index"
-              :label="item"
-              :value="item"
-            >
-            </el-option>
+            <el-option :label="clusterName" :value="clusterName"> </el-option>
           </el-select>
         </el-form-item>
-        <div style="float: right">
+        <!-- <div >
           <el-form-item>
             <el-button v-if="form.type !== 'SFTP'" plain @click="getBuckets">{{
               $t("commons.button.getBucket")
@@ -183,34 +180,32 @@
               $t("commons.button.submit")
             }}</el-button>
           </el-form-item>
-        </div>
+        </div> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false"
-          >确 定</el-button
-        >
+        <el-button @click="onCancel()">取 消</el-button>
+        <el-button type="primary" @click="onSubmit">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 <script>
 import { createBackupAccounts, listBuckets } from "@/api/backup-account";
-import { allProjects } from "@/api/projects";
+// import { allProjects } from "@/api/projects";
 import { getClusterByProject } from "@/api/cluster";
 import Rule from "@/utils/rules";
 
 export default {
   name: "RegistryCreate",
-  components: {  },
-  props: ["dialogFormVisible"],
+  components: {},
+  props: ["dialogFormVisible", "clusterName"],
   data() {
     return {
       form: {
-        projects: [],
+        projects: ["kubeoperator"],
         clusters: [],
         name: "",
-        type: "",
+        type: "MINIO",
         bucket: "",
         credentialVars: {},
       },
@@ -231,30 +226,59 @@ export default {
         },
       },
       typeOptions: [
+        // {
+        //   value: "OSS",
+        // },
         {
-          value: "OSS",
+          value: "MINIO",
         },
-        {
-          value: "S3",
-        },
-        {
-          value: "SFTP",
-        },
-        {
-          label: "Azure",
-          value: "AZURE",
-        },
+        // {
+        //   value: "SFTP",
+        // },
+        // {
+        //   label: "Azure",
+        //   value: "AZURE",
+        // },
       ],
       formLabelWidth: "120px",
       buckets: [],
       loading: false,
       projects: [],
       clusters: [],
+      visible: false,
     };
   },
+  watch: {
+    dialogFormVisible: function (val) {
+      if (val) {
+        this.visible = val;
+      } else {
+        this.visible = false;
+      }
+    },
+  },
+  computed: {
+    bucketShow() {
+      let result =
+        this.form.name &&
+        this.form.type &&
+        this.form.credentialVars.region &&
+        this.form.credentialVars.endpoint
+          ? true
+          : false;
+      console.log(result);
+      return result;
+    },
+  },
   methods: {
+    // 获取桶选项
+    getBucketOption() {
+      if (this.bucketShow) {
+        this.getBuckets();
+      }
+    },
     onSubmit() {
-      this.$refs.form.validate((valid) => {
+      this.$refs.createForm.validate((valid) => {
         if (!valid) {
           return false;
         }
@@ -273,15 +297,19 @@ export default {
               type: "success",
               message: this.$t("commons.msg.create_success"),
             });
-            this.$router.push({ name: "BackupAccount" });
+            this.onCancel('submit')
           })
           .finally(() => {
             this.loading = false;
           });
       });
     },
-    onCancel() {
-      this.$router.push({ name: "BackupAccount" });
+    onCancel(val) {
+      this.$refs.createForm.resetFields();
+      if(val === 'submit'){
+        this.$emit("cancel", true);
+      }
+       this.$emit("cancel");
     },
     getClusters() {
       this.clusters = [];
@@ -299,6 +327,7 @@ export default {
     },
     getBuckets() {
       this.loading = true;
+      console.log(this.form.credentialVars);
       listBuckets({
         name: this.form.name,
         type: this.form.type,
@@ -314,10 +343,10 @@ export default {
     },
   },
   created() {
-    this.form.type = "SFTP";
-    allProjects().then((res) => {
-      this.projects = res.items;
-    });
+    this.form.clusters.push(this.clusterName);
+    // allProjects().then((res) => {
+    //   this.projects = res.items;
+    // });
   },
 };
 </script>
