@@ -16,7 +16,7 @@
           mode="horizontal"
         >
           <el-menu-item
-            :index="'/clusters/detail/' + project + '/' + name + '/overview'"
+            :index="'/clusters/detail/' + name + '/overview'"
           >
             {{ $t("cluster.detail.tag.overview") }}
           </el-menu-item>
@@ -28,22 +28,22 @@
             :index="'/clusters/detail/' + project + '/' + name + '/namespace'"
             >{{ $t("cluster.detail.tag.namespace") }}</el-menu-item
           > -->
-          <!-- <el-menu-item :index="'/clusters/detail/'+project+'/'+name+'/storage'">{{$t('cluster.detail.tag.storage')}}</el-menu-item> -->
+          <el-menu-item :index="'/clusters/detail/'+name+'/storage'">{{$t('cluster.detail.tag.storage')}}</el-menu-item>
           <!-- <el-menu-item :index="'/clusters/detail/'+project+'/'+name+'/event'">{{$t('cluster.detail.tag.event')}}</el-menu-item> -->
           <el-menu-item
             v-if="isPrometheusOn"
-            :index="'/clusters/detail/' + project + '/' + name + '/monitor'"
+            :index="'/clusters/detail/' + name + '/monitor'"
           >
             {{ $t("cluster.detail.tag.monitor") }}
           </el-menu-item>
           <el-menu-item
             v-if="isLoggingOn"
-            :index="'/clusters/detail/' + project + '/' + name + '/logging'"
+            :index="'/clusters/detail/' + name + '/logging'"
             >{{ $t("cluster.detail.tag.log") }}
           </el-menu-item>
           <el-menu-item
             v-if="isLokiOn"
-            :index="'/clusters/detail/' + project + '/' + name + '/loki'"
+            :index="'/clusters/detail/' + name + '/loki'"
             >{{ $t("cluster.detail.tag.log") }}
           </el-menu-item>
           <!-- <el-menu-item
@@ -52,22 +52,22 @@
           > -->
           <!-- <el-menu-item v-if="arch === 'amd64'" :index="'/clusters/detail/'+project+'/'+name+'/istio'">Istio</el-menu-item> -->
           <el-menu-item
-            :index="'/clusters/detail/' + project + '/' + name + '/backup'"
+            :index="'/clusters/detail/' + name + '/backup'"
             >{{ $t("cluster.detail.tag.backup") }}</el-menu-item
           >
           <el-menu-item
             v-if="hasLicense"
-            :index="'/clusters/detail/' + project + '/' + name + '/f5'"
+            :index="'/clusters/detail/' + name + '/f5'"
             >F5</el-menu-item
           >
           <el-menu-item
-            :index="'/clusters/detail/' + project + '/' + name + '/security'"
+            :index="'/clusters/detail/' + name + '/security'"
           >
             {{ $t("cluster.detail.tag.security") }}
           </el-menu-item>
           <el-menu-item
             v-if="hasLicense"
-            :index="'/clusters/detail/' + project + '/' + name + '/grade'"
+            :index="'/clusters/detail/' + name + '/grade'"
             >{{ $t("cluster.detail.tag.grade") }}
           </el-menu-item>
         </el-menu>

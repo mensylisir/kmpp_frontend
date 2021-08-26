@@ -433,6 +433,7 @@ import { listRegistryAll } from "@/api/system-setting"
 import { checkClusterNameExistence, createCluster } from "@/api/cluster"
 import { allProjects } from "@/api/projects"
 import Rule from "@/utils/rules"
+import {searchHosts} from "@/api/hosts";
 
 export default {
   name: "ClusterCreate",
@@ -569,7 +570,7 @@ export default {
       this.loadPlan()
     },
     loadHosts() {
-      listProjectResourcesAll(this.form.projectName, "HOST").then((data) => {
+      searchHosts(1, 1000, "").then((data) => {
         this.allHosts = []
         if (data.items !== null) {
           

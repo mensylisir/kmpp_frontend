@@ -118,7 +118,7 @@
             <span class="number">{{ nodes.length }}</span>
           </span>
         </div>
-        <node :name="name" :project="project"></node>
+        <node :name="name"></node>
       </el-tab-pane>
       <el-tab-pane label="Namespaces" name="Namespaces">
         <div slot="label" class="tab-label">
@@ -418,7 +418,7 @@ export default {
     },
   },
   created() {
-    this.project = this.$route.params.project;
+    // this.project = this.$route.params.project;
     this.name = this.$route.params.name;
   },
   mounted() {

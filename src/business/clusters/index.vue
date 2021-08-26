@@ -289,7 +289,7 @@ export default {
             break
         }
         if (isExit) {
-          this.$router.push({ name: "ClusterOverview", params: { project: row.projectName, name: row.name } })
+          this.$router.push({ name: "ClusterOverview", params: { name: row.name } })
         } else {
           this.$message({ type: "info", message: this.$t("cluster.creation.repo_err") })
         }
