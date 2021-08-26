@@ -34,7 +34,7 @@ const Host = {
       path: "createStorage",
       hidden: true,
       name: "storageCreate",
-      component: () => import('@/business/hosts/create'),
+      component: () => import('@/business/hosts/storage/create'),
       meta: {
         activeMenu: "/hosts/storage",
         roles: ['ADMIN']

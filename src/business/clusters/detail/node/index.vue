@@ -679,7 +679,7 @@ export default {
       this.dialogCreateVisible = true;
       if (this.provider === "bareMetal") {
         listClusterResourcesAll(
-          this.projectName,
+        
           this.clusterName,
           "HOST"
         ).then((data) => {

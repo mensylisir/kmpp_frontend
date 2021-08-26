@@ -52,7 +52,61 @@
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="大小" min-width="100px" prop="size" />
+      <el-table-column
+        :label="$t('commons.table.type')"
+        min-width="100"
+        prop="type"
+        fix
+      />
+      <el-table-column label="大小（MB）" min-width="100px" prop="size" />
+      <el-table-column
+        :label="$t('commons.table.status')"
+        min-width="100"
+        prop="status"
+        fix
+      >
+        <template v-slot:default="{ row }">
+          <div v-if="row.status === 'Initializing'">
+            <i class="el-icon-loading" />&nbsp; &nbsp; &nbsp;
+            <el-link type="info" @click="openXterm(row)">
+              {{ $t("commons.status.initializing") }}</el-link
+            >
+          </div>
+          <div v-if="row.status === 'Terminating'">
+            <i class="el-icon-loading" />&nbsp; &nbsp; &nbsp;
+            <el-link type="info" @click="openXterm(row)">
+              {{ $t("commons.status.terminating") }}</el-link
+            >
+          </div>
+          <div v-if="row.status === 'Failed'">
+            <span class="iconfont iconerror" style="color: #fa4147"></span>
+            &nbsp; &nbsp; &nbsp;
+            <el-link type="info" @click="getErrorInfo(row)">{{
+              $t("commons.status.failed")
+            }}</el-link>
+          </div>
+          <div v-if="row.status == 'Running'">
+            <span class="iconfont iconduihao" style="color: #32b350"></span>
+            {{ $t("commons.status.running") }}
+          </div>
+          <div v-if="row.status == 'NotReady'">
+            <span class="iconfont iconerror" style="color: #fa4147"></span>
+            {{ $t("commons.status.not_ready") }}
+          </div>
+          <div v-if="row.status === 'Synchronizing'">
+            <i class="el-icon-loading" />&nbsp; &nbsp; &nbsp;
+            <span>{{ $t("commons.status.synchronizing") }}</span>
+          </div>
+          <div v-if="row.status === 'Creating'">
+            <i class="el-icon-loading" />&nbsp; &nbsp; &nbsp;
+            <span>{{ $t("commons.status.creating") }}</span>
+          </div>
+          <div v-if="row.status === 'Waiting'">
+            <i class="el-icon-loading" />&nbsp; &nbsp; &nbsp;
+            <span>{{ $t("commons.status.waiting") }}</span>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" width="180px">
         <template v-slot:default="{ row }">
           {{ row.createdAt | datetimeFormat }}
@@ -223,7 +277,7 @@
 
 <script>
 import LayoutContent from "@/components/layout/LayoutContent";
-import { deleteHost, searchHosts, syncHosts, importHosts } from "@/api/hosts";
+import { deleteHost, searchVolume, syncHosts, importHosts } from "@/api/hosts";
 import ComplexTable from "@/components/complex-table";
 import { listRegistryAll } from "@/api/system-setting";
 import { checkPermission } from "@/utils/permisstion";
@@ -437,16 +491,25 @@ export default {
     search(condition) {
       this.loading = true;
       const { currentPage, pageSize } = this.paginationConfig;
-      searchHosts(currentPage, pageSize, condition)
+      searchVolume(currentPage, pageSize, condition)
         .then((data) => {
           this.loading = false;
-          data.items.forEach((item) => {
-            if (item.volumes.length > 0) {
-              this.data = this.data.concat(item.volumes);
-            }
+          this.data = [...data.items];
+          this.data.forEach((item) => {
+            item.size = 0;
+            item.volumes.forEach((item1) => {
+              let unit = item1.size.replace(/[^a-zA-Z]/g, "");
+              let number = item1.size.replace(/[^\d]/g, "");
+              if (unit === "TB") {
+                item.size = item.size + number * 1024 * 1024;
+              } else if (unit === "GB") {
+                item.size = item.size + number * 1024;
+              } else if (unit === "MB") {
+                item.size = item.size + number;
+              }
+            });
           });
-          console.log(this.data);
-          this.paginationConfig.total = this.data.length;
+          this.paginationConfig.total = data.total;
         })
         .catch(() => {
           this.loading = false;
@@ -470,7 +533,7 @@ export default {
         }
         if (flag) {
           const { currentPage, pageSize } = this.paginationConfig;
-          searchHosts(currentPage, pageSize).then((data) => {
+          searchVolume(currentPage, pageSize).then((data) => {
             this.data = data.items;
             this.paginationConfig.total = data.total;
           });
