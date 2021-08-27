@@ -183,6 +183,11 @@ a:hover {
 .el-menu-item.is-active{
   color: #5354bb !important;
 }
+.sidebar{
+  .el-menu-item.is-active{
+    background: #dcdfe9 !important;
+  }
+}
 .el-card__header{
 border-bottom: unset;
 font-size: 16px;

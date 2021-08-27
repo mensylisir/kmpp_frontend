@@ -4,11 +4,12 @@ const get = () => {
 const set = value => {
   localStorage.setItem('sidebarStatus', value)
 }
-const state = {
+let state = {
   sidebar: {
     opened: get() ? !!+get() : true
   },
-  device: 'desktop'
+  device: 'desktop',
+  changeForm: false
 }
 
 const mutations = {
@@ -27,7 +28,7 @@ const mutations = {
   CLOSE_SIDEBAR: (state) => {
     set('sidebarStatus', 0)
     state.sidebar.opened = false
-  }
+  },
 }
 
 const actions = {

@@ -1,5 +1,5 @@
 <template>
-  <layout-content header="serviceMesh">
+  <layout-content header="服务网格">
     <span>集群名称：</span>
     <el-select
       v-model="cluster"

@@ -1,10 +1,11 @@
 <template>
-  <el-button
-    circle
-    :class="['sidebar-toggle-button', icon]"
-    @click="toggle"
-    class="slidebar-position"
-  ></el-button>
+  <div class="sidebar-bottom">
+    <i
+      :class="['sidebar-toggle-button', icon]"
+      @click="toggle"
+      class="slidebar-position"
+    ></i>
+  </div>
 </template>
 
 <script>
@@ -20,21 +21,25 @@ export default {
   computed: {
     ...mapGetters(["sidebar"]),
     icon() {
-      return this.sidebar.opened ? "iconfont iconfold" : "iconfont iconunfold";
+      return this.sidebar.opened ? "iconfont icon-indent-decrease" : "iconfont icon-indent-increase";
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.sidebar-toggle-button.el-button {
-  font-size: 8px;
-  background-color: white;
-  color: #5b5d78;
+.sidebar-bottom {
+  border-top: 1px solid #E4E7F0;
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+}
+.sidebar-toggle-button {
+  font-size: 16px;
+  color: #4B5059;
+  cursor: pointer;
 }
 .slidebar-position {
-  position: absolute;
-  right: 8px;
-  bottom: 8px;
+
 }
 </style>
