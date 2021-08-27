@@ -17,7 +17,7 @@
           :base-path="route.path"
         />
       </el-menu>
-      <sidebar-toggle-button/>
+      <sidebar-toggle-button />
     </el-scrollbar>
   </div>
 </template>
@@ -27,7 +27,6 @@ import { mapGetters } from "vuex";
 import SidebarItem from "./SidebarItem";
 import Logo from "@/components/layout/sidebar/Logo";
 import SidebarToggleButton from "@/components/layout/sidebar/SidebarToggleButton";
-
 
 export default {
   name: "Sidebar",
@@ -53,8 +52,8 @@ export default {
 @import "~@/styles/common/variables";
 
 @mixin sidebar-base-item {
-  padding-left: 20px !important;
-  border-radius: 2px;
+  padding-left: 20px;
+  border-radius: 4px;
   color: $menu-color;
 }
 
@@ -78,7 +77,7 @@ export default {
 
 @mixin menu-item-active {
   font-weight: 600;
-  background-color: #DCDFE9;
+  background-color: #dcdfe9;
   &:hover {
     background-color: $menu-bg-color-hover;
   }
@@ -116,8 +115,8 @@ export default {
 
   .el-scrollbar {
     box-sizing: border-box;
-    padding: 10px 0;
-    height: calc(100% - 80px);
+    padding: 20px 0 0 0;
+    height: calc(100% - 56px);
 
     .el-scrollbar__bar {
       &.is-vertical {
@@ -134,6 +133,9 @@ export default {
       overflow-x: hidden;
       margin-left: 12px;
       margin-right: 12px !important;
+      .el-scrollbar__view{
+            height: 100%;
+      }
     }
   }
 
@@ -150,15 +152,16 @@ export default {
 
   .el-menu {
     border: none;
-    height: 100%;
+    height: calc(100% - 41px);
     width: 100%;
     background-color: $menu-bg-color;
 
     .submenu-title-no-dropdown {
+      margin-bottom: 8px;
       @include menu-item;
 
       &:hover {
-        background-color: #DCDFE9;
+        background-color: #dcdfe9;
       }
 
       &.is-active {
@@ -185,7 +188,11 @@ export default {
 
         .el-submenu__title {
           @include menu-item-active;
-
+          color: #5354bb;
+          background: #f4f5f7;
+          i {
+            color: #5354bb;
+          }
           .sub-el-icon,
           span {
           }
@@ -210,7 +217,7 @@ export default {
     .el-submenu__title,
     .submenu-title-no-dropdown {
       span {
-        padding-left: 30px;
+        padding-left: 14px;
       }
 
       .sub-el-icon {
@@ -229,7 +236,7 @@ export default {
       }
 
       .el-submenu__title {
-        padding-left: 20px !important;
+        padding-left: 7px !important;
       }
 
       .submenu-title-no-dropdown,

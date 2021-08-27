@@ -4,7 +4,7 @@
   "font_class": "icon-",
   "font_family": "iconfont",
   "url": "https://codesign.qq.com/workspace/icons/GxDP39qAOa9wlKp",
-  "icons_count": 38,
+  "icons_count": 40,
   "icons": [
     {
       "id": "XgRxnjP3BJZLmqr",
@@ -346,6 +346,24 @@
       "class_name": "changeplatform",
       "unicode": "e031",
       "unicode_decimal": 57393,
+      "section": "未编组"
+    },
+    {
+      "id": "5l429l71nnjdYDO",
+      "name": "indent-decrease",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" class=\"design-iconfont\"><path d=\"M3 4h18v2H3V4zm0 15h18v2H3v-2zm8-5h10v2H11v-2zm0-5h10v2H11V9zm-8 3.5L7 9v7l-4-3.5z\"></path></svg>",
+      "class_name": "indent-decrease",
+      "unicode": "e032",
+      "unicode_decimal": 57394,
+      "section": "未编组"
+    },
+    {
+      "id": "RMdGZQG4wM9Xk8x",
+      "name": "indent-increase",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" class=\"design-iconfont\"><path d=\"M3 4h18v2H3V4zm0 15h18v2H3v-2zm8-5h10v2H11v-2zm0-5h10v2H11V9zm-4 3.5L3 16V9l4 3.5z\"></path></svg>",
+      "class_name": "indent-increase",
+      "unicode": "e033",
+      "unicode_decimal": 57395,
       "section": "未编组"
     }
   ]

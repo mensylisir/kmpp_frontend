@@ -1,5 +1,15 @@
 <template>
   <div class="sidebar-logo-container" :class="{ collapse: collapse }">
+    <el-tooltip class="item" content="切换平台" placement="bottom">
+      <img
+        :src="hover ? changeFormLogoHover : changeFormLogo"
+        @click="goChange"
+        class="chang-icon"
+        @mouseenter="hover = true"
+        @mouseleave="hover = false"
+      />
+    </el-tooltip>
+
     <transition name="sidebar-logo-fade" mode="out-in">
       <router-link
         v-if="collapse"
@@ -47,8 +57,16 @@ export default {
       title: "FIT2CLOUD",
       logo: require("@/assets/logo.svg"),
       collapseLogo: require("@/assets/favicon.svg"),
+      changeFormLogo: require("@/assets/changeplatform.svg"),
+      changeFormLogoHover: require("@/assets/changeplatform_hover.svg"),
+      hover: false,
     };
   },
+  methods: {
+    goChange(){
+      this.$store.state.app.changeForm = true
+    }
+  }
 };
 </script>
 
@@ -61,6 +79,8 @@ export default {
   line-height: $header-height;
   overflow: hidden;
   box-shadow: inset 0 -1px 0 0 #dcdee4;
+  display: flex;
+  align-items: center;
 
   &:after {
     content: "";
@@ -73,18 +93,27 @@ export default {
   }
 
   & .sidebar-logo-link {
-    padding: 0 20px;
+    padding: 0 20px 0 8px;
     display: flex;
     align-items: center;
     height: 100%;
     width: auto;
 
     & .sidebar-logo {
-      height: 27px;
+      height: 16px;
       vertical-align: middle;
     }
   }
-
+  .chang-icon {
+    margin-left: 12px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    &:hover {
+      // background: cornflowerblue;
+      color: #5354bb;
+    }
+  }
   &.collapse {
     .sidebar-logo-link {
       padding: 0 10px;
