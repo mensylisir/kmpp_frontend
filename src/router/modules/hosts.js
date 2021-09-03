@@ -99,6 +99,16 @@ const Host = {
       },
     },
     {
+      path: "createCertification",
+      hidden: true,
+      name: "certificationCreate",
+      component: () => import('@/business/hosts/certification/create'),
+      meta: {
+        activeMenu: "/hosts/certification",
+        roles: ['ADMIN']
+      },
+    },
+    {
       path: 'apiNetWork',
       component: () => import('@/business/hosts/apiNetWork/index'),
       name: "certification",
