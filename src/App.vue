@@ -19,6 +19,17 @@
             >
           </div>
         </el-col>
+        <el-col :span="4" :class="{ actve: activeItem === 'develop' }">
+          <div @mouseenter="activeItem = 'develop'" class="platform-item">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#icon-develop"></use>
+            </svg>
+            <span class="name">开发者平台</span>
+            <span class="description"
+              >面向开发者打造的一站式开发平台，实现企业内技术共享、框架复用，做到开发的规范，快速上手、高效交付，助力企业快速开发交付分布式应用系统</span
+            >
+          </div>
+        </el-col>
         <el-col :span="4" :class="{ actve: activeItem === 'CICD' }">
           <div
             @mouseenter="activeItem = 'CICD'"
@@ -30,8 +41,8 @@
             </svg>
             <span class="name">持续交付平台</span>
             <span class="description">
-              企业级持续集成和持续交付工具，支持应用架构守护、灰度发布、流程管控等能力，让您的软件简单，快捷，安全，高效的交付</span
-            >
+              企业级持续集成和持续交付工具，支持应用架构守护、灰度发布、流程管控等能力，让您的软件简单，快捷，安全，高效的交付
+            </span>
           </div>
         </el-col>
         <el-col :span="4" :class="{ actve: activeItem === 'kubeoperator' }">
@@ -40,22 +51,11 @@
               <use xlink:href="#icon-kubeoperator"></use>
             </svg>
             <span class="name">太初容器平台</span>
-            <span class="description"
-              >一站式的完备的分布式系统支撑平台，
+            <span class="description">
+              一站式的完备的分布式系统支撑平台，
               支持多层安全防护、准入机制、多租户应用支撑， 助企业降低 IT
               成本，提升运维效率
             </span>
-          </div>
-        </el-col>
-        <el-col :span="4" :class="{ actve: activeItem === 'develop' }">
-          <div @mouseenter="activeItem = 'develop'" class="platform-item">
-            <svg class="icon" aria-hidden="true">
-              <use xlink:href="#icon-develop"></use>
-            </svg>
-            <span class="name">开发者平台</span>
-            <span class="description"
-              >面向开发者打造的一站式开发平台，实现企业内技术共享、框架复用，做到开发的规范，快速上手、高效交付，助力企业快速开发交付分布式应用系统</span
-            >
           </div>
         </el-col>
       </el-row>
@@ -144,6 +144,8 @@ export default {
         line-height: 20px;
         font-weight: 400;
         padding: 0 40px;
+        display: inline-block;
+        height: 100px;
       }
     }
   }
