@@ -8,4 +8,6 @@ export function getAllCertificates(currentPage, pageSize,condition) {
 export function addCertificates(data) {
   return post(`${baseUrl}`, data)
 }
-
+export function upload(data) {
+  return post(`${baseUrl}/upload`, data)
+}

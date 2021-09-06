@@ -19,6 +19,14 @@
             icon="el-icon-plus"
             >{{ $t("commons.button.create") }}</el-button
           >
+          <el-button
+            size="small"
+            type="primary"
+            @click="add()"
+            v-permission="['ADMIN']"
+            icon="el-icon-upload2"
+            >导入</el-button
+          >
         </div>
       </template>
       <el-table-column type="selection" fix></el-table-column>
@@ -57,44 +65,59 @@
     </complex-table>
 
     <el-dialog
-      :title="$t('commons.button.batch_import')"
+      title="导入"
       width="66.7%"
       :visible.sync="dialogImportVisible"
       class="import"
     >
       <el-form>
-        <div class="item">
-          <div class="title">1. 下载导入模板</div>
-          <div class="content">根据提示信息完成表格内容</div>
-          <el-button icon="el-icon-download" @click="download()"
-            >下载空白模板</el-button
-          >
-        </div>
         <el-form-item class="item">
-          <div class="title">2. 上传完善后的表格</div>
-          <el-row type="flex" justify="center">
-            <el-upload
-              ref="my-upload"
-              :on-change="onUploadChange"
-              action=""
-              :auto-upload="false"
-              class="upload-demo"
-              drag
-            >
-              <i class="el-icon-upload"></i>
-              <div class="el-upload__text">
-                <div class="subtitle">点击或将文件拖拽到这里上传</div>
-                <div class="tip">
-                  {{ $t("cluster.detail.backup.local_recover_tips") }}
+          <div style="width: 50%">
+            <div class="title">上传公钥文件</div>
+            <el-row type="flex" justify="center">
+              <el-upload
+                ref="my-upload"
+                :on-change="onUploadChange"
+                action=""
+                :auto-upload="false"
+                class="upload-demo"
+                drag
+                :limit="1"
+                :on-remove="removeFile"
+              >
+                <i class="el-icon-upload"></i>
+                <div class="el-upload__text">
+                  <div class="subtitle">点击或将文件拖拽到这里上传</div>
+                  <div class="tip">
+                    {{ $t("cluster.detail.backup.local_recover_tips") }}
+                  </div>
                 </div>
-              </div>
-              <div class="el-upload__tip" slot="tip">
-                <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icontishi11"></use>
-                </svg>
-              </div>
-            </el-upload>
-          </el-row>
+              </el-upload>
+            </el-row>
+          </div>
+          <div style="width: 50%; margin-left: 20px">
+            <div class="title">上传私钥文件</div>
+            <el-row type="flex" justify="center">
+              <el-upload
+                ref="my-upload"
+                :on-change="onPrivateUpload"
+                action=""
+                :auto-upload="false"
+                class="upload-demo"
+                drag
+                :limit="1"
+                :on-remove="removeFile1"
+              >
+                <i class="el-icon-upload"></i>
+                <div class="el-upload__text">
+                  <div class="subtitle">点击或将文件拖拽到这里上传</div>
+                  <div class="tip">
+                    {{ $t("cluster.detail.backup.local_recover_tips") }}
+                  </div>
+                </div>
+              </el-upload>
+            </el-row>
+          </div>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -103,7 +126,7 @@
         }}</el-button>
         <el-button
           type="primary"
-          :disabled="isUploadDisable"
+          :disabled="!(privateFile.name && file.name)"
           @click="onUploadFile()"
           >{{ $t("commons.button.ok") }}</el-button
         >
@@ -114,7 +137,7 @@
 
 <script>
 import LayoutContent from "@/components/layout/LayoutContent";
-import { getAllCertificates } from "@/api/certificates";
+import { getAllCertificates, upload } from "@/api/certificates";
 import ComplexTable from "@/components/complex-table";
 import { listRegistryAll } from "@/api/system-setting";
 import { checkPermission } from "@/utils/permisstion";
@@ -152,6 +175,7 @@ export default {
       dialogImportVisible: false,
       isUploadDisable: true,
       file: {},
+      privateFile: {},
       searchConfig: {
         quickPlaceholder: this.$t("commons.search.quickSearch"),
         components: [
@@ -194,13 +218,31 @@ export default {
         }
       });
     },
+
+    // 上传证书
+    add() {
+      this.dialogImportVisible = true;
+    },
     sync() {
       this.dialogSyncVisible = true;
     },
     submitSync() {},
     onUploadChange(file) {
-      this.isUploadDisable = false;
       this.file = file;
+    },
+    onPrivateUpload(file) {
+      this.privateFile = file;
+      // if (this.privateFile.name && this.file.name) {
+      //   this.isUploadDisable = false;
+      // } else {
+      //   this.isUploadDisable = true;
+      // }
+    },
+    removeFile() {
+      this.file = {};
+    },
+    removeFile1() {
+      this.privateFile = {};
     },
     onImport() {
       listRegistryAll().then((data) => {
@@ -230,17 +272,18 @@ export default {
       this.currentHost = row;
     },
     onUploadFile() {
+      let supportType = ["pem", "key", "crt"];
+
       const startIndex = this.file.name.lastIndexOf(".");
       if (startIndex !== -1) {
         const fileType = this.file.name
           .substring(startIndex + 1, this.file.name.length)
           .toLowerCase();
-        if (fileType !== "xlsx") {
+        if (supportType.indexOf(fileType) < 0) {
           this.$message({
             type: "error",
             message: this.$t("host.not_support_format"),
           });
-          this.dialogImportVisible = false;
           return;
         }
       } else {
@@ -248,25 +291,47 @@ export default {
           type: "error",
           message: this.$t("host.not_support_format"),
         });
-        this.dialogImportVisible = false;
         return;
       }
+
+      const startIndex1 = this.privateFile.name.lastIndexOf(".");
+      if (startIndex1 !== -1) {
+        const fileType1 = this.privateFile.name
+          .substring(startIndex1 + 1, this.privateFile.name.length)
+          .toLowerCase();
+        if (supportType.indexOf(fileType1) < 0) {
+          this.$message({
+            type: "error",
+            message: this.$t("host.not_support_format"),
+          });
+          return;
+        }
+      } else {
+        this.$message({
+          type: "error",
+          message: this.$t("host.not_support_format"),
+        });
+        return;
+      }
+
       const formData = new FormData();
-      formData.append("file", this.file.raw);
-      // importHosts(formData).then(
-      //   () => {
-      //     this.$message({
-      //       type: "success",
-      //       message: this.$t("commons.msg.import_success"),
-      //     });
-      //     this.search();
-      //     this.dialogImportVisible = false;
-      //   },
-      //   () => {
-      //     this.search();
-      //     this.dialogImportVisible = false;
-      //   }
-      // );
+      formData.append("cert", this.file.raw);
+      formData.append("key", this.privateFile.raw);
+
+      upload(formData).then(
+        () => {
+          this.$message({
+            type: "success",
+            message: this.$t("commons.msg.import_success"),
+          });
+          this.search();
+          this.dialogImportVisible = false;
+        },
+        () => {
+          this.search();
+          this.dialogImportVisible = false;
+        }
+      );
     },
     onDelete() {},
     onGrant() {
@@ -344,14 +409,15 @@ export default {
       margin: 6px 0 12px 0;
     }
   }
+  /deep/ .el-form-item__content {
+    display: flex;
+  }
   /deep/ .upload-demo {
     margin-top: 16px;
     width: 100%;
     .el-upload {
       width: 100%;
-      height: 100%;
       .el-upload-dragger {
-        height: 100%;
         width: 100%;
       }
       .subtitle {

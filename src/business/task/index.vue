@@ -1,25 +1,124 @@
 <template>
   <layout-content header="授权中心">
-
+    <complex-table
+      :data="data"
+      local-key="host_columns"
+      :pagination-config="paginationConfig"
+      @search="search"
+      :selects.sync="hostSelections"
+      v-loading="loading"
+      :search-config="searchConfig"
+    >
+      <template #header>
+        <div>
+          <el-button
+            size="small"
+            type="primary"
+            @click="create()"
+            v-permission="['ADMIN']"
+            icon="el-icon-plus"
+            >{{ $t("commons.button.create") }}</el-button
+          >
+        </div>
+      </template>
+      <el-table-column type="selection" fix></el-table-column>
+      <el-table-column
+        :label="$t('commons.table.name')"
+        show-overflow-tooltip
+        min-width="120"
+        fix
+      >
+        <template v-slot:default="{ row }">
+          <span>{{ row.username }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :label="$t('commons.table.type')"
+        min-width="100"
+        prop="type"
+        fix
+      >
+        <!-- <template v-slot:default="{ row }">
+          <span>{{ row.is_ca === "true" ? "根证书" : "普通证书" }}</span>
+        </template> -->
+      </el-table-column>
+      <el-table-column label="创建时间" width="180px">
+        <!-- <template v-slot:default="{ row }">
+          {{ row.createdAt | datetimeFormat }}
+        </template> -->
+      </el-table-column>
+    </complex-table>
   </layout-content>
 </template>
 
 <script>
 import LayoutContent from "@/components/layout/LayoutContent";
+import { getClusterrole } from "@/api/authorize-center";
+import ComplexTable from "@/components/complex-table";
 
 export default {
   name: "serviceMesh",
-  components: { LayoutContent },
+  components: { LayoutContent, ComplexTable },
   data() {
-    return{}
+    return {
+      paginationConfig: {
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
+      },
+      condition: "",
+      loading: false,
+      data: [],
+      clusterrole: [],
+      hostSelections: [],
+      searchConfig: {
+        quickPlaceholder: this.$t("commons.search.quickSearch"),
+        components: [
+          {
+            field: "name",
+            label: this.$t("commons.table.name"),
+            component: "FuComplexInput",
+            defaultOperator: "eq",
+          },
+          {
+            field: "ip",
+            label: this.$t("host.ip"),
+            component: "FuComplexInput",
+            defaultOperator: "eq",
+          },
+          {
+            field: "created_at",
+            label: this.$t("commons.table.create_time"),
+            component: "FuComplexDateTime",
+            valueFormat: "yyyy-MM-dd",
+          },
+        ],
+      },
+    };
   },
   mounted() {
-   
+    this.search();
   },
   computed: {},
   methods: {
+    search() {
+      this.loading = true;
+      const { currentPage, pageSize } = this.paginationConfig;
+      getClusterrole(currentPage, pageSize, this.condition)
+        .then((data) => {
+          this.loading = false;
+          this.data = [...data.items];
+          this.paginationConfig.total = data.total;
+        })
+        .catch(() => {
+          this.loading = false;
+        });
+    },
 
-  }
+    create() {
+      this.$router.push({ name: "taskCreate" });
+    },
+  },
 };
 </script>
 
