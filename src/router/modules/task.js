@@ -18,6 +18,16 @@ const Manifest = {
         title: "授权中心",
       },
     },
+    {
+      path: "taskCreate",
+      hidden: true,
+      name: "taskCreate",
+      component: () => import('@/business/task/create'),
+      meta: {
+        activeMenu: "/task/list",
+        roles: ['ADMIN']
+      },
+    },
   ]
 }
 export default Manifest

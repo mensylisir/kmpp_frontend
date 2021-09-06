@@ -216,7 +216,9 @@ export default {
     getCertification() {
       getAllCertificates(1, 1000)
         .then((data) => {
-          this.certification = [...data.items];
+          this.certification = data.items.filter(item => {
+            return item.is_ca
+          });
         })
         .catch(() => {
           this.loading = false;
