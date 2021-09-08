@@ -113,7 +113,7 @@
                 >
               </el-radio-group>
             </el-form-item>
-           
+
             <el-form-item style="float: right">
               <el-button @click="onCancel()">{{
                 $t("commons.button.cancel")
@@ -304,9 +304,10 @@ export default {
 
 <style scoped lang="scss">
 .block {
+  margin-left: -59px;
   border: 1px solid #e2e8f0;
   padding: 24px;
-  width: 100%;
+  width: calc(100% + 100px);
   background-color: rgba(247, 250, 252, 0.7);
   margin-bottom: 24px;
   .item-group {
