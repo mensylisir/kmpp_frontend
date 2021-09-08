@@ -8,6 +8,9 @@ export function getClusterrole(currentPage, pageSize,condition) {
 export function getRbacs() {
   return get(`${baseUrl}/mm`)
 }
+export function rolebinding(data) {
+  return post(`${baseUrl}/rolebinding`, data)
+}
 export function clusterrolebinding(data) {
   return post(`${baseUrl}/clusterrolebinding`, data)
 }
