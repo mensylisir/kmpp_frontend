@@ -15,12 +15,12 @@ module.exports = {
     },
     proxy: {
       '/api/v1': {
-        target: 'http://172.30.1.98:8080',
+        target: 'http://172.30.1.53:8080',
         ws: true,
         secure: false,
       },
       '/proxy': {
-        target: 'http://172.30.1.98:8080',
+        target: 'http://172.30.1.53:8080',
         ws: true,
         secure: false,
       },

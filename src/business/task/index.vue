@@ -32,22 +32,47 @@
           <span>{{ row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        :label="$t('commons.table.type')"
-        min-width="100"
-        prop="type"
-        fix
-      >
-        <!-- <template v-slot:default="{ row }">
-          <span>{{ row.is_ca === "true" ? "根证书" : "普通证书" }}</span>
-        </template> -->
+      <el-table-column label="集群名称" width="180" prop="clustername" fix>
+        <template v-slot:default="{ row }">
+          <span>{{ row.clustername }}</span>
+        </template>
       </el-table-column>
-      <el-table-column label="创建时间" width="180px">
-        <!-- <template v-slot:default="{ row }">
-          {{ row.createdAt | datetimeFormat }}
-        </template> -->
+      <el-table-column label="NameSpace" width="300px">
+        <template v-slot:default="{ row }">
+          {{ row.namespaces ? row.namespaces.join(",") : "--" }}
+        </template>
+      </el-table-column>
+      <el-table-column label="kubeconfig" width="250px">
+        <template v-slot:default="{ row }">
+          <div class="config" v-if="row.namespaces">
+            <el-select v-model="row.type" placeholder="请选择">
+              <el-option
+                :label="item"
+                :value="item"
+                :key="item"
+                v-for="item in row.namespaces"
+              >
+              </el-option>
+            </el-select>
+            <el-button type="primary" @click="showConfig(row)" size="small">
+              show
+            </el-button>
+          </div>
+          <span v-else>--</span>
+        </template>
       </el-table-column>
     </complex-table>
+    <el-dialog
+      title="kubeconfig"
+      width="66.7%"
+      :visible.sync="config"
+      class="dailog"
+    >
+      <el-button type="primary" @click="copy(content)" size="small">
+        复制
+      </el-button>
+      <div class="content">{{ content }}</div>
+    </el-dialog>
   </layout-content>
 </template>
 
@@ -55,12 +80,15 @@
 import LayoutContent from "@/components/layout/LayoutContent";
 import { getClusterrole } from "@/api/authorize-center";
 import ComplexTable from "@/components/complex-table";
+import { kubeconfig } from "@/api/authorize-center";
 
 export default {
   name: "serviceMesh",
   components: { LayoutContent, ComplexTable },
   data() {
     return {
+      content: "",
+      config: false,
       paginationConfig: {
         currentPage: 1,
         pageSize: 10,
@@ -81,16 +109,20 @@ export default {
             defaultOperator: "eq",
           },
           {
-            field: "ip",
-            label: this.$t("host.ip"),
+            field: "clustername",
+            label: "集群名称",
             component: "FuComplexInput",
             defaultOperator: "eq",
           },
           {
-            field: "created_at",
-            label: this.$t("commons.table.create_time"),
+            field: "NameSpace",
+            label: "NameSpace",
             component: "FuComplexDateTime",
-            valueFormat: "yyyy-MM-dd",
+          },
+          {
+            field: "kubeconfig",
+            label: "kubeconfig",
+            component: "FuComplexDateTime",
           },
         ],
       },
@@ -101,6 +133,30 @@ export default {
   },
   computed: {},
   methods: {
+    copy(val) {
+      let that = this;
+      this.$copyText(val).then(
+        function () {
+          that.$message({ type: "success", message: "复制成功" });
+        },
+        function () {
+          that.$message({ type: "info", message: "复制失败" });
+        }
+      );
+    },
+    handelChange(val) {
+      console.log(val);
+    },
+    showConfig(item) {
+      kubeconfig({
+        clustername: item.clustername,
+        username: item.username,
+        namespace: item.type,
+      }).then((data) => {
+        this.content = data;
+        this.config = true;
+      });
+    },
     search() {
       this.loading = true;
       const { currentPage, pageSize } = this.paginationConfig;
@@ -108,6 +164,9 @@ export default {
         .then((data) => {
           this.loading = false;
           this.data = [...data.items];
+          this.data.forEach((item) => {
+            this.$set(item, 'type', item.namespaces ? item.namespaces[0] : "");
+          });
           this.paginationConfig.total = data.total;
         })
         .catch(() => {
@@ -170,6 +229,29 @@ export default {
   &--confirmed {
     color: #13c2b8;
     border: 1px solid #13c2b8;
+  }
+}
+.config {
+  display: flex;
+  button {
+    height: 28px;
+    line-height: 10px;
+    margin-left: 8px;
+    // width: 100px;
+  }
+  /deep/ .el-input--small {
+    width: 160px;
+  }
+}
+.dailog {
+  button {
+    float: right;
+  }
+  .content {
+    margin-top: 46px;
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+    white-space: pre-wrap;
   }
 }
 </style>
