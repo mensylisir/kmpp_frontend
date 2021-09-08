@@ -37,12 +37,12 @@
           <span>{{ row.clustername }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="NameSpace" width="300px">
+      <el-table-column label="NameSpace" width="350px">
         <template v-slot:default="{ row }">
           {{ row.namespaces ? row.namespaces.join(",") : "--" }}
         </template>
       </el-table-column>
-      <el-table-column label="kubeconfig" width="250px">
+      <el-table-column label="kubeconfig" width="400px">
         <template v-slot:default="{ row }">
           <div class="config" v-if="row.namespaces">
             <el-select v-model="row.type" placeholder="请选择">
