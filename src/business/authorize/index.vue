@@ -173,9 +173,8 @@ export default {
           this.loading = false;
         });
     },
-
     create() {
-      this.$router.push({ name: "taskCreate" });
+      this.$router.push({ name: "authorizeCreate" });
     },
   },
 };

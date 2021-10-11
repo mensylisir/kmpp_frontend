@@ -1,7 +1,7 @@
 import Layout from "@/business/app-layout/horizontal-layout"
 
-const Manifest = {
-  path: "/task",
+const Authorize = {
+  path: "/authorize",
   sort: 4,
   component: Layout,
   name: "Manifest",
@@ -12,22 +12,22 @@ const Manifest = {
   children: [
     {
       path: 'list',
-      component: () => import('@/business/task'),
-      name: "taskList",
+      component: () => import('@/business/authorize'),
+      name: "authorizeList",
       meta: {
         title: "授权中心",
       },
     },
     {
-      path: "taskCreate",
+      path: "authorizeCreate",
       hidden: true,
-      name: "taskCreate",
-      component: () => import('@/business/task/create'),
+      name: "authorizeCreate",
+      component: () => import('@/business/authorize/create'),
       meta: {
-        activeMenu: "/task/list",
+        activeMenu: "/authorize/list",
         roles: ['ADMIN']
       },
     },
   ]
 }
-export default Manifest
+export default Authorize

@@ -1,7 +1,7 @@
 <template>
   <layout-content
     :header="$t('commons.button.create')"
-    :back-to="{ name: 'taskList' }"
+    :back-to="{ name: 'authorizeList' }"
   >
     <el-row>
       <el-col :span="4"><br /></el-col>
@@ -221,7 +221,7 @@ export default {
                   type: "success",
                   message: this.$t("commons.msg.create_success"),
                 });
-                this.$router.push({ name: "taskList" });
+                this.$router.push({ name: "authorizeList" });
               });
             });
           });
@@ -291,7 +291,7 @@ export default {
         .catch(() => {});
     },
     onCancel() {
-      this.$router.push({ name: "taskList" });
+      this.$router.push({ name: "authorizeList" });
     },
   },
   created() {

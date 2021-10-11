@@ -207,15 +207,8 @@ export default {
   },
   methods: {
     create() {
-      listRegistryAll().then((data) => {
-        if (data.items !== null) {
-          this.$router.push({ name: "certificationCreate" });
-        } else {
-          this.$message({
-            type: "info",
-            message: this.$t("cluster.creation.repo_err"),
-          });
-        }
+      listRegistryAll().then(() => {
+        this.$router.push({ name: "certificationCreate" });
       });
     },
 
@@ -245,18 +238,11 @@ export default {
       this.privateFile = {};
     },
     onImport() {
-      listRegistryAll().then((data) => {
-        if (data.items !== null) {
-          this.dialogImportVisible = true;
-          this.isUploadDisable = true;
-          if (this.$refs["my-upload"]) {
-            this.$refs["my-upload"].clearFiles();
-          }
-        } else {
-          this.$message({
-            type: "info",
-            message: this.$t("cluster.creation.repo_err"),
-          });
+      listRegistryAll().then(() => {
+        this.dialogImportVisible = true;
+        this.isUploadDisable = true;
+        if (this.$refs["my-upload"]) {
+          this.$refs["my-upload"].clearFiles();
         }
       });
     },
