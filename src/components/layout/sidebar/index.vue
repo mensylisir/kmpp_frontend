@@ -236,7 +236,7 @@ export default {
       }
 
       .el-submenu__title {
-        padding-left: 7px !important;
+        padding-left: 12px !important;
       }
 
       .submenu-title-no-dropdown,

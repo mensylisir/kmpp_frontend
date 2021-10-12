@@ -165,7 +165,7 @@
     >
       <div>
         <span>{{ $t("host.base_info") }}</span>
-        <div  style="margin-top: 15px">
+        <div style="margin-top: 15px">
           <table style="width: 100%" class="myTable">
             <tr>
               <td>IP</td>
@@ -207,7 +207,7 @@
         </div>
         <div v-if="currentHost.hasGpu">
           <span>{{ $t("host.disk_size") }}</span>
-          <div  style="margin-top: 15px">
+          <div style="margin-top: 15px">
             <el-table :data="currentHost.hasGpu" border style="width: 100%">
               <el-table-column
                 prop="gpuInfo"
@@ -421,20 +421,13 @@ export default {
       loading: false,
       isAdmin: checkPermission("ADMIN"),
       timer: {},
-      cluster: ""
+      cluster: "",
     };
   },
   methods: {
     create() {
-      listRegistryAll().then((data) => {
-        if (data.items !== null) {
-          this.$router.push({ name: "HostCreate" });
-        } else {
-          this.$message({
-            type: "info",
-            message: this.$t("cluster.creation.repo_err"),
-          });
-        }
+      listRegistryAll().then(() => {
+        this.$router.push({ name: "HostCreate" });
       });
     },
     sync() {
@@ -467,18 +460,11 @@ export default {
       this.file = file;
     },
     onImport() {
-      listRegistryAll().then((data) => {
-        if (data.items !== null) {
-          this.dialogImportVisible = true;
-          this.isUploadDisable = true;
-          if (this.$refs["my-upload"]) {
-            this.$refs["my-upload"].clearFiles();
-          }
-        } else {
-          this.$message({
-            type: "info",
-            message: this.$t("cluster.creation.repo_err"),
-          });
+      listRegistryAll().then(() => {
+        this.dialogImportVisible = true;
+        this.isUploadDisable = true;
+        if (this.$refs["my-upload"]) {
+          this.$refs["my-upload"].clearFiles();
         }
       });
     },
@@ -719,7 +705,7 @@ export default {
       font-weight: 500;
     }
   }
-  /deep/ .complex-table__header{
+  /deep/ .complex-table__header {
     display: block;
   }
 }

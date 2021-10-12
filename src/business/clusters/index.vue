@@ -254,14 +254,10 @@ export default {
     goForDetail(row) {
       listRegistryAll().then((data) => {
         let repoList = data.items === null ? [] : data.items
-        let isExit = false
-        let isAmdExit = false
-        let isArmExit = false
         switch (row.spec.architectures) {
           case "amd64":
             for (const repo of repoList) {
               if (repo.architecture === "x86_64") {
-                isExit = true
                 break
               }
             }
@@ -269,7 +265,6 @@ export default {
           case "arm64":
             for (const repo of repoList) {
               if (repo.architecture === "aarch64") {
-                isExit = true
                 break
               }
             }
@@ -277,22 +272,16 @@ export default {
           case "all":
             for (const repo of repoList) {
               if (repo.architecture === "x86_64") {
-                isAmdExit = true
                 continue
               }
               if (repo.architecture === "aarch64") {
-                isArmExit = true
                 continue
               }
             }
-            isExit = isAmdExit && isArmExit
             break
         }
-        if (isExit) {
           this.$router.push({ name: "ClusterOverview", params: { name: row.name } })
-        } else {
-          this.$message({ type: "info", message: this.$t("cluster.creation.repo_err") })
-        }
+
       })
     },
     selectChange() {
