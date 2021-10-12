@@ -352,7 +352,7 @@ export default {
         if (isExit) {
           this.$router.push({ name: "ZoneCreate" })
         } else {
-          this.$message({ type: "info", message: this.$t("cluster.creation.repo_err") })
+          this.$router.push({ name: "ZoneCreate" })
         }
       })
     },

@@ -36,7 +36,6 @@
                           <el-option v-if="form.provider === 'bareMetal'" value="arm64" label="ARM64">ARM64</el-option>
                           <el-option v-if="form.provider === 'bareMetal'" value="all" label="MIXED">MIXED</el-option>
                         </el-select>
-                        <div v-if="!archValid"><span class="input-error">{{$t('cluster.creation.repo_err')}}</span></div>
                       </el-form-item>
                       <el-form-item :label="$t('cluster.creation.yum_repo')" prop="yumOperate">
                         <el-select style="width: 100%" v-model="form.yumOperate" clearable>
