@@ -2,8 +2,8 @@ import {post,get} from "@/plugins/request"
 
 const baseUrl = "/api/v1/rbacs"
 
-export function getClusterrole(currentPage, pageSize,condition) {
-  return get(`/api/v1/kubeusers/mm?pageNum=${currentPage}&pageSize=${pageSize}&condition=${condition}`)
+export function getClusterrole(name,currentPage, pageSize,condition) {
+  return get(`/api/v1/kubeusers/${name}?pageNum=${currentPage}&pageSize=${pageSize}&condition=${condition}`)
 }
 export function getRbacs() {
   return get(`${baseUrl}/mm`)
