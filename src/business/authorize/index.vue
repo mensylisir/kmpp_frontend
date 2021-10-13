@@ -110,6 +110,7 @@ export default {
         pageSize: 10,
         total: 0,
       },
+      options: [],
       cluster: undefined,
       condition: "",
       loading: false,
