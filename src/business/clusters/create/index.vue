@@ -33,8 +33,8 @@
                       <el-form-item :label="$t('cluster.creation.arch')" prop="architectures">
                         <el-select style="width: 100%" @change="changeArch" v-model="form.architectures" clearable>
                           <el-option value="amd64" label="AMD64">AMD64</el-option>
-                          <el-option v-if="form.provider === 'bareMetal'" value="arm64" label="ARM64">ARM64</el-option>
-                          <el-option v-if="form.provider === 'bareMetal'" value="all" label="MIXED">MIXED</el-option>
+                          <!-- <el-option v-if="form.provider === 'bareMetal'" value="arm64" label="ARM64">ARM64</el-option>
+                          <el-option v-if="form.provider === 'bareMetal'" value="all" label="MIXED">MIXED</el-option> -->
                         </el-select>
                       </el-form-item>
                       <el-form-item :label="$t('cluster.creation.yum_repo')" prop="yumOperate">
@@ -763,8 +763,8 @@ export default {
     changeArch(type) {
       this.hosts = []
       this.archValid = true
-      let isAmdExit = false
-      let isArmExit = false
+      // let isAmdExit = false
+      // let isArmExit = false
       switch (type) {
         case "amd64":
           for (const h of this.allHosts) {
@@ -772,44 +772,44 @@ export default {
               this.hosts.push(h.name)
             }
           }
-          for (const repo of this.repoList) {
-            if (repo.architecture === "x86_64") {
-              isAmdExit = true
-              break
-            }
-          }
-          this.archValid = isAmdExit
+          // for (const repo of this.repoList) {
+          //   if (repo.architecture === "x86_64") {
+          //     isAmdExit = true
+          //     break
+          //   }
+          // }
+          // this.archValid = isAmdExit
           break
-        case "arm64":
-          for (const h of this.allHosts) {
-            if (h.architecture === "aarch64") {
-              this.hosts.push(h.name)
-            }
-          }
-          for (const repo of this.repoList) {
-            if (repo.architecture === "aarch64") {
-              isArmExit = true
-              break
-            }
-          }
-          this.archValid = isArmExit
-          break
-        case "all":
-          for (const h of this.allHosts) {
-            this.hosts.push(h.name)
-          }
-          for (const repo of this.repoList) {
-            if (repo.architecture === "x86_64") {
-              isAmdExit = true
-              continue
-            }
-            if (repo.architecture === "aarch64") {
-              isArmExit = true
-              continue
-            }
-          }
-          this.archValid = isAmdExit && isArmExit
-          break
+        // case "arm64":
+        //   for (const h of this.allHosts) {
+        //     if (h.architecture === "aarch64") {
+        //       this.hosts.push(h.name)
+        //     }
+        //   }
+        //   for (const repo of this.repoList) {
+        //     if (repo.architecture === "aarch64") {
+        //       isArmExit = true
+        //       break
+        //     }
+        //   }
+        //   this.archValid = isArmExit
+        //   break
+        // case "all":
+        //   for (const h of this.allHosts) {
+        //     this.hosts.push(h.name)
+        //   }
+        //   for (const repo of this.repoList) {
+        //     if (repo.architecture === "x86_64") {
+        //       isAmdExit = true
+        //       continue
+        //     }
+        //     if (repo.architecture === "aarch64") {
+        //       isArmExit = true
+        //       continue
+        //     }
+        //   }
+        //   this.archValid = isAmdExit && isArmExit
+        //   break
       }
       if (type !== "amd64") {
         this.form.helmVersion = "v3"
