@@ -37,7 +37,7 @@
                           <el-option v-if="form.provider === 'bareMetal'" value="all" label="MIXED">MIXED</el-option> -->
                         </el-select>
                       </el-form-item>
-                      <el-form-item :label="$t('cluster.creation.yum_repo')" prop="yumOperate">
+                      <!-- <el-form-item :label="$t('cluster.creation.yum_repo')" prop="yumOperate">
                         <el-select style="width: 100%" v-model="form.yumOperate" clearable>
                           <el-option value="replace">replace</el-option>
                           <el-option value="coexist">coexist</el-option>
@@ -46,7 +46,7 @@
                         <div v-if="form.yumOperate === 'replace'"><span class="input-help">{{$t('cluster.creation.yum_repo_replace_help')}}</span></div>
                         <div v-if="form.yumOperate === 'coexist'"><span class="input-help">{{$t('cluster.creation.yum_repo_coexist_help')}}</span></div>
                         <div v-if="form.yumOperate === 'no'"><span class="input-help">{{$t('cluster.creation.yum_repo_no_help')}}</span></div>
-                      </el-form-item>
+                      </el-form-item> -->
                     </el-col>
                     <el-col :span="4"><br /></el-col>
                   </el-row>
@@ -314,7 +314,7 @@
                       <ul v-if="form.provider === 'bareMetal'">{{$t ('cluster.creation.provide_bare_metal')}}</ul>
                       <ul>{{form.version}}</ul>
                       <ul>{{form.architectures}}</ul>
-                      <ul>{{form.yumOperate}}</ul>
+                      <!-- <ul>{{form.yumOperate}}</ul> -->
                     </el-col>
                   </el-row>
 
@@ -486,7 +486,7 @@ export default {
         projectName: [Rule.RequiredRule],
         provider: [Rule.RequiredRule],
         architectures: [Rule.RequiredRule],
-        yumOperate: [Rule.RequiredRule],
+        // yumOperate: [Rule.RequiredRule],
         runtimeType: [Rule.RequiredRule],
         maxNodePodNum: [Rule.RequiredRule],
         maxClusterServiceNum: [Rule.RequiredRule],
