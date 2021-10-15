@@ -48,7 +48,7 @@
 
 <script>
 import LayoutContent from "@/components/layout/LayoutContent";
-import { getClusterrole } from "@/api/authorize-center";
+// import { getClusterrole } from "@/api/authorize-center";
 import ComplexTable from "@/components/complex-table";
 
 export default {
@@ -103,20 +103,20 @@ export default {
   computed: {},
   methods: {
     search() {
-      this.loading = true;
-      const { currentPage, pageSize } = this.paginationConfig;
-      getClusterrole(currentPage, pageSize, this.condition)
-        .then((data) => {
-          this.loading = false;
-          this.data = [...data.items];
-          this.data.forEach((item) => {
-            this.$set(item, "type", item.namespaces ? item.namespaces[0] : "");
-          });
-          this.paginationConfig.total = data.total;
-        })
-        .catch(() => {
-          this.loading = false;
-        });
+      // this.loading = true;
+      // const { currentPage, pageSize } = this.paginationConfig;
+      // getClusterrole(currentPage, pageSize, '')
+      //   .then((data) => {
+      //     this.loading = false;
+      //     this.data = [...data.items];
+      //     this.data.forEach((item) => {
+      //       this.$set(item, "type", item.namespaces ? item.namespaces[0] : "");
+      //     });
+      //     this.paginationConfig.total = data.total;
+      //   })
+      //   .catch(() => {
+      //     this.loading = false;
+      //   });
     },
     create() {
       this.$router.push({ name: "authorizeCreate" });

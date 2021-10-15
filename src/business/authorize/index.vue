@@ -1,5 +1,20 @@
 <template>
   <layout-content header="授权中心">
+    <span>集群名称：</span>
+    <el-select
+      v-model="cluster"
+      filterable
+      placeholder="请选择"
+      style="margin-bottom: 24px"
+    >
+      <el-option
+        v-for="item in options"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value"
+      >
+      </el-option>
+    </el-select>
     <complex-table
       :data="data"
       local-key="host_columns"
@@ -81,6 +96,7 @@ import LayoutContent from "@/components/layout/LayoutContent";
 import { getClusterrole } from "@/api/authorize-center";
 import ComplexTable from "@/components/complex-table";
 import { kubeconfig } from "@/api/authorize-center";
+import { searchClusters } from "@/api/cluster";
 
 export default {
   name: "serviceMesh",
@@ -94,6 +110,8 @@ export default {
         pageSize: 10,
         total: 0,
       },
+      options: [],
+      cluster: undefined,
       condition: "",
       loading: false,
       data: [],
@@ -129,9 +147,18 @@ export default {
     };
   },
   mounted() {
-    this.search();
+    this.getCluster();
   },
   computed: {},
+  watch: {
+    cluster: {
+      handler(newVal) {
+        if (newVal) {
+          this.search();
+        }
+      },
+    },
+  },
   methods: {
     copy(val) {
       let that = this;
@@ -157,15 +184,32 @@ export default {
         this.config = true;
       });
     },
+    getCluster() {
+      this.loading = true;
+      const { currentPage, pageSize } = this.paginationConfig;
+      searchClusters(currentPage, pageSize, "").then((data) => {
+        this.loading = false;
+        this.options = [...data.items];
+        this.options = this.options.filter(item => {
+          return item.source === 'local'
+        })
+        this.options.forEach((items) => {
+          items.value = items.label = items.name;
+        });
+        if (this.options[0]) {
+          this.cluster = this.options[0].value;
+        }
+      });
+    },
     search() {
       this.loading = true;
       const { currentPage, pageSize } = this.paginationConfig;
-      getClusterrole(currentPage, pageSize, this.condition)
+      getClusterrole(this.cluster, currentPage, pageSize, this.condition)
         .then((data) => {
           this.loading = false;
           this.data = [...data.items];
           this.data.forEach((item) => {
-            this.$set(item, 'type', item.namespaces ? item.namespaces[0] : "");
+            this.$set(item, "type", item.namespaces ? item.namespaces[0] : "");
           });
           this.paginationConfig.total = data.total;
         })
