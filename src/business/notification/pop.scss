@@ -1,0 +1,72 @@
+.popper-class-cus {
+  padding: 24px 0px;
+  padding-bottom: 0;
+  .pop-title {
+    font-size: 14px;
+    color: #797f8c;
+    line-height: 22px;
+    font-weight: 400;
+
+    margin-bottom: 12px;
+
+    padding: 0 24px;
+  }
+  .cus-time {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-row-gap: 16px;
+
+    font-size: 14px;
+    color: #2c2e33;
+    line-height: 22px;
+    font-weight: 500;
+
+    margin-bottom: 24px;
+    padding: 0 24px;
+    .cus-time-item {
+      cursor: pointer;
+    }
+  }
+
+  .date-pick {
+    padding: 0 24px;
+
+    margin-bottom: 8px;
+
+    .option-item {
+      display: flex;
+      align-items: center;
+
+      margin-bottom: 16px;
+      .option-title {
+        font-size: 14px;
+        color: #2c2e33;
+        line-height: 22px;
+        font-weight: 400;
+        margin-right: 12px;
+      }
+      .el-date-pick {
+        flex: 1;
+      }
+    }
+  }
+
+  .cus-pop-btn {
+    display: flex;
+    justify-content: flex-end;
+
+    box-shadow: 0 -1px 0 0 #e4e7f0;
+
+    padding: 8px 24px;
+    .cus-btn {
+      background: #5354bb;
+      color: #ffffff;
+    }
+  }
+}
+
+.date-pop-cus {
+  .el-time-panel {
+    left: -31px;
+  }
+}
