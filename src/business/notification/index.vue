@@ -70,8 +70,8 @@
             ref="queryItem"
           >
             <el-option
-              v-for="item in queryList"
-              :key="item.value"
+              v-for="(item, index) in queryList"
+              :key="item.value + index"
               :label="item.name"
               :value="item.value"
             >
@@ -166,10 +166,10 @@
     <div class="table-con" v-else>
       <div class="noti-item-con" v-for="(noti, index) in notiList" :key="index">
         <div class="noti-item-time">
-          <!-- {{ moment(noti[0]).format("YYYY-MM-DD HH:mm:ss") }} -->
-          {{ noti[1].slice(0, 23) }}
+          {{ moment(noti[0] / 1000 / 1000).format("YYYY-MM-DD HH:mm:ss.SSS") }}
+          <!-- {{ noti[1].slice(0, 23) }} -->
         </div>
-        <div class="noti-item-msg">{{ noti[1].slice(23) }}</div>
+        <div class="noti-item-msg">{{ noti[1] }}</div>
       </div>
     </div>
   </layout-content>
