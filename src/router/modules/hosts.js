@@ -75,11 +75,67 @@ const Host = {
       path: 'middle',
       component: () => import('@/business/hosts/middleware/index'),
       name: "middle",
+      props: true,
+      hidden: false,
       meta: {
         title: "中间件",
+        activeKey: "deploy",
         roles: ['ADMIN', "PROJECT_MANAGER"]
       },
+      children: [{
+        path: "deploy",
+        name: "MiddleDeploy",
+        props: true,
+        hidden: true,
+        component: () => import('@/business/hosts/middleware/deploy'),
+        meta: {
+          title: "中间件",
+          activeMenu: "/hosts/middle",
+          roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"],
+          activeKey: "deploy"
+        }
+      },
+      {
+        path: "deployDetail",
+        name: "DeployDetail",
+        props: true,
+        hidden: true,
+        component: () => import('@/business/hosts/middleware/deployDetail'),
+        meta: {
+          title: "中间件",
+          activeMenu: "/hosts/middle",
+          roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"],
+          activeKey: "deploy"
+        }
+      },
+      {
+        path: "store",
+        name: "MiddleStore",
+        props: true,
+        hidden: true,
+        component: () => import('@/business/hosts/middleware/store'),
+        meta: {
+          title: "中间件",
+          activeMenu: "/hosts/middle",
+          roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"],
+          activeKey: "store"
+        }
+      },
+      {
+        path: "storeDeploy",
+        name: "StoreDeploy",
+        props: true,
+        hidden: true,
+        component: () => import('@/business/hosts/middleware/storeDeploy'),
+        meta: {
+          title: "中间件",
+          activeMenu: "/hosts/middle",
+          roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"],
+          activeKey: "store"
+        }
+      }]
     },
+
     {
       path: 'tool',
       component: () => import('@/business/hosts/tool/index'),
