@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>step1-normal</title>
+    <g id="中间件" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Steppers/piece/Icon/Basis/Normal/03-Incomplete">
+            <circle id="box" fill="#E4E7F0" cx="12" cy="12" r="12"></circle>
+            <text id="3" font-family="PingFangSC-Medium, PingFang SC" font-size="14" font-weight="400" line-spacing="22" fill="#797F8C">
+                <tspan x="8" y="16">1</tspan>
+            </text>
+        </g>
+    </g>
+</svg>
