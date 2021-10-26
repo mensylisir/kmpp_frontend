@@ -1,4 +1,4 @@
-import Layout from "@/business/app-layout/horizontal-layout"
+import Layout from "@/business/app-layout/horizontal-layout";
 
 const Manifest = {
   path: "/supervise",
@@ -7,17 +7,26 @@ const Manifest = {
   name: "Manifest",
   meta: {
     icon: "iconfont icon-certificationmanage",
-    roles: ["ADMIN","PROJECT_MANAGER"]
+    roles: ["ADMIN", "PROJECT_MANAGER"],
+    title: "监控中心"
   },
   children: [
+    // {
+    //   path: "list",
+    //   component: () => import("@/business/supervise"),
+    //   name: "list",
+    //   meta: {
+    //     title: "监控中心"
+    //   }
+    // },
     {
-      path: 'list',
-      component: () => import('@/business/supervise'),
-      name: "list",
+      path: "dashboard",
+      component: () => import("@/business/operation-dashboard"),
+      name: "dashboard",
       meta: {
-        title: "监控中心",
-      },
-    },
+        title: "运维大盘"
+      }
+    }
   ]
-}
-export default Manifest
+};
+export default Manifest;
