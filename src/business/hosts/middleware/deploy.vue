@@ -12,8 +12,8 @@
         <div class="description">
           {{ item.shortDescription }}
           <div style="margin-top: 8px">
-            <span>App: {{ item.latestVersion.appVersion }}</span>
-            <span>Package: {{ item.latestVersion.pkgVersion }}</span>
+            <span>App: {{ item.latestVersion? item.latestVersion.appVersion : "--"}}</span>
+            <span>Package: {{ item.latestVersion? item.latestVersion.pkgVersion : "--"}}</span>
           </div>
         </div>
         <div class="status">
@@ -47,14 +47,14 @@ export default {
     goDetail(item, monitor) {
       item.nameSpace = this.nameSpace;
       this.$store.commit('setMonitor', monitor)
-      console.log(this.$store.state.middle.monitor, '333')
-      // this.$router.push({
-      //   name: "DeployDetail",
-      //   params: {
-      //     item: item,
-      //     monitor: monitor
-      //   },
-      // });
+      this.$router.push({
+        name: "DeployDetail",
+        params: {
+          name: item.name,
+          cluster: this.nameSpace[0],
+          namespace: this.nameSpace[1]
+        },
+      });
     },
     // 获取集群信息
     getCluester() {},

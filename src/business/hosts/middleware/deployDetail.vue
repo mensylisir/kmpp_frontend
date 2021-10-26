@@ -18,13 +18,35 @@
         </div>
         <div class="text-info">
           <span>应用状态：</span>
-          <span></span>
+          <svg
+            v-if="getStatus() === '运行正常'"
+            class="icon status-icon"
+            aria-hidden="true"
+          >
+            <use xlink:href="#icon-checkbox-circle-fill2"></use>
+          </svg>
+          <svg
+            v-else
+            style="color: #f59326"
+            class="icon status-icon"
+            aria-hidden="true"
+            @click="copyText(scope.row.value)"
+          >
+            <use xlink:href="#icon-safe-warning"></use>
+          </svg>
+          <span class="status-label"> {{ getStatus() }}</span>
           <span>应用版本：</span>
           <span class="text-bg"
-            >App: {{ middle.latestVersion.appVersion }}</span
+            >App:
+            {{
+              middle.latestVersion ? middle.latestVersion.appVersion : "--"
+            }}</span
           >
           <span class="text-bg"
-            >Package: {{ middle.latestVersion.pkgVersion }}</span
+            >Package:
+            {{
+              middle.latestVersion ? middle.latestVersion.pkgVersion : "--"
+            }}</span
           >
         </div>
         <div class="text-info">
@@ -46,10 +68,12 @@
             <div class="circleCenter">
               <div>{{ avilable }}/{{ total }}</div>
             </div>
-            <div style="margin-left: 16px; width: 230px">
+            <!-- <div style="margin-left: 16px; width: 230px">
               <div>kubefed-controller-manager<span></span></div>
-              <div>kubefed-admission-webhook<span></span></div>
-            </div>
+              <div style="margin-top: 8px">
+                kubefed-admission-webhook<span></span>
+              </div>
+            </div> -->
           </div>
         </div>
         <div class="right">
@@ -133,37 +157,90 @@
       <div style="padding: 16px 24px" class="resouse">
         <el-table
           v-if="activeKey === 'deployment'"
-          :data="currItem.tableData"
+          :data="currItem.detail"
           border
         >
-          <el-table-column label="名称" width="180">
+          <el-table-column label="名称">
             <template slot-scope="scope">
-              {{ scope.row.item.metadata.name }}
+              {{ scope.row.metadata.name }}
             </template>
           </el-table-column>
-          <el-table-column label="最新" prop="name">
+          <el-table-column label="最新" prop="name" width="230">
             <template slot-scope="scope">
-              {{ scope.row.item.metadata.name }}
+              {{ scope.row.spec.replicas }}
             </template>
           </el-table-column>
-          <el-table-column label="可用" prop="name">
+          <el-table-column label="可用" prop="name" width="230">
             <template slot-scope="scope">
-              {{ scope.row.item.metadata.name }}
+              {{
+                scope.row.status.readyReplicas
+                  ? scope.row.status.readyReplicas
+                  : "--"
+              }}
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-table
+          v-if="activeKey === 'statefulset'"
+          :data="currItem.detail"
+          border
+        >
+          <el-table-column label="名称">
+            <template slot-scope="scope">
+              {{ scope.row.metadata.name }}
+            </template>
+          </el-table-column>
+          <el-table-column label="最新" prop="name" width="230">
+            <template slot-scope="scope">
+              {{ scope.row.status.updatedReplicas }}
+            </template>
+          </el-table-column>
+          <el-table-column label="可用" prop="name" width="230">
+            <template slot-scope="scope">
+              {{
+                scope.row.status.availableReplicas
+                  ? scope.row.status.availableReplicas
+                  : "--"
+              }}
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-table
+          v-if="activeKey === 'daemonset'"
+          :data="currItem.detail"
+          border
+        >
+          <el-table-column label="名称">
+            <template slot-scope="scope">
+              {{ scope.row.metadata.name }}
+            </template>
+          </el-table-column>
+          <el-table-column label="DESIRED" prop="name" width="230">
+            <template slot-scope="scope">
+              {{ scope.row.status.desiredNumberScheduled }}
+            </template>
+          </el-table-column>
+          <el-table-column label="可用" prop="name" width="230">
+            <template slot-scope="scope">
+              {{
+                scope.row.status.numberAvailable
+                  ? scope.row.status.numberAvailable
+                  : "--"
+              }}
             </template>
           </el-table-column>
         </el-table>
         <el-table
           v-if="activeKey === 'secret'"
           :data="currItem.tableData"
-          :span-method="objectSpanMethod"
           border
         >
-          <el-table-column label="名称" width="180">
+          <el-table-column label="名称">
             <template slot-scope="scope">
               {{ scope.row.item.metadata.name }}
             </template>
           </el-table-column>
-          <el-table-column label="类型">
+          <el-table-column label="类型" width="230">
             <template slot-scope="scope">
               {{ scope.row.item.type }}
             </template>
@@ -172,36 +249,37 @@
             <template slot-scope="">
               <el-table
                 class="inner-table"
-                :data="tableData"
+                :data="innerTableData"
                 style="width: 100%"
                 border
                 :show-header="false"
-                :default-sort="{ prop: 'date', order: 'descending' }"
               >
-                <el-table-column prop="label" label="access-key" width="180">
+                <el-table-column prop="label" label="access-key" width="230">
                 </el-table-column>
                 <el-table-column label="key.json">
-                  <template slot-scope="scope">
+                  <template slot-scope="scope1">
                     {{
-                      scope.row.eyeOpen ? scope.row.value : "*****************"
+                      scope1.row.eyeOpen
+                        ? scope1.row.value
+                        : "*****************"
                     }}
                   </template>
                 </el-table-column>
 
                 <el-table-column label="操作" width="80">
-                  <template slot-scope="scope">
+                  <template slot-scope="scope1">
                     <svg
                       class="icon svg-icon"
                       aria-hidden="true"
-                      @click="copyText(scope.row.value)"
+                      @click="copyText(scope1.row.value)"
                     >
                       <use xlink:href="#icon-copy"></use>
                     </svg>
                     <svg
-                      v-if="scope.row.eyeOpen"
+                      v-if="scope1.row.eyeOpen"
                       class="icon svg-icon eyes"
                       aria-hidden="true"
-                      @click="scope.row.eyeOpen = !scope.row.eyeOpen"
+                      @click="scope1.row.eyeOpen = !scope1.row.eyeOpen"
                     >
                       <use xlink:href="#icon-eye-open"></use>
                     </svg>
@@ -209,7 +287,7 @@
                       v-else
                       class="icon svg-icon eyes"
                       aria-hidden="true"
-                      @click="scope.row.eyeOpen = !scope.row.eyeOpen"
+                      @click="scope1.row.eyeOpen = !scope1.row.eyeOpen"
                     >
                       <use xlink:href="#icon-eye-off"></use>
                     </svg>
@@ -219,26 +297,34 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-table
-          v-if="activeKey === 'service'"
-          :data="currItem.tableData"
-          border
-        >
-          <el-table-column label="名称" width="180">
+        <el-table v-if="activeKey === 'service'" :data="currItem.detail" border>
+          <el-table-column label="名称">
             <template slot-scope="scope">
-              {{ scope.row.item.metadata.name }}
+              {{ scope.row.metadata.name }}
             </template>
           </el-table-column>
-          <el-table-column label="类型">
+          <el-table-column label="类型" width="230">
             <template slot-scope="scope">
-              {{ scope.row.item.spec.type }}
+              {{ scope.row.spec.type }}
             </template>
           </el-table-column>
-          <el-table-column label="集群 IP" prop="name"> </el-table-column>
-          <el-table-column label="外部 IP" prop="name"> </el-table-column>
-          <el-table-column label="PORTS" prop="name">
+          <el-table-column label="集群 IP" prop="name" width="230">
             <template slot-scope="scope">
-              {{ scope.row.item.spec.ports.length }}
+              {{ scope.row.spec ? scope.row.spec.clusterIP : "--" }}
+            </template>
+          </el-table-column>
+          <el-table-column label="外部 IP" prop="name" width="230">
+            <template slot-scope="scope">
+              {{
+                scope.row.status.loadbalancer
+                  ? scope.row.status.loadbalancer.ingress.ip
+                  : "--"
+              }}
+            </template>
+          </el-table-column>
+          <el-table-column label="PORTS" prop="name" width="230">
+            <template slot-scope="scope">
+              {{ getPortName(scope.row.spec.ports) }}
             </template>
           </el-table-column>
         </el-table>
@@ -247,12 +333,12 @@
           :data="currItem.tableData"
           border
         >
-          <el-table-column label="名称" width="180">
+          <el-table-column label="名称">
             <template slot-scope="scope">
               {{ scope.row.item.metadata.name }}
             </template>
           </el-table-column>
-          <el-table-column label="类别">
+          <el-table-column label="类别" width="230">
             <template slot-scope="scope">
               {{ scope.row.item.kind }}
             </template>
@@ -276,6 +362,7 @@ import {
   deleteMiddle,
   getDeployResource,
   getResourseDetail,
+  getServiceDetail,
 } from "@/api/middleware";
 // 引用组件
 import CodeMirror from "codemirror";
@@ -328,9 +415,33 @@ export default {
       middle: {},
       detailData: {},
       tableData: [],
+      innerTableData: [],
       manifest: [],
       resouseData: {},
       activeKey: "",
+      message: {
+        status: "",
+      },
+      status: "",
+      time: 0,
+      timer: null,
+      completeCount: 0, // 已完成的数据数量
+      websock: null,
+      tabName: [
+        "deployment",
+        "secret",
+        "service",
+        "statefulset",
+        "daemonset",
+        "replicassets",
+      ], // 需要特殊处理的tab
+      prodItem: [
+        "deployment",
+        "statefulset",
+        "daemonset",
+        "replicasSets",
+        "persistentvolumeclaim",
+      ], // 产生prod的tab--tab下每一条数据的状态都是已完成，最终状态才是完成
     };
   },
   computed: {
@@ -338,30 +449,54 @@ export default {
       let result = this.manifest.filter((item) => {
         return item.name === this.activeKey;
       });
-      console.log(this.manifest);
       return result[0];
     },
     prods() {
       let result = this.manifest.filter((item) => {
-        let arr = ["deployment", "statefulset", "daemonset", "replicasSets"];
-        return arr.indexOf(item.name) > -1;
+        return this.prodItem.indexOf(item.name) > -1;
       });
-      console.log(result, "22");
       return result;
     },
     percentage() {
       let result = (this.avilable / this.total) * 100;
       return result ? result : 0;
     },
+    deployItem() {
+      let result = this.deployList.filter((item) => {
+        return item.name === this.name;
+      });
+      result[0].nameSpace = [
+        this.$route.params.cluster,
+        this.$route.params.namespace,
+      ];
+      return result[0];
+    },
+    name() {
+      return this.$route.params.name || "";
+    },
   },
   watch: {
     activeKey: {
-      handler: function () {
-        if (!this.$store.state.middle.monitor) {
-          if (this.activeKey === "deployment" || this.activeKey === "service") {
+      handler: function (val) {
+        if (val) {
+          if (
+            this.activeKey === "deployment" ||
+            this.activeKey === "service" ||
+            this.activeKey === "statefulset" ||
+            this.activeKey === "daemonset"
+          ) {
             if (this.currItem.tableData.length > 0) {
+              this.currItem.detail = [];
               this.currItem.tableData.forEach((item) => {
-                this.getResourseDetail(item.item);
+                if (
+                  this.activeKey === "deployment" ||
+                  this.activeKey === "statefulset" ||
+                  this.activeKey === "daemonset"
+                ) {
+                  this.getResourseDetail(item.item, false);
+                } else {
+                  this.getServiceDetail(item.item);
+                }
               });
             }
           }
@@ -370,17 +505,54 @@ export default {
       deep: true,
     },
   },
+  beforeDestroy() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+  },
   methods: {
+    getStatus() {
+      let total = 0;
+      let completeCount = 0;
+      let noProd = 0;
+      let totalProd = 0;
+      this.manifest.forEach((item) => {
+        totalProd = totalProd + 1;
+        if (this.prodItem.indexOf(item.name) > -1) {
+          total = total + item.tableData.length;
+          completeCount = item.tableData.filter((item1) => {
+            return item1.item.complete;
+          }).length;
+        } else {
+          noProd = noProd + 1;
+        }
+      });
+      let result =
+        (completeCount === total
+          ? "运行正常"
+          : this.time > 60000
+          ? "运行异常"
+          : "--") || (totalProd === noProd ? "运行正常" : "运行异常");
+      return result;
+    },
+    getPortName(value) {
+      let result = [];
+      value.forEach((item) => {
+        result.push(item.port + "/" + item.protocol);
+      });
+      return result.join(",");
+    },
     // 获取pro数量（deployment、statefulset、daemonset、replicasSets）
     getProNumber() {
       this.prods.forEach((item) => {
         if (item.tableData.length > 0) {
-          this.getResourseDetail(item.item, true);
+          item.tableData.forEach((item1) => {
+            this.getResourseDetail(item1.item, true);
+          });
         }
       });
     },
     copyText(val) {
-      console.log(val);
       this.$copyText(val).then(
         function () {
           Message({
@@ -396,65 +568,62 @@ export default {
         }
       );
     },
-    objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-      console.log(row, column);
-      if (columnIndex === 0) {
-        if (rowIndex % 2 === 0) {
-          return {
-            rowspan: 2,
-            colspan: 1,
-          };
-        } else {
-          return {
-            rowspan: 0,
-            colspan: 0,
-          };
-        }
-      }
-    },
-    // 获取应用详情
-    getResourseDetail(item, flag) {
-      console.log(this.currItem);
-      getResourseDetail(
+    // 获取service详情
+    getServiceDetail(item) {
+      getServiceDetail(
         this.middle.nameSpace[0],
         this.middle.nameSpace[1],
-        item.kind,
+        item.kind.toLowerCase() + "s",
         item.metadata.name
       )
         .then((data) => {
-          console.log(data, "22");
-          if (flag) {
-            // 计算prod
-            this.total = this.total + data.spec.replicas;
-            this.avilable = this.avilable + data.status.replicas;
-          }
+          this.currItem.detail.push(data);
         })
         .catch(() => {});
     },
-    webSocket(item) {
-      let url = `ws:${location.host}/proxy/kubeapps/${this.middle.nameSpace[0]}/api/clusters/default/apis/apps/v1/namespaces/${this.middle.nameSpace[1]}/${item.kind}/${item.metadata.name}`;
-      let aa = url.replace("http", "ws").replace("https", "ws");
-      console.log(aa, "66666");
-      let ws = new WebSocket(aa);
-      console.log("ws连接状态：" + ws.readyState);
-      //监听是否连接成功
-      ws.onopen = function () {
-        console.log("ws连接状态：" + ws.readyState);
-        //连接成功则发送一个数据
-        ws.send("test1");
-      };
-      //接听服务器发回的信息并处理展示
-      ws.onmessage = function (data) {
-        console.log("接收到来自服务器的消息：", data);
-        //完成通信后关闭WebSocket连接
-        // this.$store.commit("setMonitor", false);
-        // ws.close();
-      };
-
-      //监听并处理error事件
-      ws.onerror = function (error) {
-        console.log(error);
-      };
+    // 获取应用详情
+    getResourseDetail(item, flag) {
+      getResourseDetail(
+        this.middle.nameSpace[0],
+        this.middle.nameSpace[1],
+        item.kind.toLowerCase() + "s",
+        item.metadata.name
+      )
+        .then((data) => {
+          // 监控
+          if (item.kind.toLowerCase() === "daemonset") {
+            item.complete =
+              data.status.desiredNumberScheduled == data.status.numberReady
+                ? true
+                : false;
+          } else if (item.kind.toLowerCase() === "persistentvolumeclaim") {
+            item.complete = data.status.phase == "Bound" ? true : false;
+          } else {
+            if (
+              data.status.readyReplicas &&
+              data.spec.replicas === data.status.readyReplicas
+            ) {
+              item.complete = true;
+            }
+          }
+          if (flag) {
+            // 计算prod
+            this.total =
+              this.total + (data.spec.replicas ? data.spec.replicas : 0); // 预期需要这么多Pod
+            this.avilable =
+              this.avilable +
+              (data.status.readyReplicas ? data.status.readyReplicas : 0); // 最终产生的Pod数量
+          } else {
+            item.detail = data;
+            let result = this.currItem.detail.filter((item) => {
+              return item.metadata.name === data.metadata.name;
+            });
+            if (result.length === 0) {
+              this.currItem.detail.push(data);
+            }
+          }
+        })
+        .catch(() => {});
     },
     async editorInit(content) {
       this.jsonEditor = await CodeMirror.fromTextArea(this.$refs.CodeMirror, {
@@ -472,7 +641,6 @@ export default {
     },
     tabChange(index) {
       this.activeKey = index;
-
       let result = this.manifest.filter((item) => {
         return item.name === index;
       });
@@ -523,6 +691,35 @@ export default {
         })
         .catch(() => {});
     },
+    watchStatus() {
+      let that = this;
+      this.timer = window.setInterval(() => {
+        setTimeout(() => {
+          that.time = that.time + 3000;
+          this.status = this.getStatus();
+          if (that.status === "运行正常" || that.time > 60000) {
+            clearInterval(this.timer);
+            console.log(false);
+            that.$store.commit("setMonitor", false);
+            this.status = "运行异常";
+            this.activeKey = "";
+            this.activeKey = this.manifest[0].name;
+            this.getProNumber();
+          } else {
+            this.refreshData();
+          }
+        }, 0);
+      }, 3000);
+    },
+    refreshData() {
+      this.manifest.forEach((item) => {
+        if (this.prodItem.indexOf(item.name) > -1) {
+          item.tableData.forEach((item1) => {
+            this.getResourseDetail(item1.item);
+          });
+        }
+      });
+    },
     getDeployResource() {
       getDeployResource(
         this.middle.nameSpace[0],
@@ -542,7 +739,6 @@ export default {
               item: obj,
               content: item.split(".yaml")[1].trim(),
             });
-            console.log(obj);
           });
           let deployment = result1.filter((item) => {
             return item.name === "deployment";
@@ -553,12 +749,17 @@ export default {
           let service = result1.filter((item) => {
             return item.name === "service";
           });
+          let statefulset = result1.filter((item) => {
+            return item.name === "statefulset";
+          });
+          let daemonset = result1.filter((item) => {
+            return item.name === "daemonset";
+          });
+          let replicassets = result1.filter((item) => {
+            return item.name === "replicassets";
+          });
           let other = result1.filter((item) => {
-            return (
-              item.name !== "service" &&
-              item.name !== "secret" &&
-              item.name !== "deployment"
-            );
+            return this.tabName.indexOf(item.name) === -1;
           });
           this.manifest = [
             {
@@ -574,25 +775,43 @@ export default {
               tableData: service,
             },
             {
+              name: "statefulset",
+              tableData: statefulset,
+            },
+            {
+              name: "daemonset",
+              tableData: daemonset,
+            },
+            {
+              name: "replicassets",
+              tableData: replicassets,
+            },
+            {
               name: "其他资源",
               tableData: other,
             },
           ];
-          // console.log(this.manifest);
+          this.manifest = this.manifest.filter((item) => {
+            return item.tableData.length > 0;
+          });
           this.activeKey = this.manifest[0].name;
           if (secret.length > 0) {
             // 设置Application Secrets
             this.applicationData = secret[0].item.data;
             let keys = Object.keys(this.applicationData);
+            let temp = [];
             keys.forEach((item) => {
-              this.tableData.push({
+              let obj = {
                 label: item,
                 value: this.applicationData[item]
                   ? this.applicationData[item]
                   : "--",
                 eyeOpen: true,
-              });
+              };
+              temp.push(JSON.parse(JSON.stringify(obj)));
             });
+            this.tableData = [...temp];
+            this.innerTableData = JSON.parse(JSON.stringify(this.tableData));
           }
           if (deployment.length === 1) {
             // 只有一条数据
@@ -600,28 +819,49 @@ export default {
           } else {
             this.editorInit("");
           }
-          console.log(this.$store.state.middle.monitor, "444");
+          this.getStorList();
+          // 监控状态
           if (this.$store.state.middle.monitor) {
-            this.manifest.forEach((item) => {
-              if (item.tableData.length > 0 && item.name !== "其他资源") {
-                item.tableData.forEach((item1) => {
-                  // 启动监控
-                  this.webSocket(item1.item);
-                });
-              }
-            });
+            this.watchStatus();
           } else {
             // 安装完成
-            this.getStorList();
             this.getProNumber();
+            this.refreshData();
           }
+        })
+        .catch(() => {});
+    },
+    // 获取我的部署列表
+    getStorItem() {
+      this.deployList = [];
+      let params = {
+        cluster_name: this.$route.params.cluster,
+        fun_name:
+          "kubeappsapis.plugins.helm.packages.v1alpha1.HelmPackagesService.GetInstalledPackageSummaries",
+        use_tls: false,
+        body: {
+          context: {
+            cluster: "default",
+            namespace: this.$route.params.namespace,
+          },
+          paginationOptions: {
+            pageSize: 0,
+            pageToken: "",
+          },
+        },
+      };
+      getStorList(params)
+        .then((data) => {
+          this.deployList = data.map_result.installedPackageSummaries;
+          this.middle = this.deployItem;
+          console.log(this.middle);
+          this.getDeployResource();
         })
         .catch(() => {});
     },
   },
   created() {
-    this.middle = this.$route.params.item;
-    this.getDeployResource();
+    this.getStorItem();
   },
 };
 </script>
@@ -673,6 +913,7 @@ export default {
           font-size: 14px;
           color: #797f8c;
         }
+
         .text-bg {
           background: #dcdee4;
           padding: 0 4px;
@@ -694,7 +935,7 @@ export default {
       margin-bottom: 12px;
     }
     .left {
-      width: 40%;
+      width: 15%;
       margin-right: 56px;
       .content {
         display: flex;
@@ -704,7 +945,7 @@ export default {
       }
     }
     .right {
-      width: 60%;
+      width: 85%;
       .icon {
         cursor: pointer;
         width: 14px;
@@ -727,7 +968,7 @@ export default {
       margin: 0 0 16px 0;
     }
     .content {
-      white-space: pre;
+      white-space: pre-line;
       padding: 16px;
       background: #f4f5f7;
       border-radius: 4px;
@@ -747,7 +988,19 @@ export default {
     }
   }
 }
-
+.status-label {
+  font-size: 12px;
+  color: #2c2e33;
+  line-height: 20px;
+  font-weight: 400;
+  margin-right: 10px;
+}
+.status-icon {
+  color: #36b37e;
+  width: 12px;
+  height: 12px;
+  vertical-align: middle;
+}
 /deep/ .el-menu-item {
   height: 56px;
   font-size: 16px;
@@ -784,6 +1037,11 @@ export default {
       color: #2c2e33;
       line-height: 22px;
       font-weight: 400;
+      .cell {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       &:first-child {
         background: #f9fafc;
         box-shadow: inset -1px 0 0 0 #e4e7f0, inset 0 -1px 0 0 #e4e7f0;
@@ -808,6 +1066,11 @@ export default {
   .el-table {
     tr {
       td {
+        .cell {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
         font-size: 14px;
         color: #2c2e33;
         line-height: 22px;
@@ -870,9 +1133,11 @@ export default {
 }
 .circleCenter {
   position: absolute;
-  left: 28px;
   font-size: 24px;
   color: #2c2e33;
   font-weight: 700;
+  left: 0;
+  width: 62%;
+  text-align: center;
 }
 </style>

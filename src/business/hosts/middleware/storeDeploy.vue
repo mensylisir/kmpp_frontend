@@ -269,16 +269,16 @@ export default {
       deploy(this.stepOneForm.cluster, this.stepOneForm.nameSpace, params)
         .then((data) => {
           console.log(data);
-          this.$router.push({ name: "MiddleDeploy" });
-          // this.$router.push({
-          //   name: "middle",
-          //   params: {
-          //     monitor: true,
-          //     name: data.data.name,
-          //     cluster: this.stepOneForm.cluster,
-          //     nameSpace: this.stepOneForm.nameSpace
-          //   },
-          // });
+          // this.$router.push({ name: "MiddleDeploy" });
+          this.$router.push({
+            name: "middle",
+            params: {
+              monitor: true,
+              name: data.data.name,
+              cluster: this.stepOneForm.cluster,
+              nameSpace: this.stepOneForm.nameSpace,
+            },
+          });
         })
         .catch(() => {});
     },
@@ -445,6 +445,25 @@ export default {
         }
       }
     }
+  }
+  /deep/.combination {
+    .el-input {
+          input {
+      border-radius: 0;
+    }
+      &:first-child {
+        input {
+          border-top-left-radius: 4px;
+          border-bottom-left-radius: 4px;
+        }
+      }
+      &:last-child {
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+      }
+    }
+
+
   }
 }
 </style>
