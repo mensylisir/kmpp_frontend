@@ -4,7 +4,7 @@
   "font_class": "icon-",
   "font_family": "iconfont",
   "url": "https://codesign.qq.com/workspace/icons/GxDP39qAOa9wlKp",
-  "icons_count": 43,
+  "icons_count": 44,
   "icons": [
     {
       "id": "XgRxnjP3BJZLmqr",
@@ -391,6 +391,15 @@
       "class_name": "eye-open",
       "unicode": "e03a",
       "unicode_decimal": 57402,
+      "section": "未编组"
+    },
+    {
+      "id": "BGAE9KyE1YZlRd8",
+      "name": "safe-warning",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\" class=\"design-iconfont\"><path d=\"M8.57733333,2 L14.928,13 C15.047087,13.2062648 15.0470886,13.4603931 14.9280042,13.6666593 C14.8089198,13.8729256 14.5888407,14 14.3506667,14 L1.64933333,14 C1.4111593,14 1.19108016,13.8729256 1.07199577,13.6666593 C0.952911369,13.4603931 0.952912983,13.2062648 1.072,13 L7.42266667,2 C7.54175963,1.79374915 7.76183504,1.666696 8,1.666696 C8.23816496,1.666696 8.45824037,1.79374915 8.57733333,2 Z M7.33333333,10.6666667 L7.33333333,12 L8.66666667,12 L8.66666667,10.6666667 L7.33333333,10.6666667 Z M7.33333333,6 L7.33333333,9.33333333 L8.66666667,9.33333333 L8.66666667,6 L7.33333333,6 Z\" fill-rule=\"evenodd\"></path></svg>",
+      "class_name": "safe-warning",
+      "unicode": "e03b",
+      "unicode_decimal": 57403,
       "section": "未编组"
     }
   ]

@@ -30,6 +30,10 @@ export function getResourseDetail(cluster,nameSpace,type,name) {
   return get(`/proxy/kubeapps/${cluster}/api/clusters/default/apis/apps/v1/namespaces/${nameSpace}/${type}/${name}`)
 }
 
+export function getServiceDetail(cluster,nameSpace,type,name) {
+  return get(`/proxy/kubeapps/${cluster}/api/clusters/default/api/v1/namespaces/${nameSpace}/${type}/${name}`)
+}
+
 export function syncHosts(hosts) {
   const itemUrl = `${middleUrl}/sync/`
   return post(itemUrl, hosts)
