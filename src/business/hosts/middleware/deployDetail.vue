@@ -935,7 +935,6 @@ export default {
       margin-bottom: 12px;
     }
     .left {
-      width: 15%;
       margin-right: 56px;
       .content {
         display: flex;
@@ -1137,7 +1136,7 @@ export default {
   color: #2c2e33;
   font-weight: 700;
   left: 0;
-  width: 62%;
+  width: 100%;
   text-align: center;
 }
 </style>
