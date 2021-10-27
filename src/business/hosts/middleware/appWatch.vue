@@ -8,8 +8,8 @@
           mode="horizontal"
           @select="tabChange"
         >
-          <el-menu-item index="deploy"> 我的部署 </el-menu-item>
-          <el-menu-item index="store"> 应用商店 </el-menu-item>
+          <el-menu-item index="deploy"> 用量排行 </el-menu-item>
+          <el-menu-item index="store"> 使用情况 </el-menu-item>
         </el-menu>
       </div>
       <el-cascader

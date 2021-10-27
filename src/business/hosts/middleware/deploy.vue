@@ -16,10 +16,10 @@
             <span>Package: {{ item.latestVersion? item.latestVersion.pkgVersion : "--"}}</span>
           </div>
         </div>
-        <div class="status">
+        <!-- <div class="status">
           <svg></svg>
-         <!-- <span>状态：{{item.status.userReason}}</span> -->
-        </div>
+         <span>状态：{{item.status.userReason}}</span>
+        </div> -->
       </div>
     </div>
   </div>
@@ -132,7 +132,7 @@ export default {
         color: #4b5059;
         line-height: 20px;
         font-weight: 400;
-        margin: 8px 0;
+        margin: 8px 0 0 8px;
         span {
           margin-top: 8px;
           background: #dcdee4;
