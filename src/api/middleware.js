@@ -22,24 +22,10 @@ export function getDeployResource(cluster,nameSpace,name) {
   return get(`/proxy/kubeapps/${cluster}/api/kubeops/v1/clusters/default/namespaces/${nameSpace}/releases/${name}`)
 }
 
-export function searchHosts(currentPage, pageSize,condition) {
-  return post(`${middleUrl}/search?pageNum=${currentPage}&pageSize=${pageSize}`,condition)
-}
-
 export function getResourseDetail(cluster,nameSpace,type,name) {
   return get(`/proxy/kubeapps/${cluster}/api/clusters/default/apis/apps/v1/namespaces/${nameSpace}/${type}/${name}`)
 }
 
 export function getServiceDetail(cluster,nameSpace,type,name) {
   return get(`/proxy/kubeapps/${cluster}/api/clusters/default/api/v1/namespaces/${nameSpace}/${type}/${name}`)
-}
-
-export function syncHosts(hosts) {
-  const itemUrl = `${middleUrl}/sync/`
-  return post(itemUrl, hosts)
-}
-
-export function importHosts(file) {
-  const itemUrl = `${middleUrl}/upload`
-  return post(itemUrl, file)
 }
