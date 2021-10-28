@@ -158,7 +158,7 @@
     </div>
     <div class="table-no-data" v-if="notiList.length == 0">
       <svg class="icon no-data" aria-hidden="true">
-        <use xlink:href="#icontaolun"></use>
+        <use xlink:href="#icon-box-empty"></use>
       </svg>
       <span class="no-data-info">暂无数据</span>
     </div>
