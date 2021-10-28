@@ -72,6 +72,19 @@ const Host = {
       }
     },
     {
+      path: ":name/:cluster/:namespace/deployDetail",
+      name: "DeployDetail",
+      props: true,
+      hidden: true,
+      component: () => import('@/business/hosts/middleware/deployDetail'),
+      meta: {
+        title: "中间件",
+        activeMenu: "/hosts/middle",
+        roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"],
+        activeKey: "deploy"
+      }
+    },
+    {
       path: 'middle',
       component: () => import('@/business/hosts/middleware/index'),
       name: "middle",
@@ -88,19 +101,6 @@ const Host = {
         props: true,
         hidden: true,
         component: () => import('@/business/hosts/middleware/deploy'),
-        meta: {
-          title: "中间件",
-          activeMenu: "/hosts/middle",
-          roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"],
-          activeKey: "deploy"
-        }
-      },
-      {
-        path: "deployDetail",
-        name: "DeployDetail",
-        props: true,
-        hidden: true,
-        component: () => import('@/business/hosts/middleware/deployDetail'),
         meta: {
           title: "中间件",
           activeMenu: "/hosts/middle",
