@@ -136,15 +136,15 @@ const Host = {
       }]
     },
 
-    {
-      path: 'tool',
-      component: () => import('@/business/hosts/tool/index'),
-      name: "tool",
-      meta: {
-        title: "工具",
-        roles: ['ADMIN', "PROJECT_MANAGER"]
-      },
-    },
+    // {
+    //   path: 'tool',
+    //   component: () => import('@/business/hosts/tool/index'),
+    //   name: "tool",
+    //   meta: {
+    //     title: "工具",
+    //     roles: ['ADMIN', "PROJECT_MANAGER"]
+    //   },
+    // },
     {
       path: 'certification',
       component: () => import('@/business/hosts/certification/index'),

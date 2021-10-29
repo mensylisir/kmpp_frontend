@@ -5,8 +5,8 @@ const baseUrl = "/api/v1/rbacs"
 export function getClusterrole(name,currentPage, pageSize,condition) {
   return get(`/api/v1/kubeusers/${name}?pageNum=${currentPage}&pageSize=${pageSize}&condition=${condition}`)
 }
-export function getRbacs() {
-  return get(`${baseUrl}/mm`)
+export function getRbacs(cluster) {
+  return get(`${baseUrl}/${cluster}`)
 }
 export function rolebinding(data) {
   return post(`${baseUrl}/rolebinding`, data)
