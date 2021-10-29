@@ -21,7 +21,6 @@
 
 <script>
 import LayoutContent from "@/components/layout/LayoutContent";
-// import { listNamespace } from "@/api/cluster/namespace";
 
 export default {
   name: "appWatch",
@@ -44,26 +43,9 @@ export default {
         this.$router.push({ name: "useCondition" });
       }
     },
-
-    // 获取namespace
-    // getNamespace(name) {
-    //   listNamespace(name)
-    //     .then((data) => {
-    //       this.count++;
-    //       let result = data.items || [];
-    //       result.forEach(item => {
-    //         item.cluster = name
-    //       })
-    //       this.nameSpace = this.nameSpace.concat(result);
-    //       if (this.count === this.clusterList.length) {
-    //         this.tabChange(this.activeKey);
-    //       }
-    //     })
-    //     .catch(() => {});
-    // },
   },
   created() {
-    this.tabChange("recommend")
+    this.tabChange(this.activeKey)
   },
   watch: {
     $route() {},

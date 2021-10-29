@@ -32,7 +32,13 @@
         </el-table-column>
         <el-table-column prop="name" label="状态" width="100">
           <template slot-scope="scope">
-            <span>{{ scope.row.status || "--" }}</span>
+            <svg class="icon svg-icon" aria-hidden="true" v-if="scope.row.status === '异常'" style="color: #CF0A1E">
+              <use xlink:href="#icon-checkbox-circle-fill"></use>
+            </svg>
+                <svg class="icon svg-icon" aria-hidden="true" v-else style="color: #36B37E">
+              <use xlink:href="#icon-checkbox-circle-fill2"></use>
+            </svg>
+            <span>{{ scope.row.status || "活跃"}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="cpuCore" label="CPU使用量" sortable width="150">
@@ -166,6 +172,11 @@ export default {
           value:
             "sum(kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace=~'.*'}) by (namespace) / 1024 / 1024 / 1024",
         },
+        {
+          attribute: "status",
+          value:
+            "count(kube_pod_status_phase{phase='Running', namespace=~'.*'} == 0) by (namespace) unless count(kube_job_info{namespace=~'.*'}) by (namespace)",
+        },
       ],
     };
   },
@@ -232,14 +243,30 @@ export default {
               );
             });
             if (index === -1) {
-              let tableItem = {
-                namespace: item.metric.namespace,
-                cluster: cluster,
-              };
-              tableItem[params.attribute] = Number(item.value[1]);
-              this.totalData.push(tableItem);
+              if (item.metric.namespace) {
+                let tableItem = {
+                  namespace: item.metric.namespace,
+                  cluster: cluster,
+                };
+                if (params.attribute === "status") {
+                  tableItem[params.attribute] =
+                    item.value.length === 0 || item.value[1] == 0
+                      ? "活跃"
+                      : "异常";
+                } else {
+                  tableItem[params.attribute] = Number(item.value[1]);
+                }
+                this.totalData.push(tableItem);
+              }
             } else {
-              this.totalData[index][params.attribute] = Number(item.value[1]);
+              if (params.attribute === "status") {
+                this.totalData[index][params.attribute] =
+                  (item.value.length === 0 || item.value[1] == 0)
+                    ? "活跃"
+                    : "异常";
+              } else {
+                this.totalData[index][params.attribute] = Number(item.value[1]);
+              }
             }
           });
           this.pageration();
@@ -269,6 +296,7 @@ export default {
       color: #2c2e33;
       line-height: 24px;
       font-weight: 500;
+      margin: 0;
     }
     .sort {
       margin: 0 16px 0 8px;
@@ -277,6 +305,11 @@ export default {
   .block {
     text-align: right;
     margin: 15px 0;
+  }
+  svg{
+    width: 13.33px;
+    height: 13.33px;
+    margin-right: 5.33px;
   }
   /deep/ table {
     td {
