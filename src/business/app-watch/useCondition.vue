@@ -495,7 +495,7 @@ export default {
           .interval()
           .adjust("stack")
           .position("State*人口数量")
-          .size(12)
+          .size(10)
           .color("年龄段", ["#36B37E", "#F59326", "#CF0A1E"]);
 
         chart.interaction("active-region");
@@ -609,7 +609,7 @@ export default {
     // 资源使用率 - cpu
     const lineColor1 = ["#5354BB"];
     const areaColor1 = ["#e0e1f2"];
-    const legends1 = [];
+    const legends1 = ["CPU使用"];
     this.initRate(
       "cpu-rate",
       this.cpuRate,
