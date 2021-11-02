@@ -151,29 +151,20 @@
         <h4>集群资源使用情况</h4>
         <div class="content flex-layout">
           <div class="left" style="width: 40%">
-            <div
-              class="cpu"
-              @click="resourse = 'cpu'"
-              :class="{ 'resourse-select': resourse === 'cpu' }"
-            >
+            <div class="cpu">
               <div style="margin-bottom: 22px; font-size: 14px">
                 <svg class="icon svg-icon" aria-hidden="true">
                   <use xlink:href="#icon-copy"></use>
                 </svg>
                 CPU
               </div>
-              <div
-                class="flex-layout cpu-progress"
-                style="justify-content: flex-start"
-              >
+              <div class="flex-layout" style="justify-content: flex-start">
                 <el-progress
                   type="circle"
                   :percentage="
-                    getPercentage(pageData.cpuuse, pageData.cputotal)
+                    pageData.cpurate || 0
                   "
-                  :color="
-                    resourse === 'cpu' ? 'rgba(255, 255, 255, 15)' : '#5455BC'
-                  "
+                  color="white"
                   :show-text="false"
                   :width="40"
                 ></el-progress>
@@ -181,24 +172,20 @@
                   <div>使用率</div>
                   <span
                     >{{
-                      getPercentage(pageData.cpuuse, pageData.cputotal)
+                      getPercentage(pageData.cpuuse / pageData.cputotal)
                     }}%</span
                   >
                 </div>
                 <div>
                   <div>已使用/配额(Core)</div>
                   <span
-                    >{{ parseFloat(pageData.cpuuse).toFixed(4) || 0 }}/
-                    {{ parseFloat(pageData.cputotal) || "不限额" }}</span
+                    >{{ pageData.cpuuse || 0 }}/
+                    {{ pageData.cputotal || 0 }}</span
                   >
                 </div>
               </div>
             </div>
-            <div
-              class="storage"
-              @click="resourse = 'storage'"
-              :class="{ 'resourse-select': resourse === 'storage' }"
-            >
+            <div class="storage">
               <div style="margin-bottom: 22px; font-size: 14px">
                 <svg class="icon svg-icon" aria-hidden="true">
                   <use xlink:href="#icon-copy"></use>
@@ -211,11 +198,7 @@
                   :percentage="
                     getPercentage(pageData.storage, pageData.storagetotal)
                   "
-                  :color="
-                    resourse === 'storage'
-                      ? 'rgba(255, 255, 255, 15)'
-                      : '#5455BC'
-                  "
+                  color="#5455BC"
                   :show-text="false"
                   :width="40"
                 ></el-progress>
@@ -223,15 +206,15 @@
                   <div>使用率</div>
                   <span
                     >{{
-                      getPercentage(pageData.storage, pageData.storagetotal)
+                      getPercentage(pageData.storage / pageData.storagetotal)
                     }}%</span
                   >
                 </div>
                 <div>
-                  <div>已使用/配额(Gi)</div>
+                  <div>已使用/配额(Core)</div>
                   <span
-                    >{{  parseFloat(pageData.storage).toFixed(4) || 0 }}/{{
-                      parseFloat(pageData.storagetotal) || "不限额"
+                    >{{ pageData.storage || 0 }}/{{
+                      pageData.storagetotal || 0
                     }}</span
                   >
                 </div>
@@ -275,7 +258,6 @@ export default {
         emitPath: true,
         lazy: false,
       },
-      resourse: "cpu",
       filterDay: "1-day",
       tableData: [],
       nameSpace: [],
@@ -316,20 +298,23 @@ export default {
         },
         {
           attribute: "cputotal",
-          value: "sum(container_spec_cpu_quota{namespace=~",
+          value:
+            "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{namespace=~",
         },
         {
           attribute: "cpuuse",
-          value: "sum(rate(container_cpu_usage_seconds_total{namespace=~",
+          value:
+            "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{namespace=~",
         },
         // 内存
         {
           attribute: "storage",
-          value: "sum(container_memory_rss{namespace=~",
+          value: "sum(container_memory_working_set_bytes{namespace=~",
         },
         {
           attribute: "storagetotal",
-          value: "sum(container_spec_memory_limit_bytes{namespace=~",
+          value:
+            "sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{namespace=~",
         },
         // 可用部署数
         {
@@ -347,7 +332,7 @@ export default {
           attribute: "runningstatusdeploy",
           value: "count(kube_statefulset_status_replicas_ready{namespace=~",
         },
-        // 不可用的有状态集数
+        // 不 可用的有状态集数
         {
           attribute: "unavailablestatusdeploy",
           value: "count(kube_statefulset_replicas{namespace=~",
@@ -362,6 +347,16 @@ export default {
           attribute: "unavailableprogressdeploy",
           value: "count(kube_daemonset_status_number_unavailable{namespace=~",
         },
+          // 每个namespace的CPU使用率
+        {
+          attribute: "cpurate",
+          value: "sum(irate(container_cpu_usage_seconds_total{namespace=~",
+        },
+        //   // 不可用守护进程集数
+        // {
+        //   attribute: "unavailableprogressdeploy",
+        //   value: "count(kube_daemonset_status_number_unavailable{namespace=~",
+        // },
       ],
       cpuRate: [],
       network: [],
@@ -417,17 +412,12 @@ export default {
       },
       deep: true,
     },
-    resourse: {
-      handler: function () {
-        this.getCPUParam(); // 获取cpu趋势图
-      },
-    },
   },
   computed: {},
   methods: {
     getPercentage(val, val1) {
-      if (val && val1 && val1 !== "0") {
-        return parseFloat(((val / val1) * 100).toFixed(2));
+      if (val && val1) {
+        return (val / val1) * 100;
       } else {
         return 0;
       }
@@ -534,30 +524,19 @@ export default {
       this.cpuRate = this.handalData("cpuRate");
       if (this.chartCus1) {
         this.chartCus1.data(this.cpuRate);
-        // 设置总量 标题
-        this.chartCus1.annotation().text().option[0].content =
-          this.resourse === "cpu" ? "CPU使用概况（%）" : "内存占用概况（%）";
-        this.chartCus1.legend({
-          position: "top-right",
-          items: [
-            {
-              name: this.resourse === "cpu" ? "CPU使用" : "内存占用",
-            },
-          ],
-        });
         this.chartCus1.render();
       } else {
         // 资源使用率 - cpu
         const lineColor1 = ["#5354BB"];
         const areaColor1 = ["#e0e1f2"];
-        const legends1 = this.resourse === "cpu" ? ["CPU使用"] : ["内存占用"];
+        const legends1 = ["CPU使用"];
         this.initRate(
           "cpu-rate",
           this.cpuRate,
           lineColor1,
           legends1,
           areaColor1,
-          this.resourse === "cpu" ? "CPU使用概况（%）" : "内存占用概况（%）",
+          "CPU使用概况（%）",
           1
         );
       }
@@ -628,36 +607,39 @@ export default {
     // 获取列表
     getTableParam(params) {
       let params1 = "";
-      if (params.attribute === "cpuuse") {
-        params1 = params.value + `'${this.nameSpace[1]}'}[1m]))`;
-      } else if (params.attribute === "cputotal") {
-        params1 = params.value + `'${this.nameSpace[1]}'}/100000)`;
+      if (params.value === "cpuuse") {
+        params1 =
+          params.value +
+          `'${this.nameSpace[1]}'})*sum(irate(container_cpu_usage_seconds_total{namespace=~'${this.nameSpace[1]}'}[5m]) * 100)  * 0.01`;
       } else if (
-        params.attribute === "storage" ||
-        params.attribute === "storagetotal"
+        params.value === "storage" ||
+        params.value === "storagetotal"
       ) {
         params1 =
           params.value + `'${this.nameSpace[1]}'} / 1024 / 1024 / 1024)`;
       } else if (
-        params.attribute === "runningdeploy" ||
-        params.attribute === "unavailabledeploy" ||
-        params.attribute === "runningstatusdeploy" ||
-        params.attribute === "unavailableprogressdeploy"
+        params.value === "runningdeploy" ||
+        params.value === "unavailabledeploy" ||
+        params.value === "runningstatusdeploy" ||
+        params.value === "unavailableprogressdeploy"
       ) {
         params1 = params.value + `'${this.nameSpace[1]}'} != 0 )`;
-      } else if (params.attribute === "unavailablestatusdeploy") {
+      } else if (params.value === "unavailablestatusdeploy") {
         params1 =
           params.value +
           `'${this.nameSpace[1]}'})- count(kube_statefulset_status_replicas_ready{namespace=~'${this.nameSpace[1]}'} != 0)`;
-      } else if (params.attribute === "cpurate") {
-        params1 = params.value + `'${this.nameSpace[1]}'}[5m]) * 100)`;
-      } else {
+      }  else if (params.value === "cpurate") {
+        params1 =
+          params.value +
+          `'${this.nameSpace[1]}'}[5m]) * 100)`;
+      }else {
         params1 = params.value + `'${this.nameSpace[1]}'})`;
       }
       getTableParam(this.nameSpace[0], params1)
         .then((data) => {
           const result = data.data.result || [];
           this.itemArry[params.attribute] = result[0] ? result[0].value[1] : "";
+          console.log(this.itemArry, "22");
           let compute = [
             "runningdeploy",
             "unavailabledeploy",
@@ -684,16 +666,16 @@ export default {
     //CPU趋势图
     getCPUParam() {
       let time = this.getTime();
-      let params = "";
-      if (this.resourse === "cpu") {
-        params = `sum(irate(container_cpu_usage_seconds_total{namespace=~'${this.nameSpace[1]}'}[5m]) * 100)`;
-      } else {
-        params = `sum(container_memory_working_set_bytes{namespace=~'${this.nameSpace[1]}'} / 1024 / 1024 / 1024) / sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{namespace=~'${this.nameSpace[1]}'} / 1024 / 1024 / 1024)`;
-      }
-      getCPUParam(this.nameSpace[0], params, time[0], time[1], this.step)
+      getCPUParam(
+        this.nameSpace[0],
+        `sum(irate(container_cpu_usage_seconds_total{namespace=~'${this.nameSpace[1]}'}[5m]) * 100)`,
+        time[0],
+        time[1],
+        this.step
+      )
         .then((data) => {
           const result = data.data.result || [];
-          this.itemArry.cpuRate = result[0] ? result[0].values : [];
+          this.itemArry.cpuRate = result[0].values;
           this.pageData = JSON.parse(JSON.stringify(this.itemArry));
           this.initCpu(); // 初始化cpu图
         })
@@ -729,6 +711,7 @@ export default {
     },
     // 条形图
     dataInit() {
+      console.log(this.component);
       const ds = new DataSet();
       const dv = ds.createView().source(this.component);
       dv.transform({
@@ -1027,22 +1010,22 @@ export default {
       }
     }
     .cpu {
-      background: #f9fafc;
+      background: #5354bb;
       border-radius: 4px;
       font-size: 14px;
+      color: #ffffff;
       line-height: 22px;
       font-weight: 500;
       padding: 16px 16px 24px 16px;
-      cursor: pointer;
       div {
         font-size: 12px;
-        color: #4b5059;
+        color: #ffffff;
         line-height: 20px;
         font-weight: 400;
       }
       span {
         font-size: 16px;
-        color: #2c2e33;
+        color: #ffffff;
         font-weight: 700;
       }
     }
@@ -1051,7 +1034,6 @@ export default {
       background: #f9fafc;
       border-radius: 4px;
       margin-top: 8px;
-      cursor: pointer;
       div {
         font-size: 12px;
         color: #4b5059;
@@ -1074,18 +1056,6 @@ export default {
       color: #2c2e33;
       line-height: 24px;
       font-weight: 500;
-    }
-    /deep/.resourse-select {
-      background: #5354bb;
-      span {
-        color: #ffffff;
-      }
-      div {
-        color: #ffffff;
-      }
-      svg path:first-child {
-        stroke: rgba(255, 255, 255, 0.15);
-      }
     }
   }
 }

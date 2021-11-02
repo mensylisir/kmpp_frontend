@@ -285,7 +285,7 @@ export default {
   background: white;
   padding: 24px;
   margin-top: 8px;
-  height: calc(100% - 48px);
+  height: calc(100vh - 175px);
   .top {
     padding: 0 0 13px 0;
     display: flex;
