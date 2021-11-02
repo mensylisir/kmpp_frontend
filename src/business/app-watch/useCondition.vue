@@ -11,16 +11,18 @@
         ></el-cascader>
       </div>
       <div>
-        <el-select size="small" v-model="filterDay">
-          <el-option value="1" label="最近1天"> </el-option>
-          <el-option value="7" label="最近7天"> </el-option>
-          <el-option value="30" label="最近1个月"> </el-option>
-          <el-option value="90" label="最近3个月"> </el-option>
+        <el-select size="small" v-model="filterDay" @change="changeTime(true)">
+          <el-option value="30-min" label="最近30分钟"> </el-option>
+          <el-option value="1-h" label="最近1小时"> </el-option>
+          <el-option value="12-h" label="最近12小时"> </el-option>
+          <el-option value="1-day" label="最近1天"> </el-option>
+          <el-option value="3-day" label="最近3天"> </el-option>
+          <el-option value="7-day" label="最近7天"> </el-option>
         </el-select>
-        <el-button
+        <!-- <el-button
           icon="el-icon-refresh-right"
           style="margin-left: 16px"
-        ></el-button>
+        ></el-button> -->
       </div>
     </div>
     <div class="bottom">
@@ -32,7 +34,25 @@
               <div class="item">
                 <div class="label">
                   <div>应用状态</div>
-                  <span>{{ pageData.status || "--" }}</span>
+                  <svg
+                    class="icon status-icon"
+                    aria-hidden="true"
+                    v-if="pageData.status > 0"
+                    style="color: #cf0a1e"
+                  >
+                    <use xlink:href="#icon-checkbox-circle-fill"></use>
+                  </svg>
+                  <svg
+                    class="icon status-icon"
+                    aria-hidden="true"
+                    v-else
+                    style="color: #36b37e"
+                  >
+                    <use xlink:href="#icon-checkbox-circle-fill2"></use>
+                  </svg>
+                  <span style="font-size: 14px; font-weight: 400">{{
+                    pageData.status > 0 ? "异常" : "正常"
+                  }}</span>
                 </div>
                 <div class="line"></div>
                 <div class="label">
@@ -130,7 +150,7 @@
       <div class="pannal">
         <h4>集群资源使用情况</h4>
         <div class="content flex-layout">
-          <div class="left" style="width: 30%">
+          <div class="left" style="width: 40%">
             <div class="cpu">
               <div style="margin-bottom: 22px; font-size: 14px">
                 <svg class="icon svg-icon" aria-hidden="true">
@@ -139,11 +159,11 @@
                 CPU
               </div>
               <div class="flex-layout" style="justify-content: flex-start">
-                <!-- :percentage="(pageData.cpuuse / pageData.cputotal) * 100" -->
-
                 <el-progress
                   type="circle"
-                  :percentage="30"
+                  :percentage="
+                    getPercentage(pageData.cpuuse, pageData.cputotal)
+                  "
                   color="white"
                   :show-text="false"
                   :width="40"
@@ -152,16 +172,15 @@
                   <div>使用率</div>
                   <span
                     >{{
-                      (pageData.cpuuse / pageData.cputotal) * 100 || "--"
+                      getPercentage(pageData.cpuuse / pageData.cputotal)
                     }}%</span
                   >
                 </div>
                 <div>
                   <div>已使用/配额(Core)</div>
                   <span
-                    >{{ pageData.cpuuse || 0 }}/{{
-                      pageData.cputotal || 0
-                    }}</span
+                    >{{ pageData.cpuuse || 0 }}/
+                    {{ pageData.cputotal || 0 }}</span
                   >
                 </div>
               </div>
@@ -174,11 +193,11 @@
                 内存
               </div>
               <div class="flex-layout" style="justify-content: flex-start">
-                <!-- :percentage="(pageData.storage / pageData.storagetotal) * 100" -->
-
                 <el-progress
                   type="circle"
-                  :percentage="30"
+                  :percentage="
+                    getPercentage(pageData.storage, pageData.storagetotal)
+                  "
                   color="#5455BC"
                   :show-text="false"
                   :width="40"
@@ -187,7 +206,7 @@
                   <div>使用率</div>
                   <span
                     >{{
-                      (pageData.storage / pageData.storagetotal) * 100 || "--"
+                      getPercentage(pageData.storage / pageData.storagetotal)
                     }}%</span
                   >
                 </div>
@@ -202,7 +221,7 @@
               </div>
             </div>
           </div>
-          <div class="right" style="width: 70%">
+          <div class="right" style="width: 60%">
             <div class="four-grid">
               <div id="cpu-rate"></div>
             </div>
@@ -239,15 +258,19 @@ export default {
         emitPath: true,
         lazy: false,
       },
-      filterDay: "7",
-      // CPU使用概况-cpu
-      chartCus1: null,
+      filterDay: "1-day",
       tableData: [],
       nameSpace: [],
       clusterList: [],
+      currTime: [],
       pageData: {}, // 页面数据
-      // 持久卷适量，查询任务数量，查询定时任务数量，查询服务数量，查询容器组数量，查询运行的容器组数量，cpu核心数，cpu已使用核心数,内存占用，内存配额
+      // 状态，持久卷适量，查询任务数量，查询定时任务数量，查询服务数量，查询容器组数量，查询运行的容器组数量，cpu核心数，cpu已使用核心数,内存占用，内存配额，
       queryParams: [
+        {
+          attribute: "status",
+          value:
+            "count(kube_pod_status_phase{phase='Running', namespace=~'monitoring'} == 0) unless count(kube_job_info{namespace=~",
+        },
         {
           attribute: "volumeclaim",
           value: "count(kube_persistentvolumeclaim_info{namespace=~",
@@ -272,52 +295,111 @@ export default {
           attribute: "runningcontain",
           value: "sum(kube_pod_status_phase{phase='Running', namespace=~",
         },
-        // {
-        //   attribute: "cputotal",
-        //   value:
-        //     "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{namespace=~",
-        // },
-        // {
-        //   attribute: "cpuuse",
-        //   value: "sum(irate(container_cpu_usage_seconds_total{namespace=~",
-        // },
-        // // 内存-todo
-        // {
-        //   attribute: "storage",
-        //   value:
-        //     "sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_requests{namespace=~'.*'}) by (",
-        // },
-        // {
-        //   attribute: "storagetotal",
-        //   value:
-        //     "sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{namespace=~'.*'}) by (",
-        // },
+        {
+          attribute: "cputotal",
+          value:
+            "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{namespace=~",
+        },
+        {
+          attribute: "cpuuse",
+          value:
+            "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{namespace=~",
+        },
+        // 内存
+        {
+          attribute: "storage",
+          value: "sum(container_memory_working_set_bytes{namespace=~",
+        },
+        {
+          attribute: "storagetotal",
+          value:
+            "sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{namespace=~",
+        },
+        // 可用部署数
+        {
+          attribute: "runningdeploy",
+          value: "count(kube_deployment_status_replicas_ready{namespace=~",
+        },
+        // 不可用部署数
+        {
+          attribute: "unavailabledeploy",
+          value:
+            "count(kube_deployment_status_replicas_unavailable{namespace=~",
+        },
+        //  可用的有状态集数
+        {
+          attribute: "runningstatusdeploy",
+          value: "count(kube_statefulset_status_replicas_ready{namespace=~",
+        },
+        // 不 可用的有状态集数
+        {
+          attribute: "unavailablestatusdeploy",
+          value: "count(kube_statefulset_replicas{namespace=~",
+        },
+        // 可用守护进程集数
+        {
+          attribute: "runningprogressdeploy",
+          value: "count(kube_daemonset_status_number_ready{namespace=~",
+        },
+        // 不可用守护进程集数
+        {
+          attribute: "unavailableprogressdeploy",
+          value: "count(kube_daemonset_status_number_unavailable{namespace=~",
+        },
       ],
       cpuRate: [
-        { label: "使用量", year: "1750", value: 502 },
-        { label: "使用量", year: "1800", value: 635 },
-        { label: "使用量", year: "1850", value: 809 },
-        { label: "使用量", year: "1900", value: 3268 },
-        { label: "使用量", year: "1950", value: 4400 },
-        { label: "使用量", year: "1999", value: 3634 },
-        { label: "使用量", year: "2050", value: 947 },
+        // { label: "使用量", year: "1750", value: 502 },
+        // { label: "使用量", year: "1800", value: 635 },
+        // { label: "使用量", year: "1850", value: 809 },
+        // { label: "使用量", year: "1900", value: 3268 },
+        // { label: "使用量", year: "1950", value: 4400 },
+        // { label: "使用量", year: "1999", value: 3634 },
+        // { label: "使用量", year: "2050", value: 947 },
       ],
       network: [
-        { label: "使用量", year: "1750", value: 502 },
-        { label: "使用量", year: "1800", value: 635 },
-        { label: "使用量", year: "1850", value: 809 },
-        { label: "使用量", year: "1900", value: 3268 },
-        { label: "使用量", year: "1950", value: 4400 },
-        { label: "使用量", year: "1999", value: 3634 },
-        { label: "使用量", year: "2050", value: 947 },
-        { label: "请求速率", year: "1750", value: 106 },
-        { label: "请求速率", year: "1800", value: 107 },
-        { label: "请求速率", year: "1850", value: 111 },
-        { label: "请求速率", year: "1900", value: 1766 },
-        { label: "请求速率", year: "1950", value: 221 },
-        { label: "请求速率", year: "1999", value: 767 },
-        { label: "请求速率", year: "2050", value: 133 },
+        // { label: "流入", year: "1750", value: 502 },
+        // { label: "流入", year: "1800", value: 635 },
+        // { label: "流入", year: "1850", value: 809 },
+        // { label: "流出", year: "1750", value: 106 },
+        // { label: "流出", year: "1800", value: 107 },
+        // { label: "流出", year: "1850", value: 111 },
       ],
+      component: [
+        {
+          State: "守护进程集",
+          type: "running",
+          value: 0,
+        },
+        {
+          State: "守护进程集",
+          type: "unvailable",
+          value: 0,
+        },
+        {
+          State: "有状态副本集",
+          type: "running",
+          value: 0,
+        },
+        {
+          State: "有状态副本集",
+          type: "unvailable",
+          value: 0,
+        },
+        {
+          State: "部署",
+          type: "running",
+          value: 0,
+        },
+        {
+          State: "部署",
+          type: "unvailable",
+          value: 0,
+        },
+      ],
+      step: 20,
+      chartCus1: null,
+      chartCus2: null,
+      count: 0,
     };
   },
   props: [""],
@@ -328,31 +410,164 @@ export default {
           this.queryParams.forEach((item) => {
             this.getTableParam(item);
           });
-          // this.getCPUParam(); // 获取cpu趋势图
+          this.changeTime(); // 获取cpu趋势图
         }
       },
       deep: true,
     },
   },
-  computed: {
-    time() {
-      //       if(this.filterDay === '1'){
-      // this.step =
-      //       }
-      //       this.filterDay
-      let result = this.nameSpace.filter((item) => {
-        return item.metadata.name === this.currSpace;
-      });
-      return result[0];
-    },
-  },
+  computed: {},
   methods: {
+    getPercentage(val, val1) {
+      if (val && val1) {
+        return (val / val1) * 100;
+      } else {
+        return 0;
+      }
+    },
+    getTime() {
+      let timeArry = this.filterDay.split("-");
+      let currTime = Date.now();
+      let result = [];
+      let start = 0;
+      if (timeArry[1] === "min") {
+        this.step = 50;
+        start = currTime - timeArry[0] * 60 * 1000;
+      } else if (timeArry[1] === "h") {
+        this.step = timeArry[0] > 10 ? 500 : 50;
+        start = currTime - timeArry[0] * 60 * 60 * 1000;
+      } else if (timeArry[1] === "day") {
+        this.step = 500;
+        if (timeArry[0] === "7") {
+          start = currTime - (timeArry[0] - 1) * 24 * 60 * 60 * 1000;
+        } else {
+          start = currTime - timeArry[0] * 24 * 60 * 60 * 1000;
+        }
+      }
+      this.currTime = [parseInt(start / 1000), parseInt(currTime / 1000)];
+      result = [parseInt(start / 1000), parseInt(currTime / 1000)];
+      return result;
+    },
+    handalData(type) {
+      let result = [];
+      this.pageData[type].forEach((item) => {
+        let year = this.formatTime(item[0] * 1000);
+        result.push({
+          label:
+            type === "cpuRate"
+              ? "使用量"
+              : type === "netflow"
+              ? "流入"
+              : "流出",
+          Data: year,
+          value: Number(item[1]).toFixed(4),
+        });
+      });
+      return result;
+    },
     change(item) {
       if (item.length === 1) {
         this.getNamespace(item[0]);
       }
     },
-    init() {},
+    // 格式化日期
+    formatTime(time) {
+      if (time) {
+        var oDate = new Date(time * 1),
+          oYear = oDate.getFullYear(),
+          oMonth = oDate.getMonth() + 1,
+          oDay = oDate.getDate(),
+          oHour = oDate.getHours(),
+          oMin = oDate.getMinutes(),
+          oSen = oDate.getSeconds(),
+          oTime =
+            oYear +
+            "-" +
+            this.getBz(oMonth) +
+            "-" +
+            this.getBz(oDay) +
+            " " +
+            this.getBz(oHour) +
+            ":" +
+            this.getBz(oMin) +
+            ":" +
+            this.getBz(oSen); //拼接时间
+        return oTime;
+      } else {
+        return "";
+      }
+    },
+    getBz(num) {
+      if (parseInt(num) < 10) {
+        num = "0" + num;
+      }
+      return num;
+    },
+    // 修改时间段
+    changeTime() {
+      // 流入，流出
+      let network = [
+        {
+          attribute: "netflow",
+          value: "sum(irate(container_network_receive_bytes_total{namespace=~",
+        },
+        {
+          attribute: "netout",
+          value: "sum(irate(container_network_transmit_bytes_total{namespace=~",
+        },
+      ];
+      this.getCPUParam(); // 获取cpu趋势图
+      // 网络流入流出图
+      network.forEach((item) => {
+        this.getNetworkParam(item);
+      });
+    },
+    // cpu 使用图
+    initCpu() {
+      this.cpuRate = this.handalData("cpuRate");
+      if (this.chartCus1) {
+        this.chartCus1.data(this.cpuRate);
+        this.chartCus1.render();
+      } else {
+        // 资源使用率 - cpu
+        const lineColor1 = ["#5354BB"];
+        const areaColor1 = ["#e0e1f2"];
+        const legends1 = ["CPU使用"];
+        this.initRate(
+          "cpu-rate",
+          this.cpuRate,
+          lineColor1,
+          legends1,
+          areaColor1,
+          "CPU使用概况（%）",
+          1
+        );
+      }
+    },
+    // 网络流出图
+    initResouse() {
+      let netflow = this.handalData("netflow");
+      let netout = this.handalData("netout");
+      this.network = netflow.concat(netout);
+      if (this.chartCus2) {
+        this.chartCus2.data(this.network);
+        this.chartCus2.render();
+      } else {
+        // 资源使用率 - 内存
+        const lineColor2 = ["#34A677", "#319DCE"];
+        const areaColor2 = ["#f8ebdd", "#d7ebe5"];
+        const legends2 = ["流入", "流出"];
+        this.initRate(
+          "network",
+          this.network,
+          lineColor2,
+          legends2,
+          areaColor2,
+          "网络流量速率(Mbps）",
+          2
+        );
+      }
+    },
     // 获取集群信息
     getCluester() {
       searchClusters(1, 1000, "")
@@ -398,12 +613,24 @@ export default {
       if (params.value === "cpuuse") {
         params1 =
           params.value +
-          `'${this.nameSpace[1]}'})*sum(count(node_cpu_seconds_total{mode="idle"}) by (instance))`;
-      }
-      if (params.value === "storage") {
-        params1 = params.value + this.nameSpace[1] + ") / 2014 / 1024 / 1024";
-      } else if (params.value === "storagetotal") {
-        params1 = params.value + this.nameSpace[1] + ") / 2014 / 1024 / 1024";
+          `'${this.nameSpace[1]}'})*sum(irate(container_cpu_usage_seconds_total{namespace=~"kubeapps"}[5m]) * 100)  * 0.01`;
+      } else if (
+        params.value === "storage" ||
+        params.value === "storagetotal"
+      ) {
+        params1 =
+          params.value + `'${this.nameSpace[1]}'} / 1024 / 1024 / 1024)`;
+      } else if (
+        params.value === "runningdeploy" ||
+        params.value === "unavailabledeploy" ||
+        params.value === "runningstatusdeploy" ||
+        params.value === "unavailableprogressdeploy"
+      ) {
+        params1 = params.value + `'${this.nameSpace[1]}'} != 0 )`;
+      } else if (params.value === "unavailablestatusdeploy") {
+        params1 =
+          params.value +
+          `'${this.nameSpace[1]}'})- count(kube_statefulset_status_replicas_ready{namespace=~'${this.nameSpace[1]}'} != 0)`;
       } else {
         params1 = params.value + `'${this.nameSpace[1]}'})`;
       }
@@ -411,59 +638,82 @@ export default {
         .then((data) => {
           const result = data.data.result || [];
           this.pageData[params.attribute] = result[0] ? result[0].value[1] : "";
+          let compute = [
+            "runningdeploy",
+            "unavailabledeploy",
+            "runningstatusdeploy",
+            "unavailableprogressdeploy",
+            "unavailablestatusdeploy",
+            "runningprogressdeploy",
+          ];
+          this.count =
+            this.count + (compute.indexOf(params.attribute) > -1 ? 1 : 0);
+          if (this.count === compute.length) {
+            this.component = this.handelComponentData();
+            if (this.componentChart) {
+              this.componentChart.data(this.component);
+              this.componentChart.render();
+            } else {
+              this.dataInit();
+            }
+          }
         })
         .catch(() => {});
     },
+    //CPU趋势图
     getCPUParam() {
+      let time = this.getTime();
       getCPUParam(
         this.nameSpace[0],
-        "100 - (avg(irate(node_cpu_seconds_total{mode='idle'}[5m])) * 100)",
-        this.time[0],
-        this.time[1],
+        `sum(irate(container_cpu_usage_seconds_total{namespace=~'${this.nameSpace[1]}'}[5m]) * 100)`,
+        time[0],
+        time[1],
         this.step
       )
         .then((data) => {
           const result = data.data.result || [];
-          this.pageData.cpuRate = result;
+          this.pageData.cpuRate = result[0].values;
+          this.initCpu(); // 初始化cpu图
         })
         .catch(() => {});
     },
+    //网络流量统计
+    getNetworkParam(params) {
+      let time = this.getTime();
+      getCPUParam(
+        this.nameSpace[0],
+        params.value + `'${this.nameSpace[1]}'}[5m]) > 0) / 1024 / 1024`,
+        time[0],
+        time[1],
+        this.step
+      )
+        .then((data) => {
+          const result = data.data.result || [];
+          this.pageData[params.attribute] = result[0].values;
+          this.initResouse();
+        })
+        .catch(() => {});
+    },
+    handelComponentData() {
+      let result = [...this.component];
+      result[0].value = Number(this.pageData.runningdeploy);
+      result[1].value = Number(this.pageData.unavailabledeploy);
+      result[2].value = Number(this.pageData.runningstatusdeploy);
+      result[3].value = Number(this.pageData.unavailablestatusdeploy);
+      result[4].value = Number(this.pageData.runningprogressdeploy);
+      result[5].value = Number(this.pageData.unavailableprogressdeploy);
+      return result;
+    },
     // 条形图
     dataInit() {
-      const data = [
-        {
-          State: "守护进程集",
-          运行中: 25635,
-          处理中: 1890,
-          异常: 9314,
-          year: "1975",
-        },
-        {
-          State: "有状态副本集",
-          运行中: 30352,
-          处理中: 20439,
-          异常: 10225,
-          year: "1985",
-        },
-        {
-          State: "部署",
-          运行中: 38253,
-          处理中: 42538,
-          异常: 15757,
-          year: "1995",
-        },
-      ];
-
+      console.log(this.component);
       const ds = new DataSet();
-      const dv = ds.createView().source(data);
+      const dv = ds.createView().source(this.component);
       dv.transform({
         type: "fold",
-        fields: ["运行中", "处理中", "异常"], // 展开字段集
-        key: "年龄段", // key字段
-        value: "人口数量", // value字段
+        fields: ["running", "unvailable"], // 展开字段集
         retains: ["State"], // 保留字段集，默认为除fields以外的所有字段
       });
-      // 数据被加工成 {State: 'WY', 年龄段: '小于5岁', 人口数量: 25635}
       this.$nextTick(() => {
         const chart = new Chart({
           container: "container",
@@ -471,21 +721,50 @@ export default {
           height: 200,
           appendPadding: [20, 0, 0, 0], // 上，右，下，左
         });
-
         chart.coordinate().transpose();
-
         chart.data(dv.rows);
-
         // 图例位置
         chart.legend({
           position: "top-right",
+          items: [
+            {
+              name: "运行中",
+              marker: {
+                symbol: "square",
+                style: {
+                  fill: "#36B37E",
+                },
+                clickable: false,
+              },
+            },
+            {
+              name: "异常",
+              marker: {
+                symbol: "square",
+                style: {
+                  fill: "#CF0A1E",
+                },
+                clickable: false,
+              },
+            },
+          ],
         });
-        chart.scale("year", { nice: true });
+        chart.scale("value", { alias: "占比" });
 
         chart.axis("State", {
           label: {
             offset: 12,
           },
+        });
+        chart.axis("value", {
+          label: null,
+          title: {
+            style: {
+              fontSize: 14,
+              fontWeight: 300,
+            },
+          },
+          grid: null,
         });
         chart.tooltip({
           shared: true,
@@ -494,12 +773,20 @@ export default {
         chart
           .interval()
           .adjust("stack")
-          .position("State*人口数量")
+          .position("State*value")
           .size(10)
-          .color("年龄段", ["#36B37E", "#F59326", "#CF0A1E"]);
+          .color("type*State", (type) => {
+            if (type === "unvailable") {
+              return "#CF0A1E";
+            }
+            if (type === "running") {
+              return "#36B37E";
+            }
+          });
 
         chart.interaction("active-region");
         chart.render();
+        this.componentChart = chart;
       });
     },
     // 资源使用率
@@ -508,10 +795,9 @@ export default {
         const chart = new Chart({
           container: container,
           autoFit: true,
-          height: 183,
+          height: 250,
           appendPadding: [20, 0, 0, 0], // 上，右，下，左
         });
-
         chart.data(data);
 
         // 图例位置
@@ -541,9 +827,9 @@ export default {
           ],
         });
 
-        chart.scale("year", {
-          type: "linear",
-          tickInterval: 50,
+        chart.scale("Data", {
+          type: "timeCat",
+          mask: "YY/MM/DD HH:mm:ss",
         });
         chart.scale("value", {
           nice: true,
@@ -554,8 +840,6 @@ export default {
           showMarkers: false,
           shared: true,
         });
-
-        // chart.tooltip(false);
 
         // 设置总量 标题
         chart.annotation().text({
@@ -570,23 +854,25 @@ export default {
           offsetX: -34,
           offsetY: -38,
         });
-
+        chart.scale("value", {
+          // 度量
+          min: 0, // Y轴显示的最小值
+        });
         chart
           .area()
           .adjust("stack")
-          .position("year*value")
+          .position("Data*value")
           .color("label", areaColors)
           .tooltip(false);
         chart
           .line()
           .adjust("stack")
-          .position("year*value")
+          .position("Data*value")
           .color("label", lineColors);
 
         chart.interaction("element-highlight");
 
         chart.render();
-
         switch (tab) {
           case 1:
             this.chartCus1 = chart;
@@ -605,33 +891,6 @@ export default {
   },
   created() {
     this.getCluester();
-    this.dataInit();
-    // 资源使用率 - cpu
-    const lineColor1 = ["#5354BB"];
-    const areaColor1 = ["#e0e1f2"];
-    const legends1 = ["CPU使用"];
-    this.initRate(
-      "cpu-rate",
-      this.cpuRate,
-      lineColor1,
-      legends1,
-      areaColor1,
-      "CPU使用概况（%）",
-      1
-    );
-    // 资源使用率 - 内存
-    const lineColor2 = ["#34A677", "#319DCE"];
-    const areaColor2 = ["#f8ebdd", "#d7ebe5"];
-    const legends2 = ["流入", "流出"];
-    this.initRate(
-      "network",
-      this.network,
-      lineColor2,
-      legends2,
-      areaColor2,
-      "网络流量速率(Mbps）",
-      2
-    );
   },
 };
 </script>
@@ -798,6 +1057,11 @@ export default {
       font-weight: 500;
     }
   }
+}
+.status-icon {
+  width: 13.33px;
+  height: 13.33px;
+  margin-right: 5.33px;
 }
 .flex-layout {
   display: flex;

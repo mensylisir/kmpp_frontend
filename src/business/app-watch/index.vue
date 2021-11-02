@@ -76,7 +76,7 @@ export default {
     box-shadow: 0 1px 0 0 #e4e7f0;
   }
   .bottom {
-    height: calc(100% - 56px);
+    min-height: calc(100% - 56px);
     width: 100%;
     .card-group {
       display: flex;
