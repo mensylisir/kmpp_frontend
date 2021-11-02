@@ -27,7 +27,6 @@
                 v-model="form.clustername"
                 placeholder="请选择"
                 style="width: 100%"
-                @change="listNamespace(index)"
               >
                 <el-option
                   :label="item.name"
@@ -181,6 +180,15 @@ export default {
       fromName: "",
     };
   },
+    watch: {
+    "form.clustername": {
+      handler(newVal) {
+        if (newVal) {
+          this.listNamespace();
+        }
+      },
+    },
+  },
   methods: {
     add() {
       this.form.groupList.push({
@@ -257,14 +265,18 @@ export default {
     },
     getClusters() {
       searchClusters(1, 1000, "").then((data) => {
-        this.clusterOptions = data.items;
+        this.clusterOptions = data.items.filter((item) => {
+          return item.source === "local";
+        });
         this.clusterOptions.forEach((items) => {
           items.value = items.label = items.name;
         });
+        this.form.clustername = this.clusterOptions[0].name;
+        this.getRbacs();
       });
     },
     getRbacs() {
-      getRbacs()
+      getRbacs(this.form.clustername)
         .then((data) => {
           this.radioOption = data.items.clusterRoles.filter((item) => {
             return (
@@ -295,7 +307,6 @@ export default {
     },
   },
   created() {
-    this.getRbacs();
     this.getClusters();
   },
   computed: {},
