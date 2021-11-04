@@ -444,7 +444,7 @@ export default {
         this.step = timeArry[0] > 10 ? 100 : 50;
         start = currTime - timeArry[0] * 60 * 60 * 1000;
       } else if (timeArry[1] === "day") {
-        this.step = 500;
+        this.step = timeArry[1] > 1? 500 : 50;
         if (timeArry[0] === "7") {
           start = currTime - (timeArry[0] - 1) * 24 * 60 * 60 * 1000;
         } else {
@@ -818,7 +818,7 @@ export default {
           container: container,
           autoFit: true,
           height: 250,
-          appendPadding: [20, 0, 0, 0], // 上，右，下，左
+          appendPadding: [20, 0, 0, 12], // 上，右，下，左
         });
         chart.data(data);
 
@@ -865,7 +865,7 @@ export default {
 
         // 设置总量 标题
         chart.annotation().text({
-          position: ["0%", "0%"],
+          position: ["1%", "0%"],
           content: str,
           style: {
             fontSize: 14,
