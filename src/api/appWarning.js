@@ -13,8 +13,12 @@ export function getTableData(cluster) {
   return get(`/proxy/kubernetes/${cluster}/api/v1/namespaces/monitoring/services/prometheus-k8s:web/proxy/api/v1/alerts`)
 }
 
-export function getCPUParam(cluster,params,start,end,step) {
-  return get(`/proxy/kubernetes/${cluster}/api/v1/namespaces/monitoring/services/prometheus-k8s:web/proxy/api/v1/query_range?query=${params}&start=${start}&end=${end}&step=${step}`)
+export function getTotalData(cluster) {
+  return get(`/api/v1/monitor/rules?clustername=${cluster}`)
+}
+
+export function getStrategyData(cluster) {
+  return get(`/proxy/kubernetes/${cluster}/api/v1/namespaces/monitoring/services/prometheus-k8s:web/proxy/api/v1/rules`)
 }
 
 

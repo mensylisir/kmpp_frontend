@@ -24,6 +24,7 @@
           <div class="option-item">
             <span class="option-title">告警组：</span>
             <el-select
+              multiple
               v-model="currentGroup"
               filterable
               placeholder="请选择告警组"
@@ -31,9 +32,9 @@
             >
               <el-option
                 v-for="item in groupList"
-                :key="item['metadata'].name"
-                :label="item['metadata'].name"
-                :value="item['metadata'].name"
+                :key="item"
+                :label="item"
+                :value="item"
               >
               </el-option>
             </el-select>
@@ -77,60 +78,60 @@
             <span
               style="cursor: pointer; color: #5354bb"
               @click="goDetail(scope.row)"
-              >{{ scope.row.labels.alertname || "--" }}</span
+              >{{ scope.row.alertname || "--" }}</span
             >
           </template>
         </el-table-column>
-        <el-table-column prop="" label="告警描述" width="280">
+        <el-table-column prop="" label="告警描述" width="480">
           <template slot-scope="scope">
             <span style="cursor: pointer">{{
-              scope.row.annotations.description || "--"
+              scope.row.alertsummary || "--"
             }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="memoryUse" label="告警组" width="150">
+        <el-table-column prop="" label="告警组" width="150">
           <template slot-scope="scope">
-            <span>{{ scope.row.memoryUse || "--" }}</span>
+            <span>{{ scope.row.alertgroup || "--" }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="" label="等级" width="120">
           <template slot-scope="scope">
             <span
               :class="
-                scope.row.labels.severity === 'info'
+                scope.row.alertseverity === 'info'
                   ? 'level-warning'
-                  : scope.row.labels.severity === 'none'
+                  : scope.row.alertseverity === 'none'
                   ? 'level-none'
                   : 'level-red'
               "
             >
-              {{ levelMap[scope.row.labels.severity] || "--" }}
+              {{ levelMap[scope.row.alertseverity] || "--" }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="state" label="告警状态" width="130">
+        <el-table-column prop="alertstate" label="告警状态" width="130">
           <template slot-scope="scope">
             <svg
               class="icon alert-icon"
               aria-hidden="true"
               :class="{
-                'alert-red': scope.row.state === 'firing',
-                'alert-yello':
-                  scope.row.state === 'pending',
+                'alert-red': scope.row.alertstate === 'firing',
+                'alert-yello': scope.row.alertstate === 'pending',
               }"
             >
               <use xlink:href="#icon-alert"></use>
             </svg>
             <span>{{
-              scope.row.state === "firing"
+              scope.row.alertstate === "firing"
                 ? "告警中"
-                : (scope.row.state === "pending" ? "已激活" : "未触发") || "--"
+                : (scope.row.alertstate === "pending" ? "已激活" : "未触发") ||
+                  "--"
             }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="activeAt" label="触发时间" sortable width="180">
+        <el-table-column prop="alerttime" label="触发时间" sortable width="180">
           <template slot-scope="scope">
-            <span>{{ rTime(scope.row.activeAt) }}</span>
+            <span>{{ rTime(scope.row.alerttime) }}</span>
           </template>
         </el-table-column>
       </el-table>
@@ -156,20 +157,20 @@
       <table style="width: 100%" class="myTable">
         <tr>
           <td>告警策略</td>
-          <td>{{ currItem.labels.alertname || "--" }}</td>
+          <td>{{ currItem.alertname || "--" }}</td>
         </tr>
         <tr>
           <td>告警等级</td>
           <td>
             <span
               :class="
-                currItem.labels.severity === 'info'
+                currItem.alertseverity === 'info'
                   ? 'level-warning'
-                  : currItem.labels.severity === 'none'
+                  : currItem.alertseverity === 'none'
                   ? 'level-none'
                   : 'level-red'
               "
-              >{{ levelMap[currItem.labels.severity] }}</span
+              >{{ levelMap[currItem.alertseverity] || "--"}}</span
             >
           </td>
         </tr>
@@ -180,33 +181,34 @@
               class="icon alert-icon"
               aria-hidden="true"
               :class="{
-                'alert-red': currItem.state === 'firing',
-                'alert-yello': currItem.state === '已激活',
+                'alert-red': currItem.alertstate === 'firing',
+                'alert-yello': currItem.alertstate === '已激活',
               }"
             >
               <use xlink:href="#icon-alert"></use></svg
             >{{
-              currItem.state === "firing"
+              currItem.alertstate === "firing"
                 ? "告警中"
-                : (currItem.state === "pending" ? "未触发" : "已激活") || "--"
+                : (currItem.alertstate === "pending" ? "未触发" : "已激活") ||
+                  "--"
             }}
           </td>
         </tr>
         <tr>
           <td>告警组</td>
-          <td>{{ "--" }}</td>
+          <td>{{ currItem.alertgroup || "--" }}</td>
         </tr>
         <tr>
           <td>告警描述</td>
-          <td>{{ currItem.annotations.description }}</td>
+          <td>{{ currItem.alertdescription }}</td>
         </tr>
         <tr>
           <td>告警总结</td>
-          <td>{{ currItem.annotations.summary }}</td>
+          <td>{{ currItem.alertsummary }}</td>
         </tr>
         <tr>
           <td>触发时间</td>
-          <td>{{ rTime(currItem.activeAt) }}</td>
+          <td>{{ rTime(currItem.alerttime) }}</td>
         </tr>
         <!-- <tr>
           <td>持续时间</td>
@@ -214,7 +216,7 @@
         </tr> -->
         <tr>
           <td>表达式</td>
-          <td>{{ "--" }}</td>
+          <td>{{ currItem.alertquery || "--" }}</td>
         </tr>
       </table>
     </el-drawer>
@@ -222,7 +224,7 @@
 </template>
 
 <script>
-import { getTableData } from "@/api/appWarning";
+import { getTotalData } from "@/api/appWarning";
 import { searchClusters } from "@/api/cluster";
 
 export default {
@@ -231,12 +233,7 @@ export default {
   data() {
     return {
       drawer: false,
-      currItem: {
-        labels: {
-          alertname: "",
-        },
-        annotations: {},
-      },
+      currItem: {},
       page: {
         currentPage: 1,
         currSize: 10,
@@ -260,7 +257,7 @@ export default {
       },
       cluster: "", // 当前选中的集群
       clusterList: [], // 集群列表
-      currentGroup: "", // 当前选择告警组
+      currentGroup: [], // 当前选择告警组
       currentStatus: "", // 当前选中状态
       statusList: [], // 状态列表
       groupList: [], // 命名空间列表
@@ -284,7 +281,9 @@ export default {
     changeCluster() {
       this.getTableData(this.cluster);
     },
-    changeGroup() {},
+    changeGroup() {
+      this.filterData();
+    },
     changeLevel() {
       this.filterData();
     },
@@ -314,12 +313,17 @@ export default {
       }
       if (this.currentStatus) {
         result = result.filter((item) => {
-          return item.state === this.currentStatus;
+          return item.alertstate === this.currentStatus;
         });
       }
       if (this.currentLevel) {
         result = result.filter((item) => {
-          return item.labels.severity === this.currentLevel;
+          return item.alertseverity === this.currentLevel;
+        });
+      }
+      if (this.currentGroup.length > 0) {
+        result = result.filter((item) => {
+          return this.currentGroup.indexOf(item.alertgroup) > -1;
         });
       }
       this.pageration(result);
@@ -348,13 +352,28 @@ export default {
     },
     // 获取列表
     getTableData(cluster) {
-      getTableData(cluster)
+      getTotalData(cluster)
         .then((data) => {
-          this.totalData = data.data.alerts || [];
-          this.totalData.forEach((item) => {
-            item.cluster = cluster;
+          let data1 = data || [];
+          data1 = data1.filter((item) => {
+            return item.rules.length > 0;
           });
-          console.log(this.totalData, "1");
+          let result = [];
+          data1.forEach((item) => {
+            item.rules.forEach((item1) => {
+              if (item1.alerts && item1.alerts.length > 0) {
+                result = result.concat(item1.alerts);
+              }
+            });
+          });
+          result.forEach((item) => {
+             item.cluster = cluster;
+            if (this.groupList.indexOf(item.alertgroup) === -1) {
+              this.groupList.push(item.alertgroup);
+            }
+          });
+          this.totalData = JSON.parse(JSON.stringify(result));
+          console.log(this.groupList, "1");
           this.filterData();
         })
         .catch(() => {});
