@@ -40,7 +40,7 @@ export default {
         this.$router.push({ name: "notice" });
       } else if (index === "strategy") {
         // 告警策略
-        this.$router.push({ name: "strategy" });
+        // this.$router.push({ name: "strategy" });
       }
     },
   },
