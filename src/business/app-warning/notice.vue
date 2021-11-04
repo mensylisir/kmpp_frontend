@@ -7,7 +7,7 @@
             <span class="option-title">所属集群：</span>
             <el-select
               v-model="cluster"
-              filterable
+              clearable
               placeholder="请选择集群"
               @change="changeCluster"
             >
@@ -42,7 +42,7 @@
             <span class="option-title">告警等级：</span>
             <el-select
               v-model="currentLevel"
-              filterable
+              clearable
               placeholder="请选择告警等级"
               @change="changeLevel"
             >
@@ -51,44 +51,18 @@
               <el-option label="致命" value="critical"> </el-option>
             </el-select>
           </div>
-        </div>
-        <div class="noti-header-2">
           <div class="option-item">
             <span class="option-title">告警状态：</span>
             <el-select
               v-model="currentStatus"
-              filterable
+              clearable
               placeholder="请选择告警状态"
               @change="changeStatus"
             >
-              <el-option
-                v-for="item in statusList"
-                :key="item['metadata'].name"
-                :label="item['metadata'].name"
-                :value="item['metadata'].name"
-              >
-              </el-option>
+              <el-option label="告警中" value="firing"> </el-option>
+              <el-option label="未触发" value="inactive"> </el-option>
+              <el-option label="已激活" value="pending"> </el-option>
             </el-select>
-          </div>
-          <div class="option-item">
-            <span class="option-title" style="width: 60px">搜索：</span>
-            <el-input
-              v-model="currentQuery"
-              placeholder="按告警策略模糊搜索"
-              @change="changeQuery"
-              @keydown.native="beginEnterQuery"
-              ref="queryItem"
-            >
-            </el-input>
-            <el-button
-              class="cus-btn"
-              @click="beginQuery"
-              :disabled="!currentQuery.length"
-              >搜索</el-button
-            >
-            <el-button @click="resetQuery" :disabled="!currentQuery"
-              >重置</el-button
-            >
           </div>
         </div>
       </div>
@@ -142,7 +116,7 @@
               :class="{
                 'alert-red': scope.row.state === 'firing',
                 'alert-yello':
-                  scope.row.state !== 'firing' && scope.row.state !== 'pending',
+                  scope.row.state === 'pending',
               }"
             >
               <use xlink:href="#icon-alert"></use>
@@ -150,7 +124,7 @@
             <span>{{
               scope.row.state === "firing"
                 ? "告警中"
-                : (scope.row.state === "pending" ? "未触发" : "已激活") || "--"
+                : (scope.row.state === "pending" ? "已激活" : "未触发") || "--"
             }}</span>
           </template>
         </el-table-column>
@@ -308,25 +282,14 @@ export default {
       }
     },
     changeCluster() {
-      // this.getNamespace();
+      this.getTableData(this.cluster);
     },
     changeGroup() {},
-    changeLevel() {},
-    changeStatus() {},
-    changeQuery() {
-      // this.getNotification();
+    changeLevel() {
+      this.filterData();
     },
-    beginQuery() {},
-    resetQuery() {
-      this.currentQuery = [];
-    },
-    beginEnterQuery(e) {
-      // if (this.$refs.queryItem.query == "" && this.currentQuery.length == 0) {
-      //   return;
-      // }
-      if (e.keyCode == 13) {
-        // this.getNotification(this.$refs.queryItem.query);
-      }
+    changeStatus() {
+      this.filterData();
     },
     // 详情
     goDetail(item) {
@@ -334,23 +297,41 @@ export default {
       this.currItem = item;
     },
     // 数据分页
-    pageration() {
-      this.tableData = this.totalData.filter((item, index) => {
+    pageration(result) {
+      this.tableData = result.filter((item, index) => {
         return (
           this.page.currSize * (this.page.currentPage - 1) <= index &&
           index < this.page.currSize * this.page.currentPage
         );
       });
-      console.log(this.tableData);
+    },
+    filterData() {
+      let result = this.totalData;
+      if (this.cluster) {
+        result = result.filter((item) => {
+          return item.cluster === this.cluster;
+        });
+      }
+      if (this.currentStatus) {
+        result = result.filter((item) => {
+          return item.state === this.currentStatus;
+        });
+      }
+      if (this.currentLevel) {
+        result = result.filter((item) => {
+          return item.labels.severity === this.currentLevel;
+        });
+      }
+      this.pageration(result);
     },
     handleSizeChange(val) {
       this.page.currSize = val;
       this.page.currentPage = 1;
-      this.pageration();
+      this.filterData();
     },
     handleCurrentChange(val) {
       this.page.currentPage = val;
-      this.pageration();
+      this.filterData();
     },
     // 获取集群信息
     getCluester() {
@@ -370,8 +351,11 @@ export default {
       getTableData(cluster)
         .then((data) => {
           this.totalData = data.data.alerts || [];
+          this.totalData.forEach((item) => {
+            item.cluster = cluster;
+          });
           console.log(this.totalData, "1");
-          this.pageration();
+          this.filterData();
         })
         .catch(() => {});
     },
@@ -387,7 +371,7 @@ export default {
   background: white;
   padding: 24px;
   margin-top: 8px;
-  height: calc(100vh - 175px);
+  min-height: calc(100vh - 175px);
   .top {
     padding: 0 0 13px 0;
     display: flex;
@@ -494,7 +478,7 @@ export default {
   }
   .noti-header-1 {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     grid-column-gap: 32px;
 
     margin-bottom: 16px;
@@ -511,32 +495,6 @@ export default {
       /deep/.el-select {
         // margin-bottom: 0 !important;
         flex: 1;
-      }
-    }
-  }
-  .noti-header-2 {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    grid-column-gap: 32px;
-    .option-item {
-      display: flex;
-      align-items: center;
-      .option-title {
-        font-size: 14px;
-        color: #2c2e33;
-        line-height: 22px;
-        font-weight: 400;
-        margin-right: 4px;
-      }
-      /deep/.el-select {
-        // margin-bottom: 0 !important;
-        flex: 1;
-        margin-right: 8px;
-      }
-      .cus-btn {
-        margin-left: 16px;
-        background: #5354bb;
-        color: #ffffff;
       }
     }
   }
