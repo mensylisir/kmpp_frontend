@@ -82,7 +82,7 @@
             >
           </template>
         </el-table-column>
-        <el-table-column prop="" label="告警描述" width="480">
+        <el-table-column prop="" label="告警总结" width="480">
           <template slot-scope="scope">
             <span style="cursor: pointer">{{
               scope.row.alertsummary || "--"
@@ -143,7 +143,7 @@
           :page-sizes="page.size"
           :page-size="page.currSize"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="totalData.length"
+          :total="page.total"
         >
         </el-pagination>
       </div>
@@ -170,7 +170,7 @@
                   ? 'level-none'
                   : 'level-red'
               "
-              >{{ levelMap[currItem.alertseverity] || "--"}}</span
+              >{{ levelMap[currItem.alertseverity] || "--" }}</span
             >
           </td>
         </tr>
@@ -238,6 +238,7 @@ export default {
         currentPage: 1,
         currSize: 10,
         size: [10, 20, 30, 40],
+        total: 0
       },
       totalData: [],
       tableData: [
@@ -279,15 +280,19 @@ export default {
       }
     },
     changeCluster() {
+      this.page.currentPage = 1;
       this.getTableData(this.cluster);
     },
     changeGroup() {
+      this.page.currentPage = 1;
       this.filterData();
     },
     changeLevel() {
+      this.page.currentPage = 1;
       this.filterData();
     },
     changeStatus() {
+      this.page.currentPage = 1;
       this.filterData();
     },
     // 详情
@@ -326,6 +331,7 @@ export default {
           return this.currentGroup.indexOf(item.alertgroup) > -1;
         });
       }
+      this.page.total = result.length
       this.pageration(result);
     },
     handleSizeChange(val) {
@@ -367,7 +373,7 @@ export default {
             });
           });
           result.forEach((item) => {
-             item.cluster = cluster;
+            item.cluster = cluster;
             if (this.groupList.indexOf(item.alertgroup) === -1) {
               this.groupList.push(item.alertgroup);
             }

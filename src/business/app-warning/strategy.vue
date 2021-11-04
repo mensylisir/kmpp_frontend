@@ -3,7 +3,7 @@
     <div class="top">
       <div style="width: 100%">
         <div class="noti-header-1">
-          <div class="option-item">
+          <!-- <div class="option-item">
             <span class="option-title">所属集群：</span>
             <el-select
               v-model="cluster"
@@ -50,7 +50,7 @@
               <el-option label="警告" value="warning"> </el-option>
               <el-option label="致命" value="critical"> </el-option>
             </el-select>
-          </div>
+          </div> -->
           <div class="option-item">
             <span class="option-title">告警状态：</span>
             <el-select
@@ -59,9 +59,8 @@
               placeholder="请选择告警状态"
               @change="changeStatus"
             >
-              <el-option label="告警中" value="firing"> </el-option>
-              <el-option label="未触发" value="inactive"> </el-option>
-              <el-option label="已激活" value="pending"> </el-option>
+              <el-option label="告警中" value="告警中"> </el-option>
+              <el-option label="正常" value="正常"> </el-option>
             </el-select>
           </div>
         </div>
@@ -77,32 +76,48 @@
             <span
               style="cursor: pointer; color: #5354bb"
               @click="goDetail(scope.row)"
-              >{{ scope.row.name || "--" }}</span
+              >{{ scope.row.group || "--" }}</span
             >
           </template>
         </el-table-column>
-        <el-table-column prop="state" label="告警策略状态" width="280">
+        <el-table-column prop="state" label="告警策略状态" width="480">
           <template slot-scope="scope">
-            <svg
-              class="icon alert-icon"
-              aria-hidden="true"
-              :class="{
-                'alert-red': scope.row.state === 'firing',
-                'alert-yello': scope.row.state === 'pending',
-              }"
-            >
+            <svg class="icon alert-icon" aria-hidden="true">
               <use xlink:href="#icon-alert"></use>
             </svg>
-            <span>{{
-              scope.row.state === "firing"
-                ? "告警中"
-                : (scope.row.state === "pending" ? "已激活" : "未触发") || "--"
-            }}</span>
+            <span style="margin-right: 26px"
+              >未触发 {{ scope.row.inactivecount }}</span
+            >
+            <svg class="icon alert-icon alert-yello" aria-hidden="true">
+              <use xlink:href="#icon-alert"></use>
+            </svg>
+            <span style="margin-right: 26px"
+              >已激活 {{ scope.row.Pendingcount }}</span
+            >
+            <svg class="icon alert-icon alert-red" aria-hidden="true">
+              <use xlink:href="#icon-alert"></use>
+            </svg>
+            <span>告警中 {{ scope.row.firingcount }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="activeAt" label="告警状态" width="180">
           <template slot-scope="scope">
-            <span>{{ rTime(scope.row.activeAt) }}</span>
+            <svg
+              class="icon alert-icon alert-red"
+              aria-hidden="true"
+              v-if="getStatus(scope.row) === '告警中'"
+            >
+              <use xlink:href="#icon-alert"></use>
+            </svg>
+            <svg
+              class="icon alert-icon"
+              aria-hidden="true"
+              v-else
+              style="color: #36b37e"
+            >
+              <use xlink:href="#icon-checkbox-circle-fill2"></use>
+            </svg>
+            <span>{{ getStatus(scope.row) }}</span>
           </template>
         </el-table-column>
       </el-table>
@@ -114,87 +129,16 @@
           :page-sizes="page.size"
           :page-size="page.currSize"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="totalData.length"
+          :total="page.total"
         >
         </el-pagination>
       </div>
     </div>
-    <el-drawer
-      title="告警详情"
-      :visible.sync="drawer"
-      class="drawer"
-      size="51%"
-    >
-      <table style="width: 100%" class="myTable">
-        <tr>
-          <td>告警策略</td>
-          <td>{{ currItem.labels.alertname || "--" }}</td>
-        </tr>
-        <tr>
-          <td>告警等级</td>
-          <td>
-            <span
-              :class="
-                currItem.labels.severity === 'info'
-                  ? 'level-warning'
-                  : currItem.labels.severity === 'none'
-                  ? 'level-none'
-                  : 'level-red'
-              "
-              >{{ levelMap[currItem.labels.severity] }}</span
-            >
-          </td>
-        </tr>
-        <tr>
-          <td>告警状态</td>
-          <td>
-            <svg
-              class="icon alert-icon"
-              aria-hidden="true"
-              :class="{
-                'alert-red': currItem.state === 'firing',
-                'alert-yello': currItem.state === '已激活',
-              }"
-            >
-              <use xlink:href="#icon-alert"></use></svg
-            >{{
-              currItem.state === "firing"
-                ? "告警中"
-                : (currItem.state === "pending" ? "未触发" : "已激活") || "--"
-            }}
-          </td>
-        </tr>
-        <tr>
-          <td>告警组</td>
-          <td>{{ "--" }}</td>
-        </tr>
-        <tr>
-          <td>告警描述</td>
-          <td>{{ currItem.annotations.description }}</td>
-        </tr>
-        <tr>
-          <td>告警总结</td>
-          <td>{{ currItem.annotations.summary }}</td>
-        </tr>
-        <tr>
-          <td>触发时间</td>
-          <td>{{ rTime(currItem.activeAt) }}</td>
-        </tr>
-        <!-- <tr>
-          <td>持续时间</td>
-          <td>{{ "--" }}</td>
-        </tr> -->
-        <tr>
-          <td>表达式</td>
-          <td>{{ "--" }}</td>
-        </tr>
-      </table>
-    </el-drawer>
   </div>
 </template>
 
 <script>
-import { getStrategyData } from "@/api/appWarning";
+import { getTotalData } from "@/api/appWarning";
 import { searchClusters } from "@/api/cluster";
 
 export default {
@@ -213,6 +157,7 @@ export default {
         currentPage: 1,
         currSize: 10,
         size: [10, 20, 30, 40],
+        total: 0,
       },
       totalData: [],
       tableData: [
@@ -243,6 +188,14 @@ export default {
   },
   props: [""],
   methods: {
+    getStatus(item) {
+      if (item.firingcount && item.firingcount > 0) {
+        return "告警中";
+      }
+      if (!item.firingcount && !item.Pendingcount) {
+        return "正常";
+      }
+    },
     rTime(timestamp) {
       if (timestamp) {
         let date = new Date(new Date(timestamp).getTime() + 8 * 3600 * 1000);
@@ -261,11 +214,11 @@ export default {
       this.filterData();
     },
     changeStatus() {
+      this.page.currentPage = 1;
       this.filterData();
     },
     // 详情
     goDetail(item) {
-      this.drawer = true;
       this.currItem = item;
     },
     // 数据分页
@@ -279,21 +232,22 @@ export default {
     },
     filterData() {
       let result = this.totalData;
-      if (this.cluster) {
-        result = result.filter((item) => {
-          return item.cluster === this.cluster;
-        });
-      }
+      // if (this.cluster) {
+      //   result = result.filter((item) => {
+      //     return item.cluster === this.cluster;
+      //   });
+      // }
       if (this.currentStatus) {
         result = result.filter((item) => {
-          return item.state === this.currentStatus;
+          return this.getStatus(item) === this.currentStatus;
         });
       }
-      if (this.currentLevel) {
-        result = result.filter((item) => {
-          return item.labels.severity === this.currentLevel;
-        });
-      }
+      // if (this.currentLevel) {
+      //   result = result.filter((item) => {
+      //     return item.labels.severity === this.currentLevel;
+      //   });
+      // }
+      this.page.total = result.length;
       this.pageration(result);
     },
     handleSizeChange(val) {
@@ -320,9 +274,9 @@ export default {
     },
     // 获取列表
     getTableData(cluster) {
-      getStrategyData(cluster)
+      getTotalData(cluster)
         .then((data) => {
-          this.totalData = data.data.groups || [];
+          this.totalData = data || [];
           this.totalData.forEach((item) => {
             item.cluster = cluster;
           });
