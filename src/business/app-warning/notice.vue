@@ -1,7 +1,7 @@
 <template>
   <div class="recommend">
     <div class="top">
-      <div class="search">
+      <div style="width: 100%">
         <div class="noti-header-1">
           <div class="option-item">
             <span class="option-title">所属集群：</span>
@@ -13,9 +13,9 @@
             >
               <el-option
                 v-for="item in clusterList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
+                :key="item.name"
+                :label="item.name"
+                :value="item.name"
               >
               </el-option>
             </el-select>
@@ -24,13 +24,13 @@
           <div class="option-item">
             <span class="option-title">告警组：</span>
             <el-select
-              v-model="currentNamespace"
+              v-model="currentGroup"
               filterable
-              placeholder="请选择应用"
-              @change="changeNamespace"
+              placeholder="请选择告警组"
+              @change="changeGroup"
             >
               <el-option
-                v-for="item in namespacesList"
+                v-for="item in groupList"
                 :key="item['metadata'].name"
                 :label="item['metadata'].name"
                 :value="item['metadata'].name"
@@ -38,52 +38,55 @@
               </el-option>
             </el-select>
           </div>
-
           <div class="option-item">
             <span class="option-title">告警等级：</span>
             <el-select
-              v-model="currentPod"
+              v-model="currentLevel"
               filterable
-              placeholder="请选择组件"
-              @change="changePod"
+              placeholder="请选择告警等级"
+              @change="changeLevel"
             >
-              <el-option
-                v-for="item in podList"
-                :key="item['metadata'].name"
-                :label="item['metadata'].name"
-                :value="item['metadata'].name"
-              >
-              </el-option>
+              <el-option label="一般" value="info"> </el-option>
+              <el-option label="警告" value="warning"> </el-option>
+              <el-option label="致命" value="critical"> </el-option>
             </el-select>
           </div>
         </div>
         <div class="noti-header-2">
           <div class="option-item">
-            <span class="option-title">查询条件：</span>
+            <span class="option-title">告警状态：</span>
             <el-select
-              v-model="currentQuery"
+              v-model="currentStatus"
               filterable
-              placeholder="支持 nodename/path/container,支持关键字查询,按回车确定,支持添加多个条件"
-              multiple
+              placeholder="请选择告警状态"
+              @change="changeStatus"
+            >
+              <el-option
+                v-for="item in statusList"
+                :key="item['metadata'].name"
+                :label="item['metadata'].name"
+                :value="item['metadata'].name"
+              >
+              </el-option>
+            </el-select>
+          </div>
+          <div class="option-item">
+            <span class="option-title" style="width: 60px">搜索：</span>
+            <el-input
+              v-model="currentQuery"
+              placeholder="按告警策略模糊搜索"
               @change="changeQuery"
               @keydown.native="beginEnterQuery"
               ref="queryItem"
             >
-              <el-option
-                v-for="(item, index) in queryList"
-                :key="item.value + index"
-                :label="item.name"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
+            </el-input>
             <el-button
               class="cus-btn"
               @click="beginQuery"
-              :disabled="currentQuery.length == 0"
-              >查询</el-button
+              :disabled="!currentQuery.length"
+              >搜索</el-button
             >
-            <el-button @click="resetQuery" :disabled="currentQuery.length == 0"
+            <el-button @click="resetQuery" :disabled="!currentQuery"
               >重置</el-button
             >
           </div>
@@ -95,61 +98,65 @@
         :data="tableData"
         :default-sort="{ prop: 'date', order: 'descending' }"
       >
-        <el-table-column prop="namespace" label="告警资源">
+        <el-table-column label="告警策略">
           <template slot-scope="scope">
-            <span style="cursor: pointer" @click="goDetail(scope.row)">{{
-              scope.row.namespace || "--"
+            <span
+              style="cursor: pointer; color: #5354bb"
+              @click="goDetail(scope.row)"
+              >{{ scope.row.labels.alertname || "--" }}</span
+            >
+          </template>
+        </el-table-column>
+        <el-table-column prop="" label="告警描述" width="280">
+          <template slot-scope="scope">
+            <span style="cursor: pointer">{{
+              scope.row.annotations.description || "--"
             }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="cluster" label="告警描述" width="200">
-        </el-table-column>
-        <el-table-column prop="memoryUse" label="告警策略" width="280">
+        <el-table-column prop="memoryUse" label="告警组" width="150">
           <template slot-scope="scope">
-            <div>{{ fixData(scope.row.memoryUse) }}Gi</div>
-            <span class="bottom-text"
-              >配额：{{ fixData(scope.row.memoryQuota) }}</span
-            >
+            <span>{{ scope.row.memoryUse || "--" }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="container1" label="等级" width="120">
+        <el-table-column prop="" label="等级" width="120">
           <template slot-scope="scope">
             <span
               :class="
-                scope.row.level === '严重' ? 'level-red' : 'level-warning'
+                scope.row.labels.severity === 'info'
+                  ? 'level-warning'
+                  : scope.row.labels.severity === 'none'
+                  ? 'level-none'
+                  : 'level-red'
               "
             >
-              {{ scope.row.level || "--" }}
+              {{ levelMap[scope.row.labels.severity] || "--" }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="告警状态" width="180">
+        <el-table-column prop="state" label="告警状态" width="130">
           <template slot-scope="scope">
-            <svg
-              class="icon svg-icon"
-              aria-hidden="true"
-              v-if="scope.row.status === '已恢复'"
-              style="color: #36b37e"
-            >
-              <use xlink:href="#icon-checkbox-circle-fill2"></use>
-            </svg>
             <svg
               class="icon alert-icon"
               aria-hidden="true"
-              v-else
-              :class="{ 'alert-red': scope.row.status === '告警中' }"
+              :class="{
+                'alert-red': scope.row.state === 'firing',
+                'alert-yello':
+                  scope.row.state !== 'firing' && scope.row.state !== 'pending',
+              }"
             >
               <use xlink:href="#icon-alert"></use>
             </svg>
-            <span>{{ scope.row.status || "活跃" }}</span>
+            <span>{{
+              scope.row.state === "firing"
+                ? "告警中"
+                : (scope.row.state === "pending" ? "未触发" : "已激活") || "--"
+            }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="cpuCore" label="持续时间" sortable width="180">
+        <el-table-column prop="activeAt" label="触发时间" sortable width="180">
           <template slot-scope="scope">
-            <div>{{ fixData(scope.row.cpuCore) }}Core</div>
-            <span class="bottom-text"
-              >配额：{{ fixData(scope.row.cpuQuota) }}</span
-            >
+            <span>{{ rTime(scope.row.activeAt) }}</span>
           </template>
         </el-table-column>
       </el-table>
@@ -161,7 +168,7 @@
           :page-sizes="page.size"
           :page-size="page.currSize"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="tableData.length"
+          :total="totalData.length"
         >
         </el-pagination>
       </div>
@@ -174,15 +181,21 @@
     >
       <table style="width: 100%" class="myTable">
         <tr>
-          <td>告警资源</td>
-          <td>{{ currItem.ip }}</td>
+          <td>告警策略</td>
+          <td>{{ currItem.labels.alertname || "--" }}</td>
         </tr>
         <tr>
           <td>告警等级</td>
           <td>
             <span
-              :class="currItem.level === '严重' ? 'level-red' : 'level-warning'"
-              >{{ currItem.cpuCore }}</span
+              :class="
+                currItem.labels.severity === 'info'
+                  ? 'level-warning'
+                  : currItem.labels.severity === 'none'
+                  ? 'level-none'
+                  : 'level-red'
+              "
+              >{{ levelMap[currItem.labels.severity] }}</span
             >
           </td>
         </tr>
@@ -190,42 +203,44 @@
           <td>告警状态</td>
           <td>
             <svg
-              class="icon svg-icon"
-              aria-hidden="true"
-              v-if="currItem.status === '已恢复'"
-              style="color: #36b37e"
-            >
-              <use xlink:href="#icon-checkbox-circle-fill2"></use>
-            </svg>
-            <svg
               class="icon alert-icon"
               aria-hidden="true"
-              v-else
-              :class="{ 'alert-red': currItem.status === '告警中' }"
+              :class="{
+                'alert-red': currItem.state === 'firing',
+                'alert-yello': currItem.state === '已激活',
+              }"
             >
               <use xlink:href="#icon-alert"></use></svg
-            >{{ currItem.gpuNum }}
+            >{{
+              currItem.state === "firing"
+                ? "告警中"
+                : (currItem.state === "pending" ? "未触发" : "已激活") || "--"
+            }}
           </td>
         </tr>
         <tr>
-          <td>告警策略</td>
-          <td>{{ currItem.memory }}</td>
+          <td>告警组</td>
+          <td>{{ "--" }}</td>
         </tr>
         <tr>
           <td>告警描述</td>
-          <td>{{ currItem.os }}</td>
+          <td>{{ currItem.annotations.description }}</td>
+        </tr>
+        <tr>
+          <td>告警总结</td>
+          <td>{{ currItem.annotations.summary }}</td>
         </tr>
         <tr>
           <td>触发时间</td>
-          <td>{{ currItem.architecture }}</td>
+          <td>{{ rTime(currItem.activeAt) }}</td>
         </tr>
         <tr>
           <td>持续时间</td>
-          <td>{{ currItem.createdAt | datetimeFormat }}</td>
+          <td>{{ "--" }}</td>
         </tr>
         <tr>
           <td>表达式</td>
-          <td>{{ currItem.createdAt | datetimeFormat }}</td>
+          <td>{{ "--" }}</td>
         </tr>
       </table>
     </el-drawer>
@@ -233,7 +248,7 @@
 </template>
 
 <script>
-import { getTableParam } from "@/api/appWatch";
+import { getTableData } from "@/api/appWarning";
 import { searchClusters } from "@/api/cluster";
 
 export default {
@@ -242,7 +257,12 @@ export default {
   data() {
     return {
       drawer: false,
-      currItem: {},
+      currItem: {
+        labels: {
+          alertname: "",
+        },
+        annotations: {},
+      },
       page: {
         currentPage: 1,
         currSize: 10,
@@ -256,82 +276,71 @@ export default {
         },
         {
           level: "严重",
-          status: "告警中",
+          status: "firing",
         },
       ],
-      // CPU占用核心数,CPU配额数,内存占用,内存配额,容器组数量,网络流入量,单位M,网络流出量,单位M,存储
-      queryParams: [
-        {
-          attribute: "cpuCore",
-          value:
-            "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests{namespace=~'.*'}) by (namespace)",
-        },
-        {
-          attribute: "cpuQuota",
-          value:
-            "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests{namespace=~'.*'}) by (namespace) ",
-        },
-        {
-          attribute: "memoryUse",
-          value:
-            "sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_requests{namespace=~'.*'}) by (namespace) / 2014 / 1024 / 1024",
-        },
-        {
-          attribute: "memoryQuota",
-          value:
-            "sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{namespace=~'.*'}) by (namespace)/ 2014 / 1024 / 1024",
-        },
-        {
-          attribute: "container1",
-          value:
-            "count(node_namespace_pod:kube_pod_info:{namespace=~'.*'}) by (namespace)",
-        },
-        {
-          attribute: "networkflow",
-          value:
-            "sum(irate(container_network_receive_bytes_total{namespace=~'.*'}[5m]) > 0) by (namespace) / 1024 / 1024",
-        },
-        {
-          attribute: "networkthrout",
-          value:
-            "sum(irate(container_network_transmit_bytes_total{namespace=~'.*'}[5m]) > 0)by (namespace) / 1024 / 1024",
-        },
-        {
-          attribute: "storage",
-          value:
-            "sum(kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace=~'.*'}) by (namespace) / 1024 / 1024 / 1024",
-        },
-        {
-          attribute: "status",
-          value:
-            "count(kube_pod_status_phase{phase='Running', namespace=~'.*'} == 0) by (namespace) unless count(kube_job_info{namespace=~'.*'}) by (namespace)",
-        },
-      ],
+      levelMap: {
+        info: "一般",
+        warning: "警告",
+        critical: "致命",
+      },
+      cluster: "", // 当前选中的集群
+      clusterList: [], // 集群列表
+      currentGroup: "", // 当前选择告警组
+      currentStatus: "", // 当前选中状态
+      statusList: [], // 状态列表
+      groupList: [], // 命名空间列表
+      currentLevel: "", // 当前选择告警等级
+      levelList: [], // pod列表
+      currentQuery: "", // 当前查询条件
     };
   },
   props: [""],
   methods: {
+    rTime(timestamp) {
+      if (timestamp) {
+        let date = new Date(new Date(timestamp).getTime() + 8 * 3600 * 1000);
+        date = date.toJSON();
+        date = date.substring(0, 19).replace("T", " ");
+        return date;
+      } else {
+        return "";
+      }
+    },
+    changeCluster() {
+      // this.getNamespace();
+    },
+    changeGroup() {},
+    changeLevel() {},
+    changeStatus() {},
+    changeQuery() {
+      // this.getNotification();
+    },
+    beginQuery() {},
+    resetQuery() {
+      this.currentQuery = [];
+    },
+    beginEnterQuery(e) {
+      // if (this.$refs.queryItem.query == "" && this.currentQuery.length == 0) {
+      //   return;
+      // }
+      if (e.keyCode == 13) {
+        // this.getNotification(this.$refs.queryItem.query);
+      }
+    },
     // 详情
     goDetail(item) {
       this.drawer = true;
       this.currItem = item;
     },
-    // 格式化数据
-    fixData(val) {
-      let result = "--";
-      if (val) {
-        result = val.toFixed(2);
-      }
-      return result;
-    },
     // 数据分页
     pageration() {
-      // this.tableData = this.totalData.filter((item, index) => {
-      //   return (
-      //     this.page.currSize * (this.page.currentPage - 1) <= index &&
-      //     index < this.page.currSize * this.page.currentPage
-      //   );
-      // });
+      this.tableData = this.totalData.filter((item, index) => {
+        return (
+          this.page.currSize * (this.page.currentPage - 1) <= index &&
+          index < this.page.currSize * this.page.currentPage
+        );
+      });
       console.log(this.tableData);
     },
     handleSizeChange(val) {
@@ -343,8 +352,6 @@ export default {
       this.page.currentPage = val;
       this.pageration();
     },
-    sort() {},
-    reset() {},
     // 获取集群信息
     getCluester() {
       searchClusters(1, 1000, "")
@@ -352,57 +359,18 @@ export default {
           this.clusterList = data.items.filter((item) => {
             return item.source === "local";
           });
-          this.getTableData();
+          this.clusterList.forEach((item) => {
+            this.getTableData(item.name);
+          });
         })
         .catch(() => {});
     },
-    // 获取表格数据
-    getTableData() {
-      this.clusterList.forEach((item) => {
-        this.queryParams.forEach((params) => {
-          this.getTableParam(item.name, params);
-        });
-      });
-    },
     // 获取列表
-    getTableParam(cluster, params) {
-      getTableParam(cluster, params.value)
+    getTableData(cluster) {
+      getTableData(cluster)
         .then((data) => {
-          const result = data.data.result || [];
-          result.forEach((item) => {
-            let index = this.totalData.findIndex((item1) => {
-              return (
-                item1.namespace === item.metric.namespace &&
-                item1.cluster === cluster
-              );
-            });
-            if (index === -1) {
-              if (item.metric.namespace) {
-                let tableItem = {
-                  namespace: item.metric.namespace,
-                  cluster: cluster,
-                };
-                if (params.attribute === "status") {
-                  tableItem[params.attribute] =
-                    item.value.length === 0 || item.value[1] == 0
-                      ? "活跃"
-                      : "异常";
-                } else {
-                  tableItem[params.attribute] = Number(item.value[1]);
-                }
-                this.totalData.push(tableItem);
-              }
-            } else {
-              if (params.attribute === "status") {
-                this.totalData[index][params.attribute] =
-                  item.value.length === 0 || item.value[1] == 0
-                    ? "活跃"
-                    : "异常";
-              } else {
-                this.totalData[index][params.attribute] = Number(item.value[1]);
-              }
-            }
-          });
+          this.totalData = data.data.alerts || [];
+          console.log(this.totalData, "1");
           this.pageration();
         })
         .catch(() => {});
@@ -466,6 +434,10 @@ export default {
     background: #ffe8e6;
     border-radius: 2px;
   }
+  .level-none {
+    color: #2c2e33;
+    background: unset;
+  }
   .level-warning {
     padding: 0 8px;
     font-size: 12px;
@@ -480,6 +452,9 @@ export default {
   }
   .alert-red {
     color: #cf0a1e;
+  }
+  .alert-yello {
+    color: #d78700;
   }
   .drawer {
     .content {
@@ -540,7 +515,9 @@ export default {
     }
   }
   .noti-header-2 {
-    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-column-gap: 32px;
     .option-item {
       display: flex;
       align-items: center;
@@ -557,6 +534,7 @@ export default {
         margin-right: 8px;
       }
       .cus-btn {
+        margin-left: 16px;
         background: #5354bb;
         color: #ffffff;
       }

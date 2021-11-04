@@ -230,7 +230,7 @@
                 <div>
                   <div>已使用/配额(Gi)</div>
                   <span
-                    >{{  parseFloat(pageData.storage).toFixed(4) || 0 }}/{{
+                    >{{ parseFloat(pageData.storage).toFixed(4) || 0 }}/{{
                       parseFloat(pageData.storagetotal) || "不限额"
                     }}</span
                   >
@@ -444,7 +444,7 @@ export default {
         this.step = timeArry[0] > 10 ? 100 : 50;
         start = currTime - timeArry[0] * 60 * 60 * 1000;
       } else if (timeArry[1] === "day") {
-        this.step = timeArry[1] > 1? 500 : 50;
+        this.step = timeArry[1] > 1 ? 500 : 200;
         if (timeArry[0] === "7") {
           start = currTime - (timeArry[0] - 1) * 24 * 60 * 60 * 1000;
         } else {
@@ -711,7 +711,7 @@ export default {
       )
         .then((data) => {
           const result = data.data.result || [];
-          this.itemArry[params.attribute] = result[0].values;
+          this.itemArry[params.attribute] = result[0]? result[0].values : [];
           this.pageData = JSON.parse(JSON.stringify(this.itemArry));
           this.initResouse();
         })
@@ -917,7 +917,7 @@ export default {
 .useCondition {
   background: white;
   margin-top: 8px;
-  height: calc(100%);
+  min-height: calc(100vh - 120px);
   .top {
     box-shadow: 0 1px 0 0 #e4e7f0;
     padding: 8px 24px 8px 24px;
@@ -940,6 +940,9 @@ export default {
     .pannal {
       padding: 24px;
       box-shadow: 0 1px 0 0 #e4e7f0;
+      &:last-child {
+        box-shadow: unset;
+      }
       .content {
         margin-top: 20px;
         display: flex;
@@ -1032,7 +1035,7 @@ export default {
       font-size: 14px;
       line-height: 22px;
       font-weight: 500;
-      padding: 16px 16px 24px 16px;
+      padding: 26px 16px 26px 16px;
       cursor: pointer;
       div {
         font-size: 12px;
@@ -1047,10 +1050,10 @@ export default {
       }
     }
     .storage {
-      padding: 16px 16px 24px 16px;
+      padding: 26px 16px 26px 16px;
       background: #f9fafc;
       border-radius: 4px;
-      margin-top: 8px;
+      margin-top: 12px;
       cursor: pointer;
       div {
         font-size: 12px;
