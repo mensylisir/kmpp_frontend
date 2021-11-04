@@ -208,10 +208,10 @@
           <td>触发时间</td>
           <td>{{ rTime(currItem.activeAt) }}</td>
         </tr>
-        <tr>
+        <!-- <tr>
           <td>持续时间</td>
           <td>{{ "--" }}</td>
-        </tr>
+        </tr> -->
         <tr>
           <td>表达式</td>
           <td>{{ "--" }}</td>
