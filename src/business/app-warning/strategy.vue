@@ -160,21 +160,7 @@ export default {
         total: 0,
       },
       totalData: [],
-      tableData: [
-        {
-          level: "一般",
-          status: "未触发",
-        },
-        {
-          level: "严重",
-          status: "firing",
-        },
-      ],
-      levelMap: {
-        info: "一般",
-        warning: "警告",
-        critical: "致命",
-      },
+      tableData: [],
       cluster: "", // 当前选中的集群
       clusterList: [], // 集群列表
       currentGroup: "", // 当前选择告警组
@@ -220,6 +206,12 @@ export default {
     // 详情
     goDetail(item) {
       this.currItem = item;
+      // this.$router.push({
+      //   name: "strategyDetail",
+      //   params: {
+      //     groupname: item.group,
+      //   },
+      // });
     },
     // 数据分页
     pageration(result) {
