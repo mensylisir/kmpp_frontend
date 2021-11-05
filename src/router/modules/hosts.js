@@ -165,6 +165,35 @@ const Host = {
       },
     },
     {
+      path: 'domain',
+      component: () => import('@/business/hosts/domain-manage/index'),
+      name: "domain",
+      meta: {
+        title: "域名管理",
+        roles: ['ADMIN', "PROJECT_MANAGER"]
+      },
+    },
+    {
+      path: "domainCreate/:type",
+      hidden: true,
+      name: "domainCreate",
+      component: () => import('@/business/hosts/domain-manage/create'),
+      meta: {
+        activeMenu: "/hosts/domain",
+        roles: ['ADMIN']
+      },
+    },
+    {
+      path: "domainEdit/:type",
+      hidden: true,
+      name: "domainEdit",
+      component: () => import('@/business/hosts/domain-manage/edit'),
+      meta: {
+        activeMenu: "/hosts/domain",
+        roles: ['ADMIN']
+      },
+    },
+    {
       path: 'apiNetWork',
       component: () => import('@/business/hosts/apiNetWork/index'),
       name: "certification",
