@@ -2,14 +2,14 @@
   <layout-content header="" class="app-watch">
     <div class="top">
       <div style="display: flex; align-items: center">
-        <div class="detail">应用资源监控</div>
+        <div class="detail">告警</div>
         <el-menu
           :default-active="activeKey"
           mode="horizontal"
           @select="tabChange"
         >
-          <el-menu-item index="recommend"> 用量排行 </el-menu-item>
-          <el-menu-item index="useCondition"> 使用情况 </el-menu-item>
+          <el-menu-item index="notice"> 告警消息 </el-menu-item>
+          <el-menu-item index="strategy"> 告警策略 </el-menu-item>
         </el-menu>
       </div>
     </div>
@@ -35,12 +35,12 @@ export default {
   methods: {
     tabChange(index) {
       this.activeKey = index;
-      if (index === "recommend") {
-        // 用量排行
-        this.$router.push({ name: "recommend" });
-      } else if (index === "useCondition") {
-        // 使用情况
-        this.$router.push({ name: "useCondition" });
+      if (index === "notice") {
+        // 告警消息
+        this.$router.push({ name: "notice" });
+      } else if (index === "strategy") {
+        // 告警策略
+        this.$router.push({ name: "strategy" });
       }
     },
   },
@@ -76,7 +76,7 @@ export default {
     box-shadow: 0 1px 0 0 #e4e7f0;
   }
   .bottom {
-    min-height: calc(100% - 64px);
+    min-height: calc(100% - 56px);
     width: 100%;
     .card-group {
       display: flex;

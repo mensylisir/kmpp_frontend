@@ -32,13 +32,23 @@
         </el-table-column>
         <el-table-column prop="name" label="状态" width="100">
           <template slot-scope="scope">
-            <svg class="icon svg-icon" aria-hidden="true" v-if="scope.row.status === '异常'" style="color: #CF0A1E">
+            <svg
+              class="icon svg-icon"
+              aria-hidden="true"
+              v-if="scope.row.status === '异常'"
+              style="color: #cf0a1e"
+            >
               <use xlink:href="#icon-checkbox-circle-fill"></use>
             </svg>
-                <svg class="icon svg-icon" aria-hidden="true" v-else style="color: #36B37E">
+            <svg
+              class="icon svg-icon"
+              aria-hidden="true"
+              v-else
+              style="color: #36b37e"
+            >
               <use xlink:href="#icon-checkbox-circle-fill2"></use>
             </svg>
-            <span>{{ scope.row.status || "活跃"}}</span>
+            <span>{{ scope.row.status || "活跃" }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="cpuCore" label="CPU使用量" sortable width="150">
@@ -106,7 +116,7 @@
           :page-sizes="page.size"
           :page-size="page.currSize"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="tableData.length"
+          :total="totalData.length"
         >
         </el-pagination>
       </div>
@@ -140,7 +150,7 @@ export default {
         {
           attribute: "cpuQuota",
           value:
-            "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests{namespace=~'.*'}) by (namespace) ",
+            "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{namespace=~'.*'}) by (namespace)",
         },
         {
           attribute: "memoryUse",
@@ -261,7 +271,7 @@ export default {
             } else {
               if (params.attribute === "status") {
                 this.totalData[index][params.attribute] =
-                  (item.value.length === 0 || item.value[1] == 0)
+                  item.value.length === 0 || item.value[1] == 0
                     ? "活跃"
                     : "异常";
               } else {
@@ -285,7 +295,7 @@ export default {
   background: white;
   padding: 24px;
   margin-top: 8px;
-  height: calc(100% - 48px);
+  min-height: calc(100vh - 175px);
   .top {
     padding: 0 0 13px 0;
     display: flex;
@@ -306,7 +316,7 @@ export default {
     text-align: right;
     margin: 15px 0;
   }
-  svg{
+  svg {
     width: 13.33px;
     height: 13.33px;
     margin-right: 5.33px;

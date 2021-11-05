@@ -1697,7 +1697,7 @@ export default {
             "CPU (%)",
             1
           );
-
+ console.log( this.cpuRate, '2')
           // 资源使用率 - 内存
           const lineColor2 = ["#f59326", "#34a677"];
           const areaColor2 = ["#f8ebdd", "#d7ebe5"];

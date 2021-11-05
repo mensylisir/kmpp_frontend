@@ -24,7 +24,7 @@ const Manifest = {
       component: () => import("@/business/app-watch/index"),
       name: "appWatch",
       meta: {
-        title: "应用监控",
+        title: "应用资源",
         activeKey: "recommend"
       },
       children: [{
@@ -49,6 +49,39 @@ const Manifest = {
           activeKey: "useCondition"
         }
       }]
+    },
+    {
+      path: "aapWarning",
+      component: () => import("@/business/app-warning/index"),
+      name: "aapWarning",
+      meta: {
+        title: "告警",
+        activeKey: "notice"
+      },
+      children: [
+        {
+          path: "notice",
+          name: "notice",
+          props: true,
+          hidden: true,
+          component: () => import('@/business/app-warning/notice'),
+          meta: {
+            activeMenu: "/supervise/aapWarning",
+            activeKey: "notice"
+          }
+        },
+      {
+        path: "strategy",
+        name: "strategy",
+        props: true,
+        hidden: true,
+        component: () => import('@/business/app-warning/strategy'),
+        meta: {
+          activeMenu: "/supervise/aapWarning",
+          activeKey: "strategy"
+        }
+      }
+    ]
     },
   ]
 };
