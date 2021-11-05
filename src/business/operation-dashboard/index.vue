@@ -766,7 +766,7 @@ export default {
     this.getClusters();
     // 告警触发次数
     const colors3 = ["#CF0A1E", "#F59326", "#D42D7F"];
-    this.initLine("warning-num", this.warnNum, colors3, "CPU (%)");
+    this.initLine("warning-num", this.warnNum, colors3, "");
   },
   mounted() {},
   activited() {},
@@ -1826,7 +1826,7 @@ export default {
             lineColor3,
             legends3,
             areaColor3,
-            "CPU (%)",
+            "",
             3
           );
         } else {
