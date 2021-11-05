@@ -241,16 +241,7 @@ export default {
         total: 0
       },
       totalData: [],
-      tableData: [
-        {
-          level: "一般",
-          status: "未触发",
-        },
-        {
-          level: "严重",
-          status: "firing",
-        },
-      ],
+      tableData: [],
       levelMap: {
         info: "一般",
         warning: "警告",
