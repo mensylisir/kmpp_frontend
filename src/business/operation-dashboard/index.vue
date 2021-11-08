@@ -973,13 +973,19 @@ export default {
           .area()
           .adjust("stack")
           .position("year*value")
-          .color("label", areaColors)
+          .color("label", (val) => {
+            const n = legends.indexOf(val);
+            return areaColors[n];
+          })
           .tooltip(false);
         chart
           .line()
           .adjust("stack")
           .position("year*value")
-          .color("label", lineColors);
+          .color("label", (val) => {
+            const n = legends.indexOf(val);
+            return lineColors[n];
+          });
 
         chart.interaction("element-highlight");
 
@@ -1803,16 +1809,16 @@ export default {
     handleContainerInfo(type) {
       const promiseList = [
         this.getContainerInfo(
-          'count(kube_pod_info{created_by_kind!~"<none>|Job"})',
-          this.containerStart,
-          this.containerEnd,
-          "ing"
-        ),
-        this.getContainerInfo(
           "sum(kubelet_running_pods{})",
           this.containerStart,
           this.containerEnd,
           "total"
+        ),
+        this.getContainerInfo(
+          'count(kube_pod_info{created_by_kind!~"<none>|Job"})',
+          this.containerStart,
+          this.containerEnd,
+          "ing"
         ),
       ];
 
@@ -1892,6 +1898,15 @@ export default {
         }
       },
     },
+  },
+  beforeDestroy() {
+    this.chartCpu && this.chartCpu.destroy();
+    this.chartGi && this.chartGi.destroy();
+
+    this.chartCus1 && this.chartCus1.destroy();
+    this.chartCus2 && this.chartCus2.destroy();
+    this.chartCus3 && this.chartCus3.destroy();
+    this.chartCus4 && this.chartCus4.destroy();
   },
 };
 </script>
