@@ -989,6 +989,27 @@ export default {
 
         chart.interaction("element-highlight");
 
+        chart.on("afterrender", (evt) => {
+          if (tab == 2) {
+            this.containerGroups = true;
+          }
+          console.log(
+            evt,
+            "afterrender",
+            this.moment().format("YYYY-MM-DD HH:mm:ss:SSSS"),
+            tab
+          );
+        });
+
+        chart.on("beforerender", (evt) => {
+          console.log(
+            evt,
+            "beforerender",
+            this.moment().format("YYYY-MM-DD HH:mm:ss:SSSS"),
+            tab
+          );
+        });
+
         chart.render();
 
         switch (tab) {
@@ -1702,7 +1723,6 @@ export default {
             const lineColor1 = ["#319dce", "#5354bb"];
             const areaColor1 = ["#ddebfa", "#e0e1f2"];
             const legends1 = ["使用量", "请求速率"];
-            console.log(this.cpuRate, "cpu");
             this.initRate(
               "cpu-rate",
               this.cpuRate,
@@ -1725,7 +1745,6 @@ export default {
               "内存 (%)",
               2
             );
-            this.containerGroups = true;
           }
         });
       });
@@ -1898,8 +1917,15 @@ export default {
     containerGroups: {
       handler(val) {
         if (val) {
+          console.log(
+            val,
+            "val",
+            this.moment().format("YYYY-MM-DD HH:mm:ss:SSSS")
+          );
           if (this.clusterCurrentCon) {
-            this.handleContainerInfo("init");
+            setTimeout(() => {
+              this.handleContainerInfo("init");
+            }, 1000);
           }
         }
       },
