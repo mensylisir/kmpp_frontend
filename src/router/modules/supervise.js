@@ -83,6 +83,17 @@ const Manifest = {
       }
     ]
     },
+    {
+      path: ":groupname/strategyDetail",
+      name: "strategyDetail",
+      props: true,
+      hidden: true,
+      component: () => import('@/business/app-warning/strategyDetail'),
+      meta: {
+        activeMenu: "/supervise/aapWarning",
+        activeKey: "strategy"
+      }
+    }
   ]
 };
 export default Manifest;

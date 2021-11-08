@@ -248,7 +248,7 @@
       <div class="pannal">
         <h4>网络流量统计</h4>
         <div class="content">
-          <div class="right" style="width: 100%;margin-left: 0">
+          <div class="right" style="width: 100%; margin-left: 0">
             <div class="four-grid">
               <div id="network"></div>
             </div>
@@ -711,7 +711,7 @@ export default {
       )
         .then((data) => {
           const result = data.data.result || [];
-          this.itemArry[params.attribute] = result[0]? result[0].values : [];
+          this.itemArry[params.attribute] = result[0] ? result[0].values : [];
           this.pageData = JSON.parse(JSON.stringify(this.itemArry));
           this.initResouse();
         })
