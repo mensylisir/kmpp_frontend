@@ -73,19 +73,19 @@
         :data="tableData"
         :default-sort="{ prop: 'date', order: 'descending' }"
       >
-        <el-table-column label="告警名称">
+        <el-table-column label="告警">
           <template slot-scope="scope">
             <span
               style="cursor: pointer; color: #5354bb"
               @click="goDetail(scope.row)"
-              >{{ scope.row.alertname || "--" }}</span
+              >{{ scope.row.alertsummary || "--" }}</span
             >
           </template>
         </el-table-column>
-        <el-table-column prop="" label="告警总结" width="480">
+        <el-table-column prop="" label="告警规则" width="180">
           <template slot-scope="scope">
             <span style="cursor: pointer">{{
-              scope.row.alertsummary || "--"
+              scope.row.alertname || "--"
             }}</span>
           </template>
         </el-table-column>
@@ -156,8 +156,12 @@
     >
       <table style="width: 100%" class="myTable">
         <tr>
-          <td>告警名称</td>
-          <td>{{ currItem.alertname || "--" }}</td>
+          <td>告警</td>
+          <td>{{ currItem.alertsummary || "--" }}</td>
+        </tr>
+        <tr>
+          <td>告警规则</td>
+          <td>{{ currItem.alertname }}</td>
         </tr>
         <tr>
           <td>告警等级</td>
@@ -206,10 +210,6 @@
         <tr>
           <td>告警描述</td>
           <td>{{ currItem.alertdescription }}</td>
-        </tr>
-        <tr>
-          <td>告警总结</td>
-          <td>{{ currItem.alertsummary }}</td>
         </tr>
         <tr>
           <td>触发时间</td>
@@ -270,7 +270,7 @@ export default {
         name: "strategyDetail",
         params: {
           groupname: groupname,
-          backName: "notice"
+          backName: "notice",
         },
       });
     },
