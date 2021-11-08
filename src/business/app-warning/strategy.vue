@@ -206,12 +206,13 @@ export default {
     // 详情
     goDetail(item) {
       this.currItem = item;
-      // this.$router.push({
-      //   name: "strategyDetail",
-      //   params: {
-      //     groupname: item.group,
-      //   },
-      // });
+      this.$router.push({
+        name: "strategyDetail",
+        params: {
+          groupname: item.group,
+          backName: "strategy"
+        },
+      });
     },
     // 数据分页
     pageration(result) {

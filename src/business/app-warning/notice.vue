@@ -73,7 +73,7 @@
         :data="tableData"
         :default-sort="{ prop: 'date', order: 'descending' }"
       >
-        <el-table-column label="告警策略">
+        <el-table-column label="告警名称">
           <template slot-scope="scope">
             <span
               style="cursor: pointer; color: #5354bb"
@@ -156,7 +156,7 @@
     >
       <table style="width: 100%" class="myTable">
         <tr>
-          <td>告警策略</td>
+          <td>告警名称</td>
           <td>{{ currItem.alertname || "--" }}</td>
         </tr>
         <tr>
@@ -182,7 +182,7 @@
               aria-hidden="true"
               :class="{
                 'alert-red': currItem.alertstate === 'firing',
-                'alert-yello': currItem.alertstate === '已激活',
+                'alert-yello': currItem.alertstate === 'inactive',
               }"
             >
               <use xlink:href="#icon-alert"></use></svg
@@ -196,7 +196,12 @@
         </tr>
         <tr>
           <td>告警组</td>
-          <td>{{ currItem.alertgroup || "--" }}</td>
+          <td
+            style="cursor: pointer; color: #5354bb"
+            @click="goStrategy(currItem.alertgroup)"
+          >
+            {{ currItem.alertgroup || "--" }}
+          </td>
         </tr>
         <tr>
           <td>告警描述</td>
@@ -238,7 +243,7 @@ export default {
         currentPage: 1,
         currSize: 10,
         size: [10, 20, 30, 40],
-        total: 0
+        total: 0,
       },
       totalData: [],
       tableData: [],
@@ -260,6 +265,15 @@ export default {
   },
   props: [""],
   methods: {
+    goStrategy(groupname) {
+      this.$router.push({
+        name: "strategyDetail",
+        params: {
+          groupname: groupname,
+          backName: "notice"
+        },
+      });
+    },
     rTime(timestamp) {
       if (timestamp) {
         let date = new Date(new Date(timestamp).getTime() + 8 * 3600 * 1000);
@@ -272,7 +286,7 @@ export default {
     },
     changeCluster() {
       this.page.currentPage = 1;
-      this.getTableData(this.cluster);
+      this.filterData();
     },
     changeGroup() {
       this.page.currentPage = 1;
@@ -301,7 +315,7 @@ export default {
       });
     },
     filterData() {
-      let result = this.totalData;
+      let result = JSON.parse(JSON.stringify(this.totalData));
       if (this.cluster) {
         result = result.filter((item) => {
           return item.cluster === this.cluster;
@@ -322,7 +336,7 @@ export default {
           return this.currentGroup.indexOf(item.alertgroup) > -1;
         });
       }
-      this.page.total = result.length
+      this.page.total = result.length;
       this.pageration(result);
     },
     handleSizeChange(val) {
