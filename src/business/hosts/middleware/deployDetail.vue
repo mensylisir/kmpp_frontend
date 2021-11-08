@@ -699,7 +699,6 @@ export default {
           this.status = this.getStatus();
           if (that.status === "运行正常" || that.time > 60000) {
             clearInterval(this.timer);
-            console.log(false);
             that.$store.commit("setMonitor", false);
             this.status = "运行异常";
             this.activeKey = "";

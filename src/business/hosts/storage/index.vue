@@ -49,7 +49,12 @@
         fix
       >
         <template v-slot:default="{ row }">
-          <span>{{ row.name }}</span>
+          <el-link
+            @click="getDetailInfo(row)"
+            style="font-size: 12px"
+            type="info"
+            >{{ row.name }}</el-link
+          >
         </template>
       </el-table-column>
       <el-table-column
@@ -144,7 +149,7 @@
         }}</el-button>
       </div>
     </el-dialog>
-    <!-- <el-drawer
+    <el-drawer
       :title="$t('host.detail')"
       :visible.sync="dialogDetailVisible"
       size="51%"
@@ -204,7 +209,7 @@
           </div>
         </div>
       </div>
-    </el-drawer> -->
+    </el-drawer>
 
     <el-dialog
       :title="$t('host.err_title')"
