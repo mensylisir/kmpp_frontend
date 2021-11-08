@@ -51,9 +51,9 @@ const Manifest = {
       }]
     },
     {
-      path: "aapWarning",
+      path: "warning",
       component: () => import("@/business/app-warning/index"),
-      name: "aapWarning",
+      name: "warning",
       meta: {
         title: "告警",
         activeKey: "notice"
@@ -66,7 +66,7 @@ const Manifest = {
           hidden: true,
           component: () => import('@/business/app-warning/notice'),
           meta: {
-            activeMenu: "/supervise/aapWarning",
+            activeMenu: "/supervise/warning",
             activeKey: "notice"
           }
         },
@@ -77,7 +77,7 @@ const Manifest = {
         hidden: true,
         component: () => import('@/business/app-warning/strategy'),
         meta: {
-          activeMenu: "/supervise/aapWarning",
+          activeMenu: "/supervise/warning",
           activeKey: "strategy"
         }
       }
@@ -90,7 +90,7 @@ const Manifest = {
       hidden: true,
       component: () => import('@/business/app-warning/strategyDetail'),
       meta: {
-        activeMenu: "/supervise/aapWarning",
+        activeMenu: "/supervise/warning",
         activeKey: "strategy"
       }
     }
