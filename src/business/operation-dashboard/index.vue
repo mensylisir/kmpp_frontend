@@ -759,9 +759,11 @@ export default {
       chartCus3: null,
       // 告警触发次数-cpu
       chartCus4: null,
+      containerGroups: false, // 控制 容器组数量 模块 显示
     };
   },
   created() {
+    this.containerGroups = false;
     this.getClusterAll1();
     this.getClusters();
     // 告警触发次数
@@ -1202,9 +1204,9 @@ export default {
         if (this.clusterCurrent) {
           this.getNodeListByCluster(this.clusterCurrent, "init");
         }
-        if (this.clusterCurrentCon) {
-          this.handleContainerInfo("init");
-        }
+        // if (this.clusterCurrentCon) {
+        //   this.handleContainerInfo("init");
+        // }
       });
     },
 
@@ -1685,8 +1687,8 @@ export default {
           // this.chartCus3.changeData(this.kmppRate);
         } else {
           // 资源使用率 - cpu
-          const lineColor1 = ["#5354bb", "#319dce"];
-          const areaColor1 = ["#e0e1f2", "#ddebfa"];
+          const lineColor1 = ["#319dce", "#5354bb"];
+          const areaColor1 = ["#ddebfa", "#e0e1f2"];
           const legends1 = ["使用量", "请求速率"];
           this.initRate(
             "cpu-rate",
@@ -1697,10 +1699,9 @@ export default {
             "CPU (%)",
             1
           );
-          console.log(this.cpuRate, "2");
           // 资源使用率 - 内存
-          const lineColor2 = ["#f59326", "#34a677"];
-          const areaColor2 = ["#f8ebdd", "#d7ebe5"];
+          const lineColor2 = ["#34a677", "#f59326"];
+          const areaColor2 = ["#d7ebe5", "#f8ebdd"];
           const legends2 = ["使用量", "请求速率"];
           this.initRate(
             "Memory-rate",
@@ -1711,6 +1712,7 @@ export default {
             "内存 (%)",
             2
           );
+          this.containerGroups = true;
         }
       });
     },
@@ -1804,21 +1806,21 @@ export default {
           'count(kube_pod_info{created_by_kind!~"<none>|Job"})',
           this.containerStart,
           this.containerEnd,
-          "total"
+          "ing"
         ),
         this.getContainerInfo(
           "sum(kubelet_running_pods{})",
           this.containerStart,
           this.containerEnd,
-          "ing"
+          "total"
         ),
       ];
 
       Promise.all(promiseList).then(() => {
         if (type == "init") {
           // 容器组数量 - CPU
-          const lineColor3 = ["#319dce", "#34a677"];
-          const areaColor3 = ["#ddebfa", "#d7ebe5"];
+          const lineColor3 = ["#34a677", "#319dce"];
+          const areaColor3 = ["#d7ebe5", "#ddebfa"];
           const legends3 = ["运行中", "总数"];
           this.initRate(
             "kmpp-num",
@@ -1880,7 +1882,17 @@ export default {
   },
   filter: {},
   computed: {},
-  watch: {},
+  watch: {
+    containerGroups: {
+      handler(val) {
+        if (val) {
+          if (this.clusterCurrentCon) {
+            this.handleContainerInfo("init");
+          }
+        }
+      },
+    },
+  },
 };
 </script>
 
