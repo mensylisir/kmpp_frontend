@@ -759,14 +759,16 @@ export default {
       chartCus3: null,
       // 告警触发次数-cpu
       chartCus4: null,
+      containerGroups: false, // 控制 容器组数量 模块 显示
     };
   },
   created() {
+    this.containerGroups = false;
     this.getClusterAll1();
     this.getClusters();
     // 告警触发次数
     const colors3 = ["#CF0A1E", "#F59326", "#D42D7F"];
-    this.initLine("warning-num", this.warnNum, colors3, "CPU (%)");
+    this.initLine("warning-num", this.warnNum, colors3, "");
   },
   mounted() {},
   activited() {},
@@ -971,13 +973,19 @@ export default {
           .area()
           .adjust("stack")
           .position("year*value")
-          .color("label", areaColors)
+          .color("label", (val) => {
+            const n = legends.indexOf(val);
+            return areaColors[n];
+          })
           .tooltip(false);
         chart
           .line()
           .adjust("stack")
           .position("year*value")
-          .color("label", lineColors);
+          .color("label", (val) => {
+            const n = legends.indexOf(val);
+            return lineColors[n];
+          });
 
         chart.interaction("element-highlight");
 
@@ -1202,9 +1210,9 @@ export default {
         if (this.clusterCurrent) {
           this.getNodeListByCluster(this.clusterCurrent, "init");
         }
-        if (this.clusterCurrentCon) {
-          this.handleContainerInfo("init");
-        }
+        // if (this.clusterCurrentCon) {
+        //   this.handleContainerInfo("init");
+        // }
       });
     },
 
@@ -1632,6 +1640,8 @@ export default {
 
     // 获取每个集群下容器组信息并统计(type为true表示 数据变更，false--初始化)
     async getNodeListByCluster(cluster, type) {
+      this.cpuRate = [];
+      this.memoryRate = [];
       const data = await this.getClusterUsedInfo(
         cluster,
         "sum(kube_node_info { }) by (node,internal_ip)"
@@ -1655,13 +1665,6 @@ export default {
           this.resourcesEnd,
           "use"
         ),
-        this.getCpuUseResInfo(
-          this.clusterCurrent,
-          "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests{})",
-          this.resourcesStart,
-          this.resourcesEnd,
-          "res"
-        ),
         this.getMemoryUseResInfo(
           this.clusterCurrent,
           "(1 - (sum(node_memory_MemAvailable_bytes{}) / sum((node_memory_MemTotal_bytes{}))))* 100",
@@ -1669,56 +1672,68 @@ export default {
           this.resourcesEnd,
           "use"
         ),
-        this.getMemoryUseResInfo(
-          this.clusterCurrent,
-          "sum(kube_pod_init_container_resource_requests_memory_bytes{})/sum((node_memory_MemTotal_bytes{}))*100",
-          this.resourcesStart,
-          this.resourcesEnd,
-          "res"
-        ),
       ];
 
       Promise.all(promiseList).then(() => {
-        if (type == "time" || type == "node" || type == "cluster") {
-          this.chartCus1.changeData(this.cpuRate);
-          this.chartCus2.changeData(this.memoryRate);
-          // this.chartCus3.changeData(this.kmppRate);
-        } else {
-          // 资源使用率 - cpu
-          const lineColor1 = ["#5354bb", "#319dce"];
-          const areaColor1 = ["#e0e1f2", "#ddebfa"];
-          const legends1 = ["使用量", "请求速率"];
-          this.initRate(
-            "cpu-rate",
-            this.cpuRate,
-            lineColor1,
-            legends1,
-            areaColor1,
-            "CPU (%)",
-            1
-          );
- console.log( this.cpuRate, '2')
-          // 资源使用率 - 内存
-          const lineColor2 = ["#f59326", "#34a677"];
-          const areaColor2 = ["#f8ebdd", "#d7ebe5"];
-          const legends2 = ["使用量", "请求速率"];
-          this.initRate(
-            "Memory-rate",
-            this.memoryRate,
-            lineColor2,
-            legends2,
-            areaColor2,
-            "内存 (%)",
-            2
-          );
-        }
+        const promiseList1 = [
+          this.getCpuUseResInfo(
+            this.clusterCurrent,
+            "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests{})",
+            this.resourcesStart,
+            this.resourcesEnd,
+            "res"
+          ),
+          this.getMemoryUseResInfo(
+            this.clusterCurrent,
+            "sum(kube_pod_init_container_resource_requests_memory_bytes{})/sum((node_memory_MemTotal_bytes{}))*100",
+            this.resourcesStart,
+            this.resourcesEnd,
+            "res"
+          ),
+        ];
+
+        Promise.all(promiseList1).then(() => {
+          if (type == "time" || type == "node" || type == "cluster") {
+            this.chartCus1.changeData(this.cpuRate);
+            this.chartCus2.changeData(this.memoryRate);
+            // this.chartCus3.changeData(this.kmppRate);
+          } else {
+            // 资源使用率 - cpu
+            const lineColor1 = ["#319dce", "#5354bb"];
+            const areaColor1 = ["#ddebfa", "#e0e1f2"];
+            const legends1 = ["使用量", "请求速率"];
+            console.log(this.cpuRate, "cpu");
+            this.initRate(
+              "cpu-rate",
+              this.cpuRate,
+              lineColor1,
+              legends1,
+              areaColor1,
+              "CPU (%)",
+              1
+            );
+            // 资源使用率 - 内存
+            const lineColor2 = ["#34a677", "#f59326"];
+            const areaColor2 = ["#d7ebe5", "#f8ebdd"];
+            const legends2 = ["使用量", "请求速率"];
+            this.initRate(
+              "Memory-rate",
+              this.memoryRate,
+              lineColor2,
+              legends2,
+              areaColor2,
+              "内存 (%)",
+              2
+            );
+            this.containerGroups = true;
+          }
+        });
       });
     },
 
     // 资源使用率
     // 获取 cpu 使用量和请求率
     async getCpuUseResInfo(cluster, query, start, end, type) {
-      this.cpuRate = [];
       const data = await this.getClusterInfo(cluster, query, start, end);
       const list = data.data.result[0].values || [];
       if (type == "use") {
@@ -1759,7 +1774,6 @@ export default {
     // 获取内存使用信息
     // 获取 cpu 使用量和请求率
     async getMemoryUseResInfo(cluster, query, start, end, type) {
-      this.memoryRate = [];
       const data = await this.getClusterInfo(cluster, query, start, end);
       const list = data.data.result[0].values || [];
       if (type == "use") {
@@ -1801,13 +1815,13 @@ export default {
     handleContainerInfo(type) {
       const promiseList = [
         this.getContainerInfo(
-          'count(kube_pod_info{created_by_kind!~"<none>|Job"})',
+          "sum(kubelet_running_pods{})",
           this.containerStart,
           this.containerEnd,
           "total"
         ),
         this.getContainerInfo(
-          "sum(kubelet_running_pods{})",
+          'count(kube_pod_info{created_by_kind!~"<none>|Job"})',
           this.containerStart,
           this.containerEnd,
           "ing"
@@ -1817,8 +1831,8 @@ export default {
       Promise.all(promiseList).then(() => {
         if (type == "init") {
           // 容器组数量 - CPU
-          const lineColor3 = ["#319dce", "#34a677"];
-          const areaColor3 = ["#ddebfa", "#d7ebe5"];
+          const lineColor3 = ["#34a677", "#319dce"];
+          const areaColor3 = ["#d7ebe5", "#ddebfa"];
           const legends3 = ["运行中", "总数"];
           this.initRate(
             "kmpp-num",
@@ -1826,7 +1840,7 @@ export default {
             lineColor3,
             legends3,
             areaColor3,
-            "CPU (%)",
+            "",
             3
           );
         } else {
@@ -1880,7 +1894,26 @@ export default {
   },
   filter: {},
   computed: {},
-  watch: {},
+  watch: {
+    containerGroups: {
+      handler(val) {
+        if (val) {
+          if (this.clusterCurrentCon) {
+            this.handleContainerInfo("init");
+          }
+        }
+      },
+    },
+  },
+  beforeDestroy() {
+    this.chartCpu && this.chartCpu.destroy();
+    this.chartGi && this.chartGi.destroy();
+
+    this.chartCus1 && this.chartCus1.destroy();
+    this.chartCus2 && this.chartCus2.destroy();
+    this.chartCus3 && this.chartCus3.destroy();
+    this.chartCus4 && this.chartCus4.destroy();
+  },
 };
 </script>
 
