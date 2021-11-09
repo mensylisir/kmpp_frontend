@@ -133,9 +133,9 @@
             </template>
           </el-table-column>
           <el-table-column label="策略名称" prop="name"> </el-table-column>
-          <el-table-column label="活跃告警数" prop="alertcount">
+          <el-table-column label="活跃告警数" prop="alertcount" width="180">
           </el-table-column>
-          <el-table-column label="等级" prop="name">
+          <el-table-column label="等级" prop="name" width="180">
             <template slot-scope="scope">
               <span
                 :class="
@@ -150,7 +150,7 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="告警状态" prop="desc">
+          <el-table-column label="告警状态" prop="desc" width="180">
             <template slot-scope="scope">
               <svg
                 class="icon alert-icon"
@@ -162,7 +162,15 @@
               >
                 <use xlink:href="#icon-alert"></use>
               </svg>
-              <span>{{ getStatus(scope.row.state) }}</span>
+              <span>{{
+                scope.row.state
+                  ? scope.row.state === "firing"
+                    ? "告警中"
+                    : scope.row.state === "pending"
+                    ? "未触发"
+                    : "已激活"
+                  : "--"
+              }}</span>
             </template>
           </el-table-column>
         </el-table>
