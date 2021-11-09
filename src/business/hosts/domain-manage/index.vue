@@ -55,11 +55,11 @@
         <template slot-scope="scope">
           <span
             @click="handleClickEdit(scope.row)"
-            class="iconfont iconbianji1 action-icon"
+            class="iconfont icon-edit-line action-icon"
           ></span>
           <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
             ><span
-              class="iconfont iconshanchu1 action-icon"
+              class="iconfont icon-delete-line action-icon"
               slot="reference"
             ></span>
           </el-popconfirm> </template
