@@ -4,7 +4,7 @@
   "font_class": "icon-",
   "font_family": "iconfont",
   "url": "https://codesign.qq.com/workspace/icons/GxDP39qAOa9wlKp",
-  "icons_count": 48,
+  "icons_count": 49,
   "icons": [
     {
       "id": "XgRxnjP3BJZLmqr",
@@ -436,6 +436,15 @@
       "class_name": "alert",
       "unicode": "e03f",
       "unicode_decimal": 57407,
+      "section": "未编组"
+    },
+    {
+      "id": "7VXl9Or7Dej8WRA",
+      "name": "edit-line",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" class=\"design-iconfont\"><path d=\"M6.414 16L16.556 5.858l-1.414-1.414L5 14.586V16h1.414zm.829 2H3v-4.243L14.435 2.322a1 1 0 0 1 1.414 0l2.829 2.829a1 1 0 0 1 0 1.414L7.243 18zM3 20h18v2H3v-2z\"></path></svg>",
+      "class_name": "edit-line",
+      "unicode": "e040",
+      "unicode_decimal": 57408,
       "section": "未编组"
     }
   ]
