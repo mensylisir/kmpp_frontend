@@ -713,11 +713,11 @@ export default {
           start: moment().subtract(3, "d").format("X"),
           end: moment().format("X"),
         },
-        {
-          name: "最近 7 天",
-          start: moment().subtract(7, "d").format("X"),
-          end: moment().format("X"),
-        },
+        // {
+        //   name: "最近 7 天",
+        //   start: moment().subtract(7, "d").format("X"),
+        //   end: moment().format("X"),
+        // },
       ],
       // 告警触发
       warningStart: moment().subtract(1, "d").format("X"),
@@ -1754,7 +1754,7 @@ export default {
     // 获取 cpu 使用量和请求率
     async getCpuUseResInfo(cluster, query, start, end, type) {
       const data = await this.getClusterInfo(cluster, query, start, end);
-      const list = data.data.result[0].values || [];
+      const list = data.data.result.length ? data.data.result[0].values : [];
       if (type == "use") {
         list.forEach((item) => {
           const arr = this.cpuRate.filter((cpu) => {
@@ -1794,7 +1794,7 @@ export default {
     // 获取 cpu 使用量和请求率
     async getMemoryUseResInfo(cluster, query, start, end, type) {
       const data = await this.getClusterInfo(cluster, query, start, end);
-      const list = data.data.result[0].values || [];
+      const list = data.data.result.length ? data.data.result[0].values : [];
       if (type == "use") {
         list.forEach((item) => {
           const arr = this.memoryRate.filter((cpu) => {
@@ -1875,7 +1875,7 @@ export default {
         start,
         end
       );
-      const list = data.data.result[0].values || [];
+      const list = data.data.result.length ? data.data.result[0].values : [];
       if (type == "total") {
         list.forEach((item) => {
           const arr = this.kmppRate.filter((cpu) => {
