@@ -57,11 +57,11 @@
         </template>
       </el-table-column>
 
-      <fu-table-operations
+      <!-- <fu-table-operations
         :buttons="buttons"
         :label="$t('commons.table.action')"
         fix
-      />
+      /> -->
     </complex-table>
 
     <el-dialog

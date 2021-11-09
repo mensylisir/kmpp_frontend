@@ -108,7 +108,6 @@
       </el-row>
     </div>
     <!-- <div class="separate"></div> -->
-
     <el-tabs v-model="activeName" class="bottom">
       <el-tab-pane name="Nodes">
         <div slot="label" class="tab-label">
@@ -203,8 +202,7 @@
             <img src="@/assets/images/data-empty.svg" /><br />
             <span>暂无数据~</span>
           </div>
-        </div></el-tab-pane
-      >
+        </div></el-tab-pane>
     </el-tabs>
     <!--执行 WebKubeCtl 命令行 -->
     <!-- <el-card style="margin-top: 20px" v-loading="loading_xterm">
