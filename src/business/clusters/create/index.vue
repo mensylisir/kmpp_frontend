@@ -22,7 +22,7 @@
                       <el-form-item :label="$t('cluster.creation.provider')" prop="provider">
                         <el-select style="width: 100%" v-model="form.provider" clearable>
                           <el-option value="bareMetal" :label="$t('cluster.creation.provide_bare_metal')">{{$t('cluster.creation.provide_bare_metal')}}</el-option>
-                          <el-option value="plan" :label="$t('cluster.creation.provide_plan')">{{$t('cluster.creation.provide_plan')}}</el-option>
+                          <!-- <el-option value="plan" :label="$t('cluster.creation.provide_plan')">{{$t('cluster.creation.provide_plan')}}</el-option> -->
                         </el-select>
                       </el-form-item>
                       <el-form-item :label="$t('cluster.creation.version')" prop="version">
@@ -262,7 +262,7 @@
               <el-scrollbar style="height:100%">
                 <el-card>
                   <el-form-item>
-                    <span>{{$t ('cluster.creation.node_help')}}</span>
+                    <!-- <span>{{$t ('cluster.creation.node_help')}}</span> -->
                   </el-form-item>
                   <el-form-item label="Masters" prop="masters">
                     <el-select multiple filterable style="width: 100%" @change="toggle('master')" v-model="form.masters" clearable>
