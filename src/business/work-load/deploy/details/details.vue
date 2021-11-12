@@ -139,7 +139,11 @@
         </el-table-column>
         <el-table-column prop="pvc" label="挂载PVC" min-width="793">
           <template slot-scope="scope">
-            <span>{{ scope.row.persistentVolumeClaim.claimName }}</span>
+            <span>{{
+              scope.row.persistentVolumeClaim
+                ? scope.row.persistentVolumeClaim.claimName
+                : "-"
+            }}</span>
           </template>
         </el-table-column>
       </el-table>
