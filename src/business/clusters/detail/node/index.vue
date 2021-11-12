@@ -23,14 +23,14 @@
             @click="create()"
             >{{ $t("commons.button.create") }}</el-button
           >
-          <el-button
+          <!-- <el-button
             size="small"
             :disabled="
               selects.length < 1 || provider === '' || buttonDisabled()
             "
             @click="onDelete()"
             >{{ $t("commons.button.delete") }}</el-button
-          >
+          > -->
           <el-button
             size="small"
             :disabled="selects.length < 1"
@@ -148,11 +148,11 @@
         </template>
       </el-table-column>
 
-      <fu-table-operations
+      <!-- <fu-table-operations
         :buttons="buttons"
         :label="$t('commons.table.action')"
         fix
-      />
+      /> -->
     </complex-table>
 
     <el-dialog

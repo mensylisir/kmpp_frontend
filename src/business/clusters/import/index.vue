@@ -8,11 +8,11 @@
             <el-form-item :label="$t('commons.table.name')" prop="name">
               <el-input style="width: 100%" v-model="form.name" clearable></el-input>
             </el-form-item>
-            <el-form-item :label="$t('project.project')" prop="projectName">
+            <!-- <el-form-item :label="$t('project.project')" prop="projectName">
               <el-select filterable style="width: 100%" v-model.number="form.projectName" clearable>
                 <el-option v-for="item of projects" :key="item.name" :value="item.name">{{ item.name }}</el-option>
               </el-select>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="apiServer" prop="apiServer">
               <el-input style="width: 100%" v-model="form.apiServer" :placeholder="$t('cluster.import.api_server_help')" clearable></el-input>
             </el-form-item>

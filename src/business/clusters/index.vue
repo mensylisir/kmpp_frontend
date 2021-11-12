@@ -7,9 +7,9 @@
           <el-button size="small" @click="onImport()" v-permission="['ADMIN','PROJECT_MANAGER']">
             {{ $t("commons.button.import") }}
           </el-button>
-          <el-button size="small" :disabled="clusterSelection.length !== 1 || isDeleteButtonDisable" @click="onUpgrade()">
+          <!-- <el-button size="small" :disabled="clusterSelection.length !== 1 || isDeleteButtonDisable" @click="onUpgrade()">
             {{ $t("commons.button.upgrade") }}
-          </el-button>
+          </el-button> -->
           <el-button size="small" :disabled="clusterSelection.length !== 1 || isDeleteButtonDisable" @click="onHealthCheck()">
             {{ $t("commons.button.check") }}
           </el-button>
@@ -60,7 +60,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column width="150px" :label="$t('commons.table.create_time')">
+      <el-table-column width="180px" :label="$t('commons.table.create_time')">
         <template v-slot:default="{row}">
           {{ row.createdAt | datetimeFormat }}
         </template>

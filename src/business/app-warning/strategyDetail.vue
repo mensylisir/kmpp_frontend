@@ -69,9 +69,9 @@
                 >
                 <el-form-item label="描述：">{{
                   props.row.description
-                }}</el-form-item>
+                || "--"}}</el-form-item>
                 <el-form-item label="总结：">{{
-                  props.row.summary
+                  props.row.summary || "--"
                 }}</el-form-item>
                 <el-form-item
                   label=""
