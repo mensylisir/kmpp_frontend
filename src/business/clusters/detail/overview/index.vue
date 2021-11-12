@@ -205,7 +205,7 @@
         </div></el-tab-pane>
     </el-tabs>
     <!--执行 WebKubeCtl 命令行 -->
-    <!-- <el-card style="margin-top: 20px" v-loading="loading_xterm">
+    <el-card style="margin-top: 20px" v-loading="loading_xterm">
       <div slot="header" style="height: 20px">
         <el-button v-if="!opened" @click="onOpen()" style="float: right;">{{$t('cluster.detail.overview.connect')}}</el-button>
         <el-tooltip v-if="opened" effect="dark" :content="$t('cluster.detail.overview.open_in_new_windows')" placement="bottom">
@@ -220,7 +220,7 @@
       <div v-if="opened">
         <iframe style="width: 100%;height: 512px;" :src="url"></iframe>
       </div>
-    </el-card> -->
+    </el-card>
   </div>
 </template>
 
@@ -345,14 +345,14 @@ export default {
       this.loading_xterm = true;
       this.opened = true;
       getClusterToken(this.clusterName).then((data) => {
-        this.url = "/webkubectl/terminal/?token=" + data.token;
+        this.url = "/terminal/?token=" + data.token;
         this.loading_xterm = false;
       });
     },
     newWindow() {
       this.opened = true;
       getClusterToken(this.clusterName).then((data) => {
-        this.url = `/webkubectl/terminal/?token=${data.token}`;
+        this.url = `/terminal/?token=${data.token}`;
         window.open(
           this.url,
           "_blank",
