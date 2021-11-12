@@ -150,6 +150,7 @@ export default {
       }
     },
     handleSizeChange() {
+      this.paginationConfig.currentPage = 1;
       this.tableData = this.tableDataAll.slice(
         0,
         this.paginationConfig.currentPage * this.paginationConfig.pageSize
