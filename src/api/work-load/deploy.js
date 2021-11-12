@@ -50,3 +50,9 @@ export function getStorageClass(clustername) {
   const url = `/api/v1/kubedeploy/allstorageclass?clustername=${clustername}`;
   return get(url);
 }
+
+export function newGetDeployItem(clustername, namespace) {
+  return get(
+    `/api/v1/kubernetes/resource?clustername=${clustername}&namespace=${namespace}&resourcetype=deployment&resourcename=xiang-deploy`
+  );
+}

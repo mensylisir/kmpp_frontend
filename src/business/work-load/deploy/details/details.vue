@@ -135,9 +135,12 @@
         style="width: 100%"
         :header-cell-style="{ background: '#F9FAFC' }"
       >
-        <el-table-column prop="date" label="数据卷名称" min-width="399">
+        <el-table-column prop="name" label="数据卷名称" min-width="399">
         </el-table-column>
-        <el-table-column prop="name" label="挂载PVC" min-width="793">
+        <el-table-column prop="pvc" label="挂载PVC" min-width="793">
+          <template slot-scope="scope">
+            <span>{{ scope.row.persistentVolumeClaim.claimName }}</span>
+          </template>
         </el-table-column>
       </el-table>
     </div>
@@ -151,14 +154,15 @@
             deployInfo["spec"].template.spec.containers[0].name
           }}</span>
         </el-col>
-        <el-col :span="8">
+        <!-- <el-col :span="8">
           <span class="tag-name">容器端口名称：</span
           ><span class="tag-content">{{
             deployInfo["spec"].template.spec.containers[0].ports
               ? deployInfo["spec"].template.spec.containers[0].ports[0].name
               : "-"
           }}</span></el-col
-        >
+        > -->
+
         <el-col :span="8">
           <span class="tag-name">端口：</span
           ><span class="tag-content">{{
@@ -168,9 +172,8 @@
               : "-"
           }}</span></el-col
         >
-      </el-row>
-      <el-row :gutter="24">
-        <el-col :span="24">
+
+        <el-col :span="8">
           <span class="tag-name">镜像：</span
           ><span class="tag-content">{{
             deployInfo["spec"].template.spec.containers[0].image
@@ -183,6 +186,20 @@
           ></span>
         </el-col>
       </el-row>
+      <!-- <el-row :gutter="24">
+        <el-col :span="24">
+          <span class="tag-name">镜像：</span
+          ><span class="tag-content">{{
+            deployInfo["spec"].template.spec.containers[0].image
+          }}</span
+          ><span
+            class="iconfont icon-copy-1"
+            v-clipboard:copy="content"
+            v-clipboard:success="onCopy"
+            v-clipboard:error="onError"
+          ></span>
+        </el-col>
+      </el-row> -->
       <el-row :gutter="24">
         <el-col :span="24">
           <span class="tag-name">CPU request/limited：</span
@@ -224,7 +241,7 @@
 </template>
 
 <script>
-import { getDeployItem } from "@/api/work-load/deploy";
+import { getDeployItem, newGetDeployItem } from "@/api/work-load/deploy";
 import moment from "moment";
 export default {
   name: "",
@@ -233,29 +250,9 @@ export default {
   data() {
     return {
       getDeployItem,
+      newGetDeployItem,
       moment,
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄",
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-      ],
+      tableData: [],
       content: "sdfidshfoshfuishfsjihjio",
       deployInfo: {},
       load: false,
@@ -263,6 +260,7 @@ export default {
   },
   created() {
     this.getDeploy();
+    // this.newGetDeploy();
   },
   mounted() {},
   activited() {},
@@ -292,9 +290,26 @@ export default {
         this.$route.params.deployName
       );
       this.deployInfo = data || {};
+      this.tableData = this.deployInfo.spec.template.spec.volumes
+        ? this.deployInfo.spec.template.spec.volumes
+        : [];
       this.load = true;
       console.log(this.deployInfo, "deployInfo");
     },
+
+    // async newGetDeploy() {
+    //   this.load = false;
+    //   const data = await this.newGetDeployItem(
+    //     this.$route.params.clusterName,
+    //     this.$route.params.namespace
+    //   );
+    //   this.deployInfo = data || {};
+    //   this.tableData = this.deployInfo.spec.template.spec.volumes
+    //     ? this.deployInfo.spec.template.spec.volumes
+    //     : [];
+    //   this.load = true;
+    //   console.log(this.deployInfo, "deployInfo");
+    // },
   },
   filter: {},
   computed: {},
