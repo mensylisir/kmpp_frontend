@@ -1,7 +1,12 @@
 <template>
   <div class="card-group">
-    <div class="item" :key="item.name" v-for="item in storList" @click="goDeploy(item)">
-      <img :src="item.iconUrl"/>
+    <div
+      class="item"
+      :key="item.name"
+      v-for="item in storList"
+      @click="goDeploy(item)"
+    >
+      <img :src="item.iconUrl" />
       <div class="right">
         <h5>{{ item.name }}</h5>
         <div class="description">
@@ -30,10 +35,13 @@ export default {
   methods: {
     // 跳转部署详情
     goDeploy(item) {
-      item.nameSpace = this.nameSpace[0]
-      this.$router.push({name: "StoreDeploy", params: {
-        item: item
-      }})
+      item.nameSpace = this.nameSpace[0];
+      this.$router.push({
+        name: "StoreDeploy",
+        params: {
+          item: item,
+        },
+      });
     },
     // 获取列表
     getStorList() {
@@ -78,6 +86,10 @@ export default {
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     margin: 16px;
+    &:hover {
+      box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16),
+        0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09);
+    }
     img {
       width: 48px;
       height: 48px;
@@ -108,7 +120,7 @@ export default {
         }
       }
       .status {
-        svg{
+        svg {
           width: 11.6px;
           height: 11.6px;
           margin-right: 3px;
