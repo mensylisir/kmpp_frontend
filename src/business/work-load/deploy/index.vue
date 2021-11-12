@@ -141,6 +141,19 @@ export default {
         pageSize: 10,
         total: 0,
       },
+      // 系统命名空间，禁止编辑
+      disableNamespaceList: [
+        "ingress-nginx",
+        "istio-system",
+        "kube-federation-system",
+        "kube-node-lease",
+        "kube-public",
+        "kube-system",
+        "kubeapps",
+        "loki-stack",
+        "monitoring",
+        "permission-manager",
+      ],
     };
   },
   created() {
@@ -197,7 +210,10 @@ export default {
 
     handleClickEdit(data) {
       this.$router.push({
-        name: "deployDetailsEdit",
+        name:
+          this.disableNamespaceList.indexOf(data["metadata"].namespace) != -1
+            ? "deployDetailsCheck"
+            : "deployDetailsEdit",
         params: {
           clusterName: this.clusterCurrent,
           deployName: data["metadata"].name,

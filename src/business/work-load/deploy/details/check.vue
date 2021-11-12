@@ -3,7 +3,10 @@
     <div class="split-8"></div>
     <div class="domain-page-title">
       <span class="page-title">YAML文件</span>
-      <el-button type="primary" @click="submitForm"
+      <el-button
+        type="primary"
+        @click="submitForm"
+        :disabled="disableNamespaceList.indexOf($route.params.namespace) != -1"
         ><span class="iconfont icon-coding"></span>编辑YAML</el-button
       >
     </div>
@@ -70,6 +73,18 @@ export default {
       jsonEditor: null,
       value: "", // 默认显示的值
       initing: false,
+      disableNamespaceList: [
+        "ingress-nginx",
+        "istio-system",
+        "kube-federation-system",
+        "kube-node-lease",
+        "kube-public",
+        "kube-system",
+        "kubeapps",
+        "loki-stack",
+        "monitoring",
+        "permission-manager",
+      ],
     };
   },
   created() {
