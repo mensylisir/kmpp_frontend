@@ -345,14 +345,15 @@ export default {
       this.loading_xterm = true;
       this.opened = true;
       getClusterToken(this.clusterName).then((data) => {
-        this.url = "/terminal/?token=" + data.token;
+        this.url = "/webkubectl/terminal/?token=" + data.token;
+        console.log()
         this.loading_xterm = false;
       });
     },
     newWindow() {
       this.opened = true;
       getClusterToken(this.clusterName).then((data) => {
-        this.url = `/terminal/?token=${data.token}`;
+        this.url = `/webkubectl/terminal/?token=${data.token}`;
         window.open(
           this.url,
           "_blank",
