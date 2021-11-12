@@ -12,8 +12,18 @@
         <div class="description">
           {{ item.shortDescription }}
           <div style="margin-top: 8px">
-            <span>App: {{ item.latestVersion? item.latestVersion.appVersion : "--"}}</span>
-            <span>Package: {{ item.latestVersion? item.latestVersion.pkgVersion : "--"}}</span>
+            <span
+              >App:
+              {{
+                item.latestVersion ? item.latestVersion.appVersion : "--"
+              }}</span
+            >
+            <span
+              >Package:
+              {{
+                item.latestVersion ? item.latestVersion.pkgVersion : "--"
+              }}</span
+            >
           </div>
         </div>
         <!-- <div class="status">
@@ -46,13 +56,13 @@ export default {
     // 跳转部署详情
     goDetail(item, monitor) {
       item.nameSpace = this.nameSpace;
-      this.$store.commit('setMonitor', monitor)
+      this.$store.commit("setMonitor", monitor);
       this.$router.push({
         name: "DeployDetail",
         params: {
           name: item.name,
           cluster: this.nameSpace[0],
-          namespace: this.nameSpace[1]
+          namespace: this.nameSpace[1],
         },
       });
     },
@@ -112,6 +122,10 @@ export default {
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     margin: 16px;
+    &:hover {
+      box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16),
+        0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09);
+    }
     img {
       width: 48px;
       height: 48px;
@@ -147,8 +161,7 @@ export default {
           height: 11.6px;
           margin-right: 3px;
         }
-        span{
-          
+        span {
         }
         font-size: 12px;
         color: #2c2e33;
