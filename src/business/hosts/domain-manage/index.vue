@@ -32,7 +32,6 @@
       style="width: 100%"
       :header-cell-style="{ background: '#F9FAFC' }"
     >
-      <el-table-column type="index" width="50"> </el-table-column>
       <el-table-column prop="domain" label="域名" min-width="304">
         <template slot-scope="scope">
           <span class="active-domain" @click="winOpen(scope.row)">{{
@@ -151,6 +150,7 @@ export default {
       }
     },
     handleSizeChange() {
+      this.paginationConfig.currentPage = 1;
       this.tableData = this.tableDataAll.slice(
         0,
         this.paginationConfig.currentPage * this.paginationConfig.pageSize
