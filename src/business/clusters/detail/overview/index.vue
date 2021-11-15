@@ -202,25 +202,39 @@
             <img src="@/assets/images/data-empty.svg" /><br />
             <span>暂无数据~</span>
           </div>
-        </div></el-tab-pane>
+        </div></el-tab-pane
+      >
     </el-tabs>
     <!--执行 WebKubeCtl 命令行 -->
-    <el-card style="margin-top: 20px" v-loading="loading_xterm">
+    <!-- <el-card style="margin-top: 20px" v-loading="loading_xterm">
       <div slot="header" style="height: 20px">
-        <el-button v-if="!opened" @click="onOpen()" style="float: right;">{{$t('cluster.detail.overview.connect')}}</el-button>
-        <el-tooltip v-if="opened" effect="dark" :content="$t('cluster.detail.overview.open_in_new_windows')" placement="bottom">
-          <el-button @click="newWindow()" style="float: right;">
+        <el-button v-if="!opened" @click="onOpen()" style="float: right">{{
+          $t("cluster.detail.overview.connect")
+        }}</el-button>
+        <el-tooltip
+          v-if="opened"
+          effect="dark"
+          :content="$t('cluster.detail.overview.open_in_new_windows')"
+          placement="bottom"
+        >
+          <el-button @click="newWindow()" style="float: right">
             <svg class="icon" aria-hidden="true">
               <use xlink:href="#iconchuangkou"></use>
             </svg>
-          </el-button>  
+          </el-button>
         </el-tooltip>
-        <el-button v-if="currentCluster.source==='local'" icon="el-icon-document" @click="downloadKubeConfig()" style="float: right; margin-right: 10px">{{$t('cluster.detail.overview.download_kube_config')}}</el-button>
+        <el-button
+          v-if="currentCluster.source === 'local'"
+          icon="el-icon-document"
+          @click="downloadKubeConfig()"
+          style="float: right; margin-right: 10px"
+          >{{ $t("cluster.detail.overview.download_kube_config") }}</el-button
+        >
       </div>
       <div v-if="opened">
-        <iframe style="width: 100%;height: 512px;" :src="url"></iframe>
+        <iframe style="width: 100%; height: 512px" :src="url"></iframe>
       </div>
-    </el-card>
+    </el-card> -->
   </div>
 </template>
 
@@ -346,7 +360,7 @@ export default {
       this.opened = true;
       getClusterToken(this.clusterName).then((data) => {
         this.url = "/webkubectl/terminal/?token=" + data.token;
-        console.log()
+        console.log();
         this.loading_xterm = false;
       });
     },

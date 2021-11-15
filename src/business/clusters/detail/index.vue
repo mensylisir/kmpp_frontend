@@ -15,9 +15,7 @@
           :default-active="$route.path"
           mode="horizontal"
         >
-          <el-menu-item
-            :index="'/clusters/detail/' + name + '/overview'"
-          >
+          <el-menu-item :index="'/clusters/detail/' + name + '/overview'">
             {{ $t("cluster.detail.tag.overview") }}
           </el-menu-item>
           <!-- <el-menu-item
@@ -28,7 +26,9 @@
             :index="'/clusters/detail/' + project + '/' + name + '/namespace'"
             >{{ $t("cluster.detail.tag.namespace") }}</el-menu-item
           > -->
-          <el-menu-item :index="'/clusters/detail/'+name+'/storage'">{{$t('cluster.detail.tag.storage')}}</el-menu-item>
+          <el-menu-item :index="'/clusters/detail/' + name + '/storage'">{{
+            $t("cluster.detail.tag.storage")
+          }}</el-menu-item>
           <!-- <el-menu-item :index="'/clusters/detail/'+project+'/'+name+'/event'">{{$t('cluster.detail.tag.event')}}</el-menu-item> -->
           <el-menu-item
             v-if="isPrometheusOn"
@@ -51,24 +51,24 @@
             >{{ $t("cluster.detail.tag.tool") }}</el-menu-item
           > -->
           <!-- <el-menu-item v-if="arch === 'amd64'" :index="'/clusters/detail/'+project+'/'+name+'/istio'">Istio</el-menu-item> -->
-          <el-menu-item
-            :index="'/clusters/detail/' + name + '/backup'"
-            >{{ $t("cluster.detail.tag.backup") }}</el-menu-item
-          >
+          <el-menu-item :index="'/clusters/detail/' + name + '/backup'">{{
+            $t("cluster.detail.tag.backup")
+          }}</el-menu-item>
           <el-menu-item
             v-if="hasLicense"
             :index="'/clusters/detail/' + name + '/f5'"
             >F5</el-menu-item
           >
-          <el-menu-item
-            :index="'/clusters/detail/' + name + '/security'"
-          >
+          <el-menu-item :index="'/clusters/detail/' + name + '/security'">
             {{ $t("cluster.detail.tag.security") }}
           </el-menu-item>
           <el-menu-item
             v-if="hasLicense"
             :index="'/clusters/detail/' + name + '/grade'"
             >{{ $t("cluster.detail.tag.grade") }}
+          </el-menu-item>
+          <el-menu-item :index="'/clusters/detail/' + name + '/shell'">
+            {{ $t("cluster.detail.overview.connect") }}
           </el-menu-item>
         </el-menu>
       </div>
@@ -156,9 +156,9 @@ export default {
     font-weight: 400;
   }
 }
-.separate{
+.separate {
   height: 8px;
-  background: #E4E7F0;
+  background: #e4e7f0;
   width: calc(100% + 40px);
   margin-left: -20px;
 }
