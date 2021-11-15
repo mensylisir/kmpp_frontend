@@ -37,13 +37,6 @@ module.exports = {
       '/terminal': {
         target: 'http://172.30.1.53:28083',
         secure: false,
-        // proxy_set_header X-Real-IP $remote_addr;
-        // proxy_set_header X-Forwarded-For $remote_addr;
-        // proxy_set_header Host $host;
-        // pathRewrite: {
-        //   "^/webkubectl/?$": "",
-        //   "^/webkubectl/(.*)$": "/$1",
-        //   }
       },
     },
   },

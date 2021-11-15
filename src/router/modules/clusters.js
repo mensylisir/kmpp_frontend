@@ -136,6 +136,17 @@ const Cluster = {
           }
         },
         {
+          path: "shell",
+          name: "shell",
+          hidden: true,
+          props: true,
+          component: () => import("@/business/clusters/detail/shell"),
+          meta: {
+            activeMenu: "/clusters",
+            roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"]
+          }
+        },
+        {
           path: "security",
           name: "ClusterSecurity",
           hidden: true,

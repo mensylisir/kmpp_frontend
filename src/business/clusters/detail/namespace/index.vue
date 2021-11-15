@@ -216,16 +216,16 @@ export default {
         }
       });
     },
-    isInSystemSpace(row) {
-      const systemSpaces = [
-        "default",
-        "kube-public",
-        "kube-operator",
-        "kube-system",
-        "istio-system",
-        "kube-node-lease",
-      ];
-      return systemSpaces.indexOf(row.metadata.name) === -1;
+    isInSystemSpace() {
+      // const systemSpaces = [
+      //   "default",
+      //   "kube-public",
+      //   "kube-operator",
+      //   "kube-system",
+      //   "istio-system",
+      //   "kube-node-lease",
+      // ];
+      return false;
     },
     checkIsEmptyNs(row) {
       if (row) {
