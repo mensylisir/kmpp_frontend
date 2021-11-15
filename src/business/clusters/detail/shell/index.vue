@@ -1,7 +1,7 @@
 <template>
   <div>
     <!--执行 WebKubeCtl 命令行 -->
-    <el-card style="margin-top: 20px" v-loading="loading_xterm">
+    <el-card  v-loading="loading_xterm">
       <div slot="header" style="height: 20px">
         <el-button v-if="!opened" @click="onOpen()" style="float: right">{{
           $t("cluster.detail.overview.connect")
@@ -11,6 +11,7 @@
           effect="dark"
           :content="$t('cluster.detail.overview.open_in_new_windows')"
           placement="bottom"
+          style="margin-bottom: 15px"
         >
           <el-button @click="newWindow()" style="float: right">
             <svg class="icon" aria-hidden="true">
@@ -34,12 +35,12 @@
 </template>
 
 <script>
-import {
-  getClusterToken,
-} from "@/api/cluster/cluster";
+import { getClusterToken } from "@/api/cluster/cluster";
+import { getClusterByName } from "@/api/cluster";
+
 export default {
   name: "ClusterOverview",
-  components: {  },
+  components: {},
   data() {
     return {
       loading_chart: false,
@@ -94,12 +95,21 @@ export default {
   },
   computed: {},
   methods: {
+    search() {
+      this.loading_chart = true;
+      this.clusterName = this.$route.params.name;
+      getClusterByName(this.clusterName).then((data) => {
+        this.currentCluster = data;
+        this.onOpen();
+      });
+    },
     downloadKubeConfig() {
       window.open(`/api/v1/clusters/kubeconfig/${this.clusterName}`, "_blank");
     },
     onOpen() {
       this.loading_xterm = true;
       this.opened = true;
+      console.log(this.clusterName, "11");
       getClusterToken(this.clusterName).then((data) => {
         this.url = "/webkubectl/terminal/?token=" + data.token;
         this.loading_xterm = false;
@@ -119,7 +129,7 @@ export default {
   },
   created() {},
   mounted() {
-    this.onOpen();
+    this.search();
   },
 };
 </script>
