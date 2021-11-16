@@ -39,19 +39,12 @@ export default {
     init() {
       let terminalContainer = document.getElementById("terminal-container");
       this.term = new Terminal({
-        rendererType: "canvas", //渲染类型
         disableStdin: true,
         cursorStyle: "underline",
         cols: 100,
         rows: 58,
         letterSpacing: 1,
         fontSize: 12,
-        theme: {
-          foreground: "#ECECEC", //字体
-          background: "#000000", //背景色
-          cursor: "help", //设置光标
-          lineHeight: 20,
-        },
       });
       this.term.open(terminalContainer);
       this.term.write("connect to logger...");
