@@ -1,7 +1,7 @@
 <template>
   <div class="domain-manage">
     <div class="bread-crumb">
-      <span class="bread-crumb-item" @click="$router.push({ name: 'deploy' })"
+      <span class="bread-crumb-item" @click="$router.push({ name: 'task' })"
         >任务/</span
       ><span>任务详情</span>
     </div>
@@ -41,7 +41,7 @@ export default {
       if (index === "details") {
         // 用量排行
         this.$router.push({
-          name: "deployDetailsMod",
+          name: "taskDetailsMod",
           params: {
             clusterName: this.$route.params.clusterName,
             deployName: this.$route.params.deployName,
@@ -53,8 +53,8 @@ export default {
         this.$router.push({
           name:
             this.$route.meta.action == "check"
-              ? "deployDetailsCheck"
-              : "deployDetailsEdit",
+              ? "taskDetailsCheck"
+              : "taskDetailsEdit",
           params: {
             clusterName: this.$route.params.clusterName,
             deployName: this.$route.params.deployName,

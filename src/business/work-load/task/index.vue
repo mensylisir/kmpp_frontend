@@ -1,20 +1,17 @@
 <template>
   <layout-content header="">
-    <div class="sel-action">
-      <div class="task-button">
-        <div
-          :class="{ active: currType === 'task' }"
-          @click="currType = 'task'"
-        >
-          任务
-        </div>
-        <div
-          :class="{ active: currType === 'timeTask' }"
-          @click="currType = 'timeTask'"
-        >
-          定时任务
-        </div>
+    <div class="task-button">
+      <div :class="{ active: currType === 'task' }" @click="currType = 'task'">
+        任务
       </div>
+      <div
+        :class="{ active: currType === 'timeTask' }"
+        @click="currType = 'timeTask'"
+      >
+        定时任务
+      </div>
+    </div>
+    <div class="sel-action">
       <el-button type="primary" @click="createDeploy">
         <i class="el-icon-plus" style="margin-right: 4px"></i>任务
       </el-button>
@@ -60,7 +57,6 @@
       style="width: 100%"
       :header-cell-style="{ background: '#F9FAFC' }"
     >
-      <el-table-column type="index" width="50"> </el-table-column>
       <el-table-column prop="domain" label="名称" min-width="200">
         <template slot-scope="scope">
           <span class="active-domain" @click="winOpen(scope.row)">{{
@@ -85,18 +81,58 @@
           <span>{{ scope.row["metadata"].namespace }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="image" label="镜像" min-width="496">
+      <el-table-column
+        prop="image"
+        label="镜像"
+        min-width="496"
+        v-if="currType === 'task'"
+      >
         <template slot-scope="scope">
           <span>{{ scope.row["spec"].template.spec.containers[0].image }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="pod" label="完成/期望Pod数量" min-width="152">
+      <el-table-column
+        prop="pod"
+        label="完成/期望Pod数量"
+        min-width="152"
+        v-if="currType === 'task'"
+      >
         <template slot-scope="scope">
           <span
             >{{ scope.row["status"].readyReplicas }}/{{
               scope.row["status"].replicas
             }}</span
           >
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="image"
+        label="定时规则"
+        min-width="496"
+        v-if="currType === 'timeTask'"
+      >
+        <template slot-scope="scope">
+          <span>{{ scope.row["spec"].template.spec.containers[0].image }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="image"
+        label="正在运行任务数"
+        min-width="496"
+        v-if="currType === 'timeTask'"
+      >
+        <template slot-scope="scope">
+          <span>{{ scope.row["spec"].template.spec.containers[0].image }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="image"
+        label="创建时间"
+        min-width="496"
+        v-if="currType === 'timeTask'"
+      >
+        <template slot-scope="scope">
+          <span>{{ scope.row["spec"].template.spec.containers[0].image }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" min-width="64">
@@ -188,7 +224,7 @@ export default {
     },
     winOpen(data) {
       this.$router.push({
-        name: "deployDetailsMod",
+        name: "taskDetailsMod",
         params: {
           clusterName: this.clusterCurrent,
           deployName: data["metadata"].name,
@@ -299,6 +335,7 @@ export default {
   watch: {
     currType: {
       handler: function () {
+        this.getClusters();
         console.log(this.currType);
       },
     },
@@ -377,11 +414,15 @@ export default {
   border-radius: 4px;
   display: flex;
   width: 162px;
+  margin-bottom: 16px;
   div {
     font-size: 16px;
     color: #797f8c;
-    line-height: 24px;
+    line-height: 31px;
     font-weight: 500;
+    width: 50%;
+    cursor: pointer;
+    text-align: center;
   }
   .active {
     background: #ffffff;

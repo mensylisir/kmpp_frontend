@@ -24,25 +24,26 @@
             >{{ deployInfo["status"].conditions[1].type }}</span
           >
         </el-col>
-        <el-col :span="8">
-          <span class="tag-name">所属服务：</span
-          ><span class="tag-content tag-content-active">{{
-            deployInfo["metadata"].namespace
-          }}</span></el-col
-        >
+
         <el-col :span="8">
           <span class="tag-name">集群信息：</span
           ><span class="tag-content">{{
             $route.params.clusterName
           }}</span></el-col
         >
+        <el-col :span="8">
+          <span class="tag-name">重启策略：</span
+          ><span class="tag-content">{{
+            deployInfo["metadata"].namespace
+          }}</span></el-col
+        >
       </el-row>
 
       <el-row :gutter="24">
-        <el-col :span="8">
+        <!-- <el-col :span="8">
           <span class="tag-name">副本数量：</span
           ><span class="tag-content">{{ deployInfo["status"].replicas }}</span>
-        </el-col>
+        </el-col> -->
         <!-- <el-col :span="8">
           <span class="tag-name">CPU使用量：</span
           ><span class="tag-content"
@@ -64,7 +65,7 @@
           }}</span>
         </el-col>
         <el-col :span="8">
-          <span class="tag-name">更新策略：</span
+          <span class="tag-name">重试次数：</span
           ><span class="tag-content">{{
             deployInfo["spec"].strategy.type
           }}</span></el-col
