@@ -206,7 +206,7 @@
       >
     </el-tabs>
     <!--执行 WebKubeCtl 命令行 -->
-    <el-card style="margin-top: 20px" v-loading="loading_xterm">
+    <!-- <el-card style="margin-top: 20px" v-loading="loading_xterm">
       <div slot="header" style="height: 20px">
         <el-button v-if="!opened" @click="onOpen()" style="float: right">{{
           $t("cluster.detail.overview.connect")
@@ -234,7 +234,7 @@
       <div v-if="opened">
         <iframe style="width: 100%; height: 512px" :src="url"></iframe>
       </div>
-    </el-card>
+    </el-card> -->
   </div>
 </template>
 

@@ -88,6 +88,7 @@ export default {
         total: 0,
       },
       loading: false,
+      url1: ""
     };
   },
   watch: {
@@ -115,7 +116,7 @@ export default {
     },
     newWindow() {
       getClusterToken(this.clusterName).then((data) => {
-        this.url = `/webkubectl/terminal/?token=${data.token}`;
+        this.url1 = `/webkubectl/terminal/?token=${data.token}`;
         window.open(
           this.url,
           "_blank",
