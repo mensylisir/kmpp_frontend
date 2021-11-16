@@ -1,7 +1,7 @@
 <template>
   <div>
     <!--执行 WebKubeCtl 命令行 -->
-    <el-card  v-loading="loading_xterm">
+    <el-card v-loading="loading_xterm">
       <div slot="header" style="height: 20px">
         <el-button v-if="!opened" @click="onOpen()" style="float: right">{{
           $t("cluster.detail.overview.connect")
@@ -97,7 +97,6 @@ export default {
   methods: {
     search() {
       this.loading_chart = true;
-      this.clusterName = this.$route.params.name;
       getClusterByName(this.clusterName).then((data) => {
         this.currentCluster = data;
         this.onOpen();
@@ -109,14 +108,12 @@ export default {
     onOpen() {
       this.loading_xterm = true;
       this.opened = true;
-      console.log(this.clusterName, "11");
       getClusterToken(this.clusterName).then((data) => {
         this.url = "/webkubectl/terminal/?token=" + data.token;
         this.loading_xterm = false;
       });
     },
     newWindow() {
-      this.opened = true;
       getClusterToken(this.clusterName).then((data) => {
         this.url = `/webkubectl/terminal/?token=${data.token}`;
         window.open(
@@ -129,6 +126,7 @@ export default {
   },
   created() {},
   mounted() {
+    this.clusterName = this.$route.params.name;
     this.search();
   },
 };
