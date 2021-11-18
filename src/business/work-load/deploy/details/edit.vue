@@ -91,7 +91,7 @@ export default {
       const reBody = {
         cluster_name: this.$route.params.clusterName,
         resource_type: "deployment",
-        resource_name: this.deployInfo.metadata.namespace,
+        resource_name: this.deployInfo.metadata.name,
         namespace: this.deployInfo.metadata.namespace,
         data: value,
       };

@@ -137,43 +137,6 @@
           </el-option>
         </el-select>
       </el-form-item>
-
-      <el-form-item label="标签" prop="data" class="cus-tags">
-        <div slot="label" class="pvc-info">
-          <span class="pvc-title">添加数据卷</span>
-          <el-switch v-model="pvcSwitch" active-text="添加数据卷"> </el-switch>
-        </div>
-        <div class="data-pvc" v-if="pvcSwitch">
-          <el-input
-            v-model="deployForm1.dataName"
-            placeholder="请输入数据卷名称"
-          ></el-input>
-          <el-select
-            v-model="deployForm1.data"
-            placeholder="请选择PVC"
-            class="cus-sel-data"
-          >
-            <el-option
-              v-for="item in pvcList"
-              :key="item['metadata'].name"
-              :label="item['metadata'].name"
-              :value="item['metadata'].name"
-            >
-            </el-option>
-          </el-select>
-
-          <div class="create-pvc">
-            <span class="tip-1">没有PVC？</span
-            ><span class="tip-2" @click="pvcObj.dialogVisible = true"
-              >去创建 →</span
-            >
-          </div>
-        </div>
-        <div class="tip-info">
-          为容器提供存储，目前支持文件存储
-          NFS、PVC，还需挂载到容器的指定路径中。
-        </div>
-      </el-form-item>
     </el-form>
     <div class="module-name">实例内容器</div>
     <el-form
@@ -209,6 +172,51 @@
           v-model="deployForm2.image"
           placeholder="请输入镜像"
         ></el-input>
+      </el-form-item>
+
+      <el-form-item label="标签" prop="data" class="cus-tags">
+        <div slot="label" class="pvc-info">
+          <span class="pvc-title">添加数据卷</span>
+          <el-switch v-model="pvcSwitch" active-text="添加数据卷"> </el-switch>
+        </div>
+        <div class="data-pvc" v-if="pvcSwitch">
+          <el-input
+            v-model="deployForm2.dataName"
+            placeholder="请输入数据卷名称"
+          ></el-input>
+          <el-select
+            v-model="deployForm2.data"
+            placeholder="请选择PVC"
+            class="cus-sel-data"
+          >
+            <el-option
+              v-for="item in pvcList"
+              :key="item['metadata'].name"
+              :label="item['metadata'].name"
+              :value="item['metadata'].name"
+            >
+            </el-option>
+          </el-select>
+
+          <div class="create-pvc">
+            <span class="tip-1">没有PVC？</span
+            ><span class="tip-2" @click="pvcObj.dialogVisible = true"
+              >去创建 →</span
+            >
+          </div>
+        </div>
+        <div class="tip-info">
+          为容器提供存储，目前支持文件存储
+          NFS、PVC，还需挂载到容器的指定路径中。
+        </div>
+        <el-input
+          placeholder="请输入内容"
+          v-model="deployForm2.mountPath"
+          class="cus-con-path"
+          v-if="pvcSwitch"
+        >
+          <template slot="prepend">容器挂载路径</template>
+        </el-input>
       </el-form-item>
 
       <el-form-item label="CPU限制（选填）" prop="cpulimit">
@@ -312,10 +320,12 @@ export default {
     };
 
     var dataRule = (rule, value, callback) => {
-      if (this.deployForm1.dataName == "") {
+      if (this.deployForm2.dataName == "") {
         callback(new Error("请输入数据卷名称"));
-      } else if (this.deployForm1.data == "") {
+      } else if (this.deployForm2.data == "") {
         callback(new Error("请选择PVC"));
+      } else if (this.deployForm2.mountPath == "") {
+        callback(new Error("请输入容器挂载路径"));
       } else {
         callback();
       }
@@ -370,19 +380,10 @@ export default {
         templateLabelsCopy: [""],
         clustername: "",
         namespace: "",
-        data: "",
-        dataName: "",
       },
       rules1: {
         deployName: [
           { required: true, message: "请输入部署名称", trigger: "blur" },
-        ],
-        data: [
-          {
-            required: true,
-            trigger: "change",
-            validator: dataRule,
-          },
         ],
         deployLabelsCopy: [
           {
@@ -436,6 +437,9 @@ export default {
         // portname: "",
         containerPort: "",
         image: "",
+        data: "",
+        dataName: "",
+        mountPath: "",
         cpulimit: {
           request: "",
           limit: "",
@@ -457,6 +461,13 @@ export default {
           { required: true, message: "请输入容器端口", trigger: "blur" },
         ],
         image: [{ required: true, message: "请输入镜像", trigger: "blur" }],
+        data: [
+          {
+            required: true,
+            trigger: "change",
+            validator: dataRule,
+          },
+        ],
         cpulimit: [{ validator: cpulimitRule }],
         memorylimit: [{ validator: memorylimitRule }],
         replicas: [
@@ -513,18 +524,6 @@ export default {
       this.$refs.deployForm1.validate((valid1) => {
         if (valid1) {
           const data1 = this.deployForm1;
-          if (!this.pvcSwitch) {
-            delete data1.data;
-            delete data1.dataName;
-          } else {
-            // 数据卷-pvc
-            data1.Volumes = [
-              {
-                name: data1.dataName,
-                claimName: data1.data,
-              },
-            ];
-          }
 
           data1.deployLabels = {};
           data1.deployLabelsCopy.forEach((item) => {
@@ -544,6 +543,25 @@ export default {
           this.$refs.deployForm2.validate((valid2) => {
             if (valid2) {
               const data2 = this.deployForm2;
+              if (!this.pvcSwitch) {
+                delete data2.data;
+                delete data2.dataName;
+              } else {
+                // 数据卷-pvc
+                data2.volumes = [
+                  {
+                    name: data2.dataName,
+                    claimName: data2.data,
+                  },
+                ];
+                data2.volumeMounts = [
+                  {
+                    name: data2.dataName,
+                    mountPath: data2.mountPath,
+                  },
+                ];
+              }
+
               if (!this.cpulimitSwitch) {
                 delete data2.cpulimit;
               } else {
@@ -669,10 +687,12 @@ export default {
       handler(val) {
         var dataRule = (rule, value, callback) => {
           if (rule.required) {
-            if (this.deployForm1.dataName == "") {
+            if (this.deployForm2.dataName == "") {
               callback(new Error("请输入数据卷名称"));
-            } else if (this.deployForm1.data == "") {
+            } else if (this.deployForm2.data == "") {
               callback(new Error("请选择PVC"));
+            } else if (this.deployForm2.mountPath == "") {
+              callback(new Error("请输入容器挂载路径"));
             } else {
               callback();
             }
@@ -680,7 +700,7 @@ export default {
             callback();
           }
         };
-        this.$set(this.rules1, "data", [
+        this.$set(this.rules, "data", [
           {
             required: val,
             trigger: "change",
@@ -732,6 +752,16 @@ export default {
     color: #797f8c;
     line-height: 20px;
     font-weight: 400;
+  }
+
+  .cus-con-path {
+    margin-top: 16px;
+    /deep/.el-input-group__prepend {
+      font-size: 14px;
+      color: #2c2e33;
+      line-height: 22px;
+      font-weight: 400;
+    }
   }
 
   .cus-tags {

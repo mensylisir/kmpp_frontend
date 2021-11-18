@@ -32,9 +32,11 @@
         >
         <el-col :span="8">
           <span class="tag-name">集群信息：</span
-          ><span class="tag-content">{{
-            $route.params.clusterName
-          }}</span></el-col
+          ><span class="tag-content"
+            >{{ $route.params.clusterName }}/{{
+              deployInfo["metadata"].namespace
+            }}</span
+          ></el-col
         >
       </el-row>
 
@@ -184,7 +186,9 @@
           }}</span
           ><span
             class="iconfont icon-copy-1"
-            v-clipboard:copy="content"
+            v-clipboard:copy="
+              deployInfo['spec'].template.spec.containers[0].image
+            "
             v-clipboard:success="onCopy"
             v-clipboard:error="onError"
           ></span>
@@ -257,7 +261,6 @@ export default {
       newGetDeployItem,
       moment,
       tableData: [],
-      content: "sdfidshfoshfuishfsjihjio",
       deployInfo: {},
       load: false,
     };
