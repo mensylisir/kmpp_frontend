@@ -209,7 +209,7 @@
         </el-col>
       </el-row> -->
       <el-row :gutter="24">
-        <el-col :span="24">
+        <el-col :span="8">
           <span class="tag-name">CPU request/limited：</span
           ><span class="tag-content"
             >{{
@@ -225,9 +225,7 @@
             }}</span
           >
         </el-col>
-      </el-row>
-      <el-row :gutter="24">
-        <el-col :span="24">
+        <el-col :span="8">
           <span class="tag-name">内存 request/limited：</span
           ><span class="tag-content"
             >{{
@@ -244,6 +242,24 @@
           >
         </el-col>
       </el-row>
+      <!-- <el-row :gutter="24">
+        <el-col :span="24">
+          <span class="tag-name">内存 request/limited：</span
+          ><span class="tag-content"
+            >{{
+              deployInfo["spec"].template.spec.containers[0].resources.requests
+                ? deployInfo["spec"].template.spec.containers[0].resources
+                    .requests.memory
+                : "-"
+            }}/{{
+              deployInfo["spec"].template.spec.containers[0].resources.limits
+                ? deployInfo["spec"].template.spec.containers[0].resources
+                    .limits.memory
+                : "-"
+            }}</span
+          >
+        </el-col>
+      </el-row> -->
     </div>
   </div>
 </template>
