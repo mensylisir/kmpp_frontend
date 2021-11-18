@@ -4,27 +4,146 @@
     <div class="mod-title">基本信息</div>
     <div class="mod-one" v-if="load">
       <svg class="icon deploy-icon" aria-hidden="true">
-        <use xlink:href="#icon-deploymentlogo"></use>
+        <use xlink:href="#icon-joblogo"></use>
       </svg>
-      <span class="deploy-name">{{ deployInfo["metadata"].name }}</span>
+      <span class="deploy-name">{{ deployInfo.name }}</span>
+      <div class="job-count">
+        <div class="item">
+          <div>
+            {{
+              deployInfo.json_data["status"].active
+                ? deployInfo.json_data["status"].active
+                : 0
+            }}
+          </div>
+          <span>运行</span>
+        </div>
+        <div class="space"></div>
+        <div class="item">
+          <div>
+            {{
+              deployInfo.json_data["spec"].parallelism
+                ? deployInfo.json_data["spec"].parallelism
+                : 0
+            }}
+          </div>
+          <span>并行</span>
+        </div>
+        <div class="space"></div>
+        <div class="item">
+          <div>
+            {{ completeCount }}
+          </div>
+          <span>完成</span>
+        </div>
+        <div class="space"></div>
+        <div class="item">
+          <div>
+            {{ failCount }}
+          </div>
+          <span>失败</span>
+        </div>
+      </div>
     </div>
     <div class="mod-two" v-if="load">
       <el-row :gutter="24">
         <el-col :span="8">
-          <span class="tag-name">运行状态：</span
-          ><span
-            class="tag-content"
-            v-if="deployInfo['status'].conditions[0].status == 'True'"
-            style="margin-right: 6px"
-            >{{ deployInfo["status"].conditions[0].type }}</span
-          >
-          <span
-            class="tag-content"
-            v-if="deployInfo['status'].conditions[1].status == 'True'"
-            >{{ deployInfo["status"].conditions[1].type }}</span
-          >
-        </el-col>
+          <span class="tag-name">运行状态：</span>
+          <span v-if="deployInfo.json_data['status'].active">
+            <i class="iconfont icon-refresh-fill" style="color: #5354bb"></i>
+            运行中
+          </span>
+          <span v-else-if="deployInfo.json_data['status'].conditions">
+            <span
+              v-if="
+                deployInfo.json_data['status'].conditions[0].status == 'True'
+              "
+              style="margin-right: 6px"
+            >
+              <i
+                style="color: #36b37e"
+                class="iconfont icon-checkbox-circle-fill2"
+                v-if="
+                  deployInfo.json_data['status'].conditions[0].type ===
+                  'Complete'
+                "
+              ></i>
+              <i
+                class="iconfont icon-refresh-fill"
+                style="color: #5354bb"
+                v-if="
+                  deployInfo.json_data['status'].conditions[0].type ===
+                  'Running'
+                "
+              ></i>
+              <!-- 已停止 -->
+              <i
+                style="color: #cf0a1e"
+                class="iconfont icon-checkbox-circle-fill"
+                v-if="
+                  deployInfo.json_data['status'].conditions[0].type === 'Failed'
+                "
+              ></i>
+              <!-- 已挂起 -->
+              <i
+                style="color: #f59326"
+                class="iconfont icon-safe-warning"
+                v-if="
+                  deployInfo.json_data['status'].conditions[0].type ===
+                  'Suspended'
+                "
+              ></i>
 
+              {{
+                statusMap[deployInfo.json_data["status"].conditions[0].type]
+              }}</span
+            >
+            <span
+              v-if="
+                deployInfo.json_data['status'].conditions[1] &&
+                deployInfo.json_data['status'].conditions[1].status == 'True'
+              "
+            >
+              <i
+                style="color: #36b37e"
+                class="iconfont icon-checkbox-circle-fill2"
+                v-if="
+                  deployInfo.json_data['status'].conditions[1].type ===
+                  'Complete'
+                "
+              ></i>
+              <i
+                class="iconfont icon-refresh-fill"
+                style="color: #5354bb"
+                v-if="
+                  deployInfo.json_data['status'].conditions[1].type ===
+                  'Running'
+                "
+              ></i>
+              <!-- 已停止 -->
+              <i
+                style="color: #cf0a1e"
+                class="iconfont icon-checkbox-circle-fill"
+                v-if="
+                  deployInfo.json_data['status'].conditions[1].type === 'Failed'
+                "
+              ></i>
+              <!-- 已挂起 -->
+              <i
+                style="color: #f59326"
+                class="iconfont icon-safe-warning"
+                v-if="
+                  deployInfo.json_data['status'].conditions[1].type ===
+                  'Suspended'
+                "
+              ></i>
+              {{
+                statusMap[deployInfo.json_data["status"].conditions[1].type]
+              }}</span
+            >
+          </span>
+          <span v-else>--</span>
+        </el-col>
         <el-col :span="8">
           <span class="tag-name">集群信息：</span
           ><span class="tag-content">{{
@@ -34,7 +153,7 @@
         <el-col :span="8">
           <span class="tag-name">重启策略：</span
           ><span class="tag-content">{{
-            deployInfo["metadata"].namespace
+            deployInfo.json_data["spec"].template.spec.restartPolicy || "--"
           }}</span></el-col
         >
       </el-row>
@@ -59,7 +178,7 @@
         <el-col :span="8">
           <span class="tag-name">创建时间：</span
           ><span class="tag-content">{{
-            moment(deployInfo["metadata"].creationTimestamp).format(
+            moment(deployInfo.json_data["metadata"].creationTimestamp).format(
               "YYYY/MM/DD HH:mm:ss"
             )
           }}</span>
@@ -67,33 +186,23 @@
         <el-col :span="8">
           <span class="tag-name">重试次数：</span
           ><span class="tag-content">{{
-            deployInfo["spec"].strategy.type
+            deployInfo.json_data["spec"]
+              ? deployInfo.json_data["spec"].parallelism
+              : "--"
           }}</span></el-col
         >
       </el-row>
 
       <el-row :gutter="24">
-        <!-- <el-col :span="8">
-          <span class="tag-name">创建时间：</span
-          ><span class="tag-content">{{
-            moment(deployInfo["metadata"].creationTimestamp).format(
-              "YYYY/MM/DD HH:mm:ss"
-            )
-          }}</span>
-        </el-col>
-        <el-col :span="8">
-          <span class="tag-name">更新策略：</span
-          ><span class="tag-content">{{
-            deployInfo["spec"].strategy.type
-          }}</span></el-col
-        > -->
         <el-col :span="8">
           <span class="tag-name">注释：</span
           ><span class="tag-content tag-content-bg"
             >deployment.kubernetes.io/revision={{
-              deployInfo["metadata"].annotations[
-                "deployment.kubernetes.io/revision"
-              ]
+              deployInfo.json_data["metadata"].annotations
+                ? deployInfo.json_data["metadata"].annotations[
+                    "deployment.kubernetes.io/revision"
+                  ]
+                : "--"
             }}</span
           ></el-col
         >
@@ -105,7 +214,8 @@
           <div class="tab-item-block">
             <span
               class="tag-content tag-content-bg tag-ml"
-              v-for="(value, key, index) in deployInfo['metadata'].labels"
+              v-for="(value, key, index) in deployInfo.json_data['metadata']
+                .labels"
               :key="index"
               >{{ key }}:{{ value }}</span
             >
@@ -119,8 +229,8 @@
           <div class="tab-item-block">
             <span
               class="tag-content tag-content-bg tag-ml"
-              v-for="(value, key, index) in deployInfo['spec'].selector
-                .matchLabels"
+              v-for="(value, key, index) in deployInfo.json_data['spec']
+                .selector.matchLabels"
               :key="index"
               >{{ key }}:{{ value }}</span
             >
@@ -156,97 +266,113 @@
         <el-col :span="8">
           <span class="tag-name">容器名称：</span
           ><span class="tag-content">{{
-            deployInfo["spec"].template.spec.containers[0].name
+            deployInfo.json_data["spec"].template
+              ? deployInfo.json_data["spec"].template.spec.containers[0].name
+              : "--"
           }}</span>
         </el-col>
-        <!-- <el-col :span="8">
-          <span class="tag-name">容器端口名称：</span
-          ><span class="tag-content">{{
-            deployInfo["spec"].template.spec.containers[0].ports
-              ? deployInfo["spec"].template.spec.containers[0].ports[0].name
-              : "-"
-          }}</span></el-col
-        > -->
-
-        <el-col :span="8">
-          <span class="tag-name">端口：</span
-          ><span class="tag-content">{{
-            deployInfo["spec"].template.spec.containers[0].ports
-              ? deployInfo["spec"].template.spec.containers[0].ports[0]
-                  .containerPort
-              : "-"
-          }}</span></el-col
-        >
-
-        <el-col :span="8">
+         <el-col :span="8">
           <span class="tag-name">镜像：</span
           ><span class="tag-content">{{
-            deployInfo["spec"].template.spec.containers[0].image
+            deployInfo.json_data["spec"].template.spec.containers[0].image
           }}</span
           ><span
             class="iconfont icon-copy-1"
-            v-clipboard:copy="content"
+            v-clipboard:copy="
+              deployInfo.json_data['spec'].template.spec.containers[0].image
+            "
             v-clipboard:success="onCopy"
             v-clipboard:error="onError"
           ></span>
         </el-col>
+        <!-- <el-col :span="8">
+          <span class="tag-name">容器端口名称：</span
+          ><span class="tag-content">{{
+            deployInfo.json_data["spec"].template.spec.containers[0].ports
+              ? deployInfo.json_data["spec"].template.spec.containers[0]
+                  .ports[0].name
+              : "-"
+          }}</span></el-col
+        >
+        <el-col :span="8">
+          <span class="tag-name">端口：</span
+          ><span class="tag-content">{{
+            deployInfo.json_data["spec"].template.spec.containers[0].ports
+              ? deployInfo.json_data["spec"].template.spec.containers[0]
+                  .ports[0].containerPort
+              : "-"
+          }}</span></el-col
+        > -->
       </el-row>
-      <!-- <el-row :gutter="24">
-        <el-col :span="24">
+      <!-- <el-row :gutter="16">
+        <el-col :span="8">
+          <span class="tag-name">端口协议：</span
+          ><span class="tag-content">{{
+            deployInfo.json_data["spec"].template.spec.containers[0].protocol ||
+            "http"
+          }}</span>
+        </el-col>
+        <el-col :span="8">
           <span class="tag-name">镜像：</span
           ><span class="tag-content">{{
-            deployInfo["spec"].template.spec.containers[0].image
+            deployInfo.json_data["spec"].template.spec.containers[0].image
           }}</span
           ><span
             class="iconfont icon-copy-1"
-            v-clipboard:copy="content"
+            v-clipboard:copy="
+              deployInfo.json_data['spec'].template.spec.containers[0].image
+            "
             v-clipboard:success="onCopy"
             v-clipboard:error="onError"
           ></span>
         </el-col>
       </el-row> -->
-      <el-row :gutter="24">
+      <!-- <el-row :gutter="24">
         <el-col :span="24">
           <span class="tag-name">CPU request/limited：</span
           ><span class="tag-content"
             >{{
-              deployInfo["spec"].template.spec.containers[0].resources.requests
-                ? deployInfo["spec"].template.spec.containers[0].resources
-                    .requests.cpu
+              deployInfo.json_data["spec"].template.spec.containers[0].resources
+                .requests
+                ? deployInfo.json_data["spec"].template.spec.containers[0]
+                    .resources.requests.cpu
                 : "-"
             }}/{{
-              deployInfo["spec"].template.spec.containers[0].resources.limits
-                ? deployInfo["spec"].template.spec.containers[0].resources
-                    .limits.cpu
+              deployInfo.json_data["spec"].template.spec.containers[0].resources
+                .limits
+                ? deployInfo.json_data["spec"].template.spec.containers[0]
+                    .resources.limits.cpu
                 : "-"
             }}</span
           >
         </el-col>
-      </el-row>
-      <el-row :gutter="24">
+      </el-row> -->
+      <!-- <el-row :gutter="24">
         <el-col :span="24">
           <span class="tag-name">内存 request/limited：</span
           ><span class="tag-content"
             >{{
-              deployInfo["spec"].template.spec.containers[0].resources.requests
-                ? deployInfo["spec"].template.spec.containers[0].resources
-                    .requests.memory
+              deployInfo.json_data["spec"].template.spec.containers[0].resources
+                .requests
+                ? deployInfo.json_data["spec"].template.spec.containers[0]
+                    .resources.requests.memory
                 : "-"
             }}/{{
-              deployInfo["spec"].template.spec.containers[0].resources.limits
-                ? deployInfo["spec"].template.spec.containers[0].resources
-                    .limits.memory
+              deployInfo.json_data["spec"].template.spec.containers[0].resources
+                .limits
+                ? deployInfo.json_data["spec"].template.spec.containers[0]
+                    .resources.limits.memory
                 : "-"
             }}</span
           >
         </el-col>
-      </el-row>
+      </el-row> -->
     </div>
   </div>
 </template>
 
 <script>
-import { getDeployItem, newGetDeployItem } from "@/api/work-load/deploy";
+import { getJobItem, newGetDeployItem } from "@/api/work-load/task";
 import moment from "moment";
 export default {
   name: "",
@@ -254,17 +380,23 @@ export default {
   props: {},
   data() {
     return {
-      getDeployItem,
+      getJobItem,
       newGetDeployItem,
       moment,
       tableData: [],
-      content: "sdfidshfoshfuishfsjihjio",
+      content: "",
       deployInfo: {},
       load: false,
+      statusMap: {
+        Running: "执行中",
+        Complete: "已完成",
+        Failed: "已停止",
+        Suspended: "已挂起",
+      },
     };
   },
   created() {
-    this.getDeploy();
+    this.getJobDetail();
     // this.newGetDeploy();
   },
   mounted() {},
@@ -287,19 +419,20 @@ export default {
     },
 
     // ajax
-    async getDeploy() {
+    async getJobDetail() {
       this.load = false;
-      const data = await this.getDeployItem(
+      const data = await this.getJobItem(
         this.$route.params.clusterName,
         this.$route.params.namespace,
         this.$route.params.deployName
       );
-      this.deployInfo = data || {};
-      this.tableData = this.deployInfo.spec.template.spec.volumes
-        ? this.deployInfo.spec.template.spec.volumes
+      this.deployInfo = data[0] || {};
+      console.log(data[0], "detail");
+      this.tableData = this.deployInfo.json_data.spec.template.spec.volumes
+        ? this.deployInfo.json_data.spec.template.spec.volumes
         : [];
       this.load = true;
-      console.log(this.deployInfo, "deployInfo");
+      console.log(this.tableData, "deployInfo");
     },
 
     // async newGetDeploy() {
@@ -317,7 +450,26 @@ export default {
     // },
   },
   filter: {},
-  computed: {},
+  computed: {
+    completeCount() {
+      let result = 0;
+      if (this.load && this.deployInfo.json_data["status"].conditions) {
+        result = this.deployInfo.json_data["status"].conditions.filter((item) => {
+          return item.status === "True" && item.type === "Complete";
+        }).length;
+      }
+      return result;
+    },
+    failCount() {
+      let result = 0;
+      if (this.load && this.deployInfo.json_data["status"].conditions) {
+        result = this.deployInfo.json_data["status"].conditions.filter((item) => {
+          return item.status === "True" && item.type === "Failed";
+        }).length;
+      }
+      return result;
+    },
+  },
   watch: {},
 };
 </script>
@@ -407,6 +559,31 @@ export default {
     color: #5354bb;
     cursor: pointer;
     margin-left: 8px;
+  }
+}
+.job-count {
+  display: flex;
+  align-items: center;
+  margin-left: 24px;
+  .item {
+    padding:0 16px;
+    div {
+      font-size: 16px;
+      color: #2c2e33;
+      line-height: 24px;
+      font-weight: 500;
+    }
+  }
+  .space {
+    height: 32px;
+    width: 1px;
+    background: #e4e7f0;
+  }
+  span {
+    font-size: 12px;
+    color: #797f8c;
+    line-height: 20px;
+    font-weight: 400;
   }
 }
 

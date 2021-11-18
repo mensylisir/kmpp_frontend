@@ -19,7 +19,7 @@
           <el-input v-model="pvcForm.pvcName" placeholder="请输入"></el-input>
         </el-form-item>
 
-        <el-form-item class="cus-form-item" prop="namespace" label="命名空间">
+        <el-form-item class="cus-form-item" prop="namespace" label="集群信息">
           <div class="sel-prefix">集群信息</div>
           <el-select
             v-model="pvcForm.clustername"
@@ -93,7 +93,7 @@
             min="0"
             style="width: 50%"
           >
-            <template slot="append">GiB</template></el-input
+            <template slot="append">M</template></el-input
           >
         </el-form-item>
 
@@ -130,6 +130,13 @@ export default {
   components: {},
   props: ["pvcObj"],
   data() {
+    var dataRule = (rule, value, callback) => {
+      if (this.pvcForm.requestStorage == 0) {
+        callback(new Error("请输入存储容量"));
+      } else {
+        callback();
+      }
+    };
     return {
       searchClusters,
       listNamespace,
@@ -137,7 +144,7 @@ export default {
       namespacesList: [], // 命名空间列表
       pvcForm: {
         pvcName: "",
-        clustername: "",
+        clusterName: "",
         namespace: "",
         // notes: "",
         accessMode: "",
@@ -155,20 +162,24 @@ export default {
             trigger: "change",
           },
         ],
-        // notes: [
-        //   { required: true, message: "请输入标签值", trigger: "blur" },
-        //   {
-        //     message:
-        //       "只能包含小写字母、数字及分隔符(“-”),且必须以小写字母开头，数字或小写字母结尾",
-        //     pattern: /^[a-z][a-z0-9-]*[a-z0-9]$/,
-        //     trigger: "blur",
-        //   },
-        // ],
+        notes: [
+          { required: true, message: "请输入标签值", trigger: "blur" },
+          {
+            message:
+              "只能包含小写字母、数字及分隔符(“-”),且必须以小写字母开头，数字或小写字母结尾",
+            pattern: /^[a-z][a-z0-9-]*[a-z0-9]$/,
+            trigger: "blur",
+          },
+        ],
         accessMode: [
           { required: true, message: "请选择访问模式", trigger: "change" },
         ],
         requestStorage: [
-          { required: true, message: "请输入存储容量", trigger: "blur" },
+          {
+            required: true,
+            trigger: "change",
+            validator: dataRule,
+          },
         ],
         storageClassName: [
           { required: true, message: "请选择StorageClass", trigger: "change" },

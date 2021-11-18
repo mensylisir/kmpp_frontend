@@ -53,6 +53,8 @@
     </div>
 
     <el-table
+      v-loading="loading"
+      element-loading-text="正在删除，请稍后"
       :data="tableData"
       style="width: 100%"
       :header-cell-style="{ background: '#F9FAFC' }"
@@ -60,25 +62,109 @@
       <el-table-column prop="domain" label="名称" min-width="200">
         <template slot-scope="scope">
           <span class="active-domain" @click="winOpen(scope.row)">{{
-            scope.row["metadata"].name
+            scope.row.json_data["metadata"].name
           }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="host" label="状态" min-width="128">
         <template slot-scope="scope">
-          <span
-            v-if="scope.row['status'].conditions[0].status == 'True'"
-            style="margin-right: 6px"
-            >{{ scope.row["status"].conditions[0].type }}</span
-          >
-          <span v-if="scope.row['status'].conditions[1].status == 'True'">{{
-            scope.row["status"].conditions[1].type
-          }}</span>
+          <span v-if="scope.row.json_data['status'].active">
+            <i class="iconfont icon-refresh-fill" style="color: #5354bb"></i>
+            运行中
+          </span>
+          <span v-else-if="scope.row.json_data['status'].conditions">
+            <span
+              v-if="
+                scope.row.json_data['status'].conditions[0].status == 'True'
+              "
+              style="margin-right: 6px"
+            >
+              <i
+                style="color: #36b37e"
+                class="iconfont icon-checkbox-circle-fill2"
+                v-if="
+                  scope.row.json_data['status'].conditions[0].type ===
+                  'Complete'
+                "
+              ></i>
+              <i
+                class="iconfont icon-refresh-fill"
+                style="color: #5354bb"
+                v-if="
+                  scope.row.json_data['status'].conditions[0].type === 'Running'
+                "
+              ></i>
+              <!-- 已停止 -->
+              <i
+                style="color: #cf0a1e"
+                class="iconfont icon-checkbox-circle-fill"
+                v-if="
+                  scope.row.json_data['status'].conditions[0].type === 'Failed'
+                "
+              ></i>
+              <!-- 已挂起 -->
+              <i
+                style="color: #f59326"
+                class="iconfont icon-safe-warning"
+                v-if="
+                  scope.row.json_data['status'].conditions[0].type ===
+                  'Suspended'
+                "
+              ></i>
+
+              {{
+                statusMap[scope.row.json_data["status"].conditions[0].type]
+              }}</span
+            >
+            <span
+              v-if="
+                scope.row.json_data['status'].conditions[1] &&
+                scope.row.json_data['status'].conditions[1].status == 'True'
+              "
+            >
+              <i
+                style="color: #36b37e"
+                class="iconfont icon-checkbox-circle-fill2"
+                v-if="
+                  scope.row.json_data['status'].conditions[1].type ===
+                  'Complete'
+                "
+              ></i>
+              <i
+                class="iconfont icon-refresh-fill"
+                style="color: #5354bb"
+                v-if="
+                  scope.row.json_data['status'].conditions[1].type === 'Running'
+                "
+              ></i>
+              <!-- 已停止 -->
+              <i
+                style="color: #cf0a1e"
+                class="iconfont icon-checkbox-circle-fill"
+                v-if="
+                  scope.row.json_data['status'].conditions[1].type === 'Failed'
+                "
+              ></i>
+              <!-- 已挂起 -->
+              <i
+                style="color: #f59326"
+                class="iconfont icon-safe-warning"
+                v-if="
+                  scope.row.json_data['status'].conditions[1].type ===
+                  'Suspended'
+                "
+              ></i>
+              {{
+                statusMap[scope.row.json_data["status"].conditions[1].type]
+              }}</span
+            >
+          </span>
+          <span v-else>--</span>
         </template>
       </el-table-column>
-      <el-table-column prop="namespace" label="命名空间" min-width="152">
+      <el-table-column prop="namespace" label="命名空间" min-width="130">
         <template slot-scope="scope">
-          <span>{{ scope.row["metadata"].namespace }}</span>
+          <span>{{ scope.row.json_data["metadata"].namespace }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -88,20 +174,30 @@
         v-if="currType === 'task'"
       >
         <template slot-scope="scope">
-          <span>{{ scope.row["spec"].template.spec.containers[0].image }}</span>
+          <span>{{
+            scope.row.json_data["spec"].template.spec.containers[0].image
+          }}</span>
+          <span
+            class="iconfont icon-copy-1 copy-icon"
+            v-clipboard:copy="scope.row.json_data['spec'].template.spec.containers[0].image"
+            v-clipboard:success="onCopy"
+            v-clipboard:error="onError"
+          ></span>
         </template>
       </el-table-column>
       <el-table-column
         prop="pod"
         label="完成/期望Pod数量"
-        min-width="152"
+        min-width="130"
         v-if="currType === 'task'"
       >
         <template slot-scope="scope">
           <span
-            >{{ scope.row["status"].readyReplicas }}/{{
-              scope.row["status"].replicas
-            }}</span
+            >{{
+              scope.row.json_data["status"].succeeded
+                ? scope.row.json_data["status"].succeeded
+                : 0
+            }}/{{ scope.row.json_data["spec"].parallelism }}</span
           >
         </template>
       </el-table-column>
@@ -112,17 +208,21 @@
         v-if="currType === 'timeTask'"
       >
         <template slot-scope="scope">
-          <span>{{ scope.row["spec"].template.spec.containers[0].image }}</span>
+          <span>{{
+            scope.row.json_data["spec"].template.spec.containers[0].image
+          }}</span>
         </template>
       </el-table-column>
       <el-table-column
         prop="image"
         label="正在运行任务数"
-        min-width="496"
+        min-width="300"
         v-if="currType === 'timeTask'"
       >
         <template slot-scope="scope">
-          <span>{{ scope.row["spec"].template.spec.containers[0].image }}</span>
+          <span>{{
+            scope.row.json_data["spec"].template.spec.containers[0].image
+          }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -132,7 +232,9 @@
         v-if="currType === 'timeTask'"
       >
         <template slot-scope="scope">
-          <span>{{ scope.row["spec"].template.spec.containers[0].image }}</span>
+          <span>{{
+            scope.row.json_data["spec"].template.spec.containers[0].image
+          }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" min-width="64">
@@ -168,7 +270,7 @@
 <script>
 import LayoutContent from "@/components/layout/LayoutContent";
 import { searchClusters } from "@/api/cluster";
-import { getDeploy } from "@/api/work-load/deploy";
+import { getJob, delJob } from "@/api/work-load/task";
 import { listNamespace } from "@/api/cluster/namespace";
 import "./index.scss";
 export default {
@@ -178,7 +280,8 @@ export default {
   data() {
     return {
       searchClusters,
-      getDeploy,
+      getJob,
+      delJob,
       listNamespace,
       clusterList: [],
       clusterCurrent: "",
@@ -205,6 +308,13 @@ export default {
         "permission-manager",
       ],
       currType: "task",
+      statusMap: {
+        Running: "执行中",
+        Complete: "已完成",
+        Failed: "已停止",
+        Suspended: "已挂起",
+      },
+      loading: false,
     };
   },
   created() {
@@ -214,9 +324,23 @@ export default {
   activited() {},
   update() {},
   methods: {
+    // 复制
+    onCopy: function () {
+      this.$message({
+        type: "success",
+        message: "复制成功!",
+      });
+      // alert("复制成功： " + e.text);
+    },
+    onError: function () {
+      this.$message({
+        type: "error",
+        message: "复制失败!",
+      });
+    },
     createDeploy() {
       this.$router.push({
-        name: "deployCreate",
+        name: "taskCreate",
         params: {
           cluster: this.clusterCurrent,
         },
@@ -227,8 +351,8 @@ export default {
         name: "taskDetailsMod",
         params: {
           clusterName: this.clusterCurrent,
-          deployName: data["metadata"].name,
-          namespace: data["metadata"].namespace,
+          deployName: data.json_data["metadata"].name,
+          namespace: data.json_data["metadata"].namespace,
         },
       });
     },
@@ -239,9 +363,9 @@ export default {
     changeNamespace() {
       this.paginationConfig.currentPage = 1;
       if (this.currentNamespace == "全部") {
-        this.getDeployList(this.clusterCurrent, undefined);
+        this.getJobList(this.clusterCurrent, undefined);
       } else {
-        this.getDeployList(this.clusterCurrent, this.currentNamespace);
+        this.getJobList(this.clusterCurrent, this.currentNamespace);
       }
     },
     handleSizeChange() {
@@ -257,26 +381,37 @@ export default {
           this.paginationConfig.pageSize,
         this.paginationConfig.currentPage * this.paginationConfig.pageSize
       );
+      console.log(this.tableData, "22");
     },
 
     handleClickEdit(data) {
       this.$router.push({
         name:
-          this.disableNamespaceList.indexOf(data["metadata"].namespace) != -1
-            ? "deployDetailsCheck"
-            : "deployDetailsEdit",
+          this.disableNamespaceList.indexOf(data.json_data["metadata"].namespace) != -1
+            ? "taskDetailsCheck"
+            : "taskDetailsEdit",
         params: {
           clusterName: this.clusterCurrent,
-          deployName: data["metadata"].name,
-          namespace: data["metadata"].namespace,
+          deployName: data.json_data["metadata"].name,
+          namespace: data.json_data["metadata"].namespace,
         },
       });
     },
-
-    confirmDel() {
-      // this.deleteIngress(data.clustername, data.namespace, data.ingressname);
+    async confirmDel(data) {
+      await this.delJob({
+        cluster_name: data.cluster_name,
+        namespace: data.namespace,
+        name: data.name,
+      });
+      this.loading = true;
+      setTimeout(() => {
+        this.loading = false;
+        this.getJobList(
+          this.clusterCurrent,
+          this.currentNamespace === "全部" ? undefined : this.currentNamespace
+        );
+      }, 3000);
     },
-
     // ajax
     getClusters(condition) {
       this.tableDataAll = [];
@@ -306,10 +441,9 @@ export default {
       });
     },
 
-    async getDeployList(cluster, namespace) {
-      const data = await this.getDeploy(cluster, namespace);
+    async getJobList(cluster, namespace) {
+      const data = await this.getJob(cluster, namespace);
       this.tableDataAll = data || [];
-      console.log(data, "deploylist");
       this.paginationConfig.total = this.tableDataAll.length;
       this.tableData = this.tableDataAll.slice(
         this.paginationConfig.currentPage - 1,
@@ -327,7 +461,7 @@ export default {
         },
       });
       // 获取列表
-      this.getDeployList(this.clusterCurrent, undefined);
+      this.getJobList(this.clusterCurrent, undefined);
     },
   },
   filter: {},
@@ -429,6 +563,11 @@ export default {
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
     border-radius: 4px;
   }
+}
+.copy-icon{
+  margin-left: 10px;
+  color:  #5354BB;
+  cursor: pointer;
 }
 
 /deep/.el-table--small .el-table__cell {

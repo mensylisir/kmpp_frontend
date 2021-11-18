@@ -61,15 +61,15 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/search.js";
 
-import { getDeployItem } from "@/api/work-load/deploy";
-import YAML from "json2yaml";
+import { getJobItem } from "@/api/work-load/task";
+// import YAML from "json2yaml";
 export default {
   name: "",
   components: {},
   props: {},
   data() {
     return {
-      getDeployItem,
+      getJobItem,
       jsonEditor: null,
       value: "", // 默认显示的值
       initing: false,
@@ -88,6 +88,7 @@ export default {
     };
   },
   created() {
+    console.log(this.$route.params.namespace, '22')
     this.getDeploy();
   },
   mounted() {},
@@ -96,7 +97,7 @@ export default {
   methods: {
     submitForm() {
       this.$router.push({
-        name: "deployDetailsEdit",
+        name: "taskDetailsEdit",
         params: {
           clusterName: this.$route.params.clusterName,
           deployName: this.$route.params.deployName,
@@ -125,13 +126,12 @@ export default {
     // ajax
     async getDeploy() {
       this.initing = true;
-      const data = await this.getDeployItem(
+      const data = await this.getJobItem(
         this.$route.params.clusterName,
         this.$route.params.namespace,
         this.$route.params.deployName
       );
-
-      this.value = YAML.stringify(data) || "";
+      this.value = data[0]? data[0].yaml_data : "";
 
       this.editorInit();
       this.initing = false;
