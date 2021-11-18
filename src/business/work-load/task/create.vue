@@ -14,9 +14,9 @@
       :rules="rules1"
       validate-on-rule-change
     >
-      <el-form-item label="名称" prop="deployName">
+      <el-form-item label="名称" prop="name">
         <el-input
-          v-model="deployForm1.deployName"
+          v-model="deployForm1.name"
           placeholder="请输入名称"
         ></el-input>
       </el-form-item>
@@ -27,7 +27,7 @@
         class="cus-tags"
       >
         <div slot="label" class="slot-label-tags">
-          <span class="tags-title">元数据标签</span>
+          <span class="tags-title">标签</span>
           <span class="tags-btn" @click="addTags('d')">添加变量</span>
         </div>
         <div
@@ -51,7 +51,7 @@
         </div>
       </el-form-item>
 
-      <el-form-item label="MatchLabels" prop="matchLabelsCopy" class="cus-tags">
+      <!-- <el-form-item label="MatchLabels" prop="matchLabelsCopy" class="cus-tags">
         <div slot="label" class="slot-label-tags">
           <span class="tags-title">选择器标签</span>
           <span class="tags-btn" @click="addTags('m')">添加变量</span>
@@ -75,8 +75,8 @@
         <div class="tip-info">
           只能包含小写字母、数字及分隔符(“-”),且必须以小写字母开头，数字或小写字母结尾；使用“:”分隔键-值对
         </div>
-      </el-form-item>
-
+      </el-form-item> -->
+      <!-- 
       <el-form-item
         label="TemplateLabels"
         prop="templateLabelsCopy"
@@ -105,12 +105,12 @@
         <div class="tip-info">
           只能包含小写字母、数字及分隔符(“-”),且必须以小写字母开头，数字或小写字母结尾；使用“:”分隔键-值对
         </div>
-      </el-form-item>
+      </el-form-item> -->
 
-      <el-form-item class="cus-form-item" prop="namespace" label="命名空间">
+      <el-form-item class="cus-form-item" prop="namespace" label="集群信息">
         <div class="sel-prefix">集群信息</div>
         <el-select
-          v-model="deployForm1.clustername"
+          v-model="deployForm1.cluster_name"
           placeholder="请选择集群"
           @change="clusterChange"
           class="cus-sel1"
@@ -137,7 +137,121 @@
           </el-option>
         </el-select>
       </el-form-item>
+    </el-form>
+    <div class="module-name">Job设置</div>
+    <el-form
+      label-position="top"
+      label-width="80px"
+      :model="deployForm3"
+      ref="deployForm3"
+      :rules="rules3"
+    >
+      <el-form-item label="执行成功次数" prop="completions">
+        <el-input-number
+          :min="1"
+          style="margin-right: 12px"
+          v-model="deployForm3.completions"
+          placeholder="请输入重试次数"
+        >
+        </el-input-number>
+        <span class="tip-info"> 设置 Job 成功执行任务的数量。 </span>
+      </el-form-item>
+      <el-form-item label="重试次数" prop="backoffLimit">
+        <el-input-number
+          :min="1"
+          style="margin-right: 12px"
+          v-model="deployForm3.backoffLimit"
+          placeholder="请输入重试次数"
+        >
+        </el-input-number>
+        <span class="tip-info"> 设置 Job 管理的 Pod 需要重复执行的次数。 </span>
+      </el-form-item>
+      <el-form-item label="并行度" prop="parallelism">
+        <el-input-number
+          :min="1"
+          style="margin-right: 12px"
+          v-model="deployForm3.parallelism"
+          placeholder="请输入并行度"
+        >
+        </el-input-number>
+        <span class="tip-info"> 设置 Job 并行执行的 Pod 数量。 </span>
+      </el-form-item>
+      <el-form-item label="失败重启策略" prop="restart_policy">
+        <el-select
+          style="width: 100%"
+          v-model="deployForm3.restart_policy"
+          placeholder="请选择失败重启策略"
+        >
+          <el-option label="Never" value="Never"> </el-option>
+          <el-option label="OnFailure" value="OnFailure"> </el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <!-- 
+    <div class="module-name">命令行</div>
+    <el-form
+      label-position="top"
+      label-width="80px"
+      :model="deployForm4"
+      ref="deployForm4"
+      :rules="rules4"
+    >
+      
+    </el-form> -->
 
+    <div class="module-name">实例内容器</div>
+    <el-form
+      label-position="top"
+      label-width="80px"
+      :model="deployForm2"
+      ref="deployForm2"
+      :rules="rules"
+    >
+      <div class="tip-info">command命令行和arg命令行至少填写一项</div>
+
+      <el-form-item label="command" prop="commands">
+        <el-input
+          type="textarea"
+          v-model="deployForm2.commands"
+          :autosize="{ minRows: 4, maxRows: 10 }"
+          placeholder="请输入command命令行,例如：['/bin/sh','-c','while true;do echo hello;sleep 1;done']"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="arg" prop="args">
+        <el-input
+          type="textarea"
+          :autosize="{ minRows: 4, maxRows: 10 }"
+          v-model="deployForm2.args"
+          placeholder="请输入arg命令行,例如：['-c','while true;do echo hello;sleep 1;done']"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="容器名称" prop="name">
+        <el-input
+          v-model="deployForm2.name"
+          placeholder="请输入容器名称，只能包含小写字母、数字及分隔符(“-”),且不能以分隔符开头或结尾"
+        ></el-input>
+      </el-form-item>
+
+      <!-- <el-form-item label="容器端口名称" prop="portname">
+        <el-input
+          v-model="deployForm2.portname"
+          placeholder="请输入容器端口名称"
+        ></el-input>
+      </el-form-item> -->
+
+      <el-form-item label="容器端口" prop="containerPort" class="cus-tags">
+        <el-input
+          v-model="deployForm2.containerPort"
+          placeholder="请输入容器端口"
+        ></el-input>
+      </el-form-item>
+
+      <el-form-item label="镜像" prop="image">
+        <el-input
+          v-model="deployForm2.image"
+          placeholder="请输入镜像"
+        ></el-input>
+      </el-form-item>
       <el-form-item label="标签" prop="data" class="cus-tags">
         <div slot="label" class="pvc-info">
           <span class="pvc-title">添加数据卷</span>
@@ -145,11 +259,11 @@
         </div>
         <div class="data-pvc" v-if="pvcSwitch">
           <el-input
-            v-model="deployForm1.dataName"
+            v-model="deployForm2.dataName"
             placeholder="请输入数据卷名称"
           ></el-input>
           <el-select
-            v-model="deployForm1.data"
+            v-model="deployForm2.data"
             placeholder="请选择PVC"
             class="cus-sel-data"
           >
@@ -174,41 +288,18 @@
           NFS、PVC，还需挂载到容器的指定路径中。
         </div>
       </el-form-item>
-    </el-form>
-    <div class="module-name">实例内容器</div>
-    <el-form
-      label-position="top"
-      label-width="80px"
-      :model="deployForm2"
-      ref="deployForm2"
-      :rules="rules"
-    >
-      <el-form-item label="容器名称" prop="containerName">
+      <el-form-item
+        label=""
+        prop="mount_path"
+        v-if="pvcSwitch"
+        class="pvc-path"
+      >
         <el-input
-          v-model="deployForm2.containerName"
-          placeholder="请输入容器名称，只能包含小写字母、数字及分隔符(“-”),且不能以分隔符开头或结尾"
-        ></el-input>
-      </el-form-item>
-
-      <!-- <el-form-item label="容器端口名称" prop="portname">
-        <el-input
-          v-model="deployForm2.portname"
-          placeholder="请输入容器端口名称"
-        ></el-input>
-      </el-form-item> -->
-
-      <el-form-item label="容器端口" prop="containerPort" class="cus-tags">
-        <el-input
-          v-model="deployForm2.containerPort"
-          placeholder="请输入容器端口"
-        ></el-input>
-      </el-form-item>
-
-      <el-form-item label="镜像" prop="image">
-        <el-input
-          v-model="deployForm2.image"
-          placeholder="请输入镜像"
-        ></el-input>
+          placeholder="请输入容器挂载路径"
+          v-model="deployForm2.mount_path"
+        >
+          <template slot="prepend">容器挂载路径</template>
+        </el-input>
       </el-form-item>
 
       <el-form-item label="CPU限制（选填）" prop="cpulimit">
@@ -271,13 +362,13 @@
         </div>
       </el-form-item>
 
-      <el-form-item label="副本数量" prop="replicas">
+      <!-- <el-form-item label="副本数量" prop="replicas">
         <el-input-number
           v-model="deployForm2.replicas"
           placeholder="请输入副本数量"
         >
         </el-input-number>
-      </el-form-item>
+      </el-form-item> -->
 
       <el-form-item>
         <el-button @click="resetForm">取消</el-button>
@@ -292,11 +383,7 @@
 <script>
 import { searchClusters } from "@/api/cluster";
 import { listNamespace } from "@/api/cluster/namespace";
-import {
-  createDeploy,
-  createPvc,
-  getStorageClass,
-} from "@/api/work-load/deploy";
+import { createDeploy, createPvc, getStorageClass } from "@/api/work-load/task";
 import pvcModal from "./pvc-modal.vue";
 export default {
   name: "",
@@ -312,10 +399,14 @@ export default {
     };
 
     var dataRule = (rule, value, callback) => {
-      if (this.deployForm1.dataName == "") {
-        callback(new Error("请输入数据卷名称"));
-      } else if (this.deployForm1.data == "") {
-        callback(new Error("请选择PVC"));
+      if (this.pvcSwitch) {
+        if (this.deployForm2.dataName == "") {
+          callback(new Error("请输入数据卷名称"));
+        } else if (this.deployForm1.data == "") {
+          callback(new Error("请选择PVC"));
+        } else {
+          callback();
+        }
       } else {
         callback();
       }
@@ -344,6 +435,22 @@ export default {
         callback();
       }
     };
+    var commandRule = (rule, value, callback) => {
+      if (!this.deployForm2.commands && !this.deployForm2.args) {
+        callback(new Error("command命令行和arg命令行至少填写一项"));
+      } else {
+        let reg = /^\[.*\]$/;
+        let val = this.deployForm2.commands
+          ? this.deployForm2.commands
+          : this.deployForm2.args;
+        if (reg.test(val)) {
+          callback();
+        } else {
+          callback(new Error("输入格式不正确，只能以[开头，以]结尾"));
+        }
+        callback();
+      }
+    };
     return {
       searchClusters,
       listNamespace,
@@ -362,28 +469,17 @@ export default {
         dialogVisible: false,
         storageClassListL: [],
       },
-
       deployForm1: {
-        deployName: "",
+        name: "",
         deployLabelsCopy: [""],
         matchLabelsCopy: [""],
         templateLabelsCopy: [""],
-        clustername: "",
+        cluster_name: "",
         namespace: "",
-        data: "",
-        dataName: "",
       },
       rules1: {
-        deployName: [
-          { required: true, message: "请输入名称", trigger: "blur" },
-        ],
-        data: [
-          {
-            required: true,
-            trigger: "change",
-            validator: dataRule,
-          },
-        ],
+        name: [{ required: true, message: "请输入名称", trigger: "blur" }],
+
         deployLabelsCopy: [
           {
             required: true,
@@ -432,10 +528,15 @@ export default {
         ],
       },
       deployForm2: {
-        containerName: "", // 容器名称
+        commands: "",
+        args: "",
+        name: "", // 容器名称
         // portname: "",
         containerPort: "",
+        mount_path: "",
         image: "",
+        data: "",
+        dataName: "",
         cpulimit: {
           request: "",
           limit: "",
@@ -444,33 +545,62 @@ export default {
           request: "",
           limit: "",
         },
-        replicas: 1,
+        request: {},
+        limits: {},
+        // replicas: 1,
       },
       rules: {
-        containerName: [
-          { required: true, message: "请输入容器名称", trigger: "blur" },
+        data: [
+          {
+            required: true,
+            trigger: "change",
+            validator: dataRule,
+          },
+        ],
+        name: [{ required: true, message: "请输入容器名称", trigger: "blur" }],
+        mount_path: [
+          { required: true, message: "请输入容器挂载路径", trigger: "blur" },
         ],
         // portname: [
         //   { required: true, message: "请输入容器端口名称", trigger: "blur" },
         // ],
         containerPort: [
-          { required: true, message: "请输入容器端口", trigger: "blur" },
+          { required: false, message: "请输入容器端口", trigger: "blur" },
         ],
         image: [{ required: true, message: "请输入镜像", trigger: "blur" }],
         cpulimit: [{ validator: cpulimitRule }],
         memorylimit: [{ validator: memorylimitRule }],
-        replicas: [
+        // replicas: [
+        //   {
+        //     required: true,
+        //     message: "请输入副本数量",
+        //     trigger: "blur",
+        //   },
+        // ],
+        commands: [
           {
-            required: true,
-            message: "请输入副本数量",
             trigger: "blur",
+            validator: commandRule,
+          },
+        ],
+        args: [
+          {
+            trigger: "blur",
+            validator: commandRule,
           },
         ],
       },
+      deployForm3: {
+        parallelism: 1,
+        backoffLimit: 1,
+        completions: 1,
+        restart_policy: "Never",
+      },
+      rules3: {},
     };
   },
   created() {
-    this.deployForm1.clustername = this.$route.params.cluster;
+    this.deployForm1.cluster_name = this.$route.params.cluster;
     this.getClusters();
   },
   mounted() {
@@ -512,23 +642,11 @@ export default {
     submitForm() {
       this.$refs.deployForm1.validate((valid1) => {
         if (valid1) {
-          const data1 = this.deployForm1;
-          if (!this.pvcSwitch) {
-            delete data1.data;
-            delete data1.dataName;
-          } else {
-            // 数据卷-pvc
-            data1.Volumes = [
-              {
-                name: data1.dataName,
-                claimName: data1.data,
-              },
-            ];
-          }
+          let data1 = JSON.parse(JSON.stringify(this.deployForm1));
 
-          data1.deployLabels = {};
+          data1.Labels = {};
           data1.deployLabelsCopy.forEach((item) => {
-            data1.deployLabels[item.split(":")[0]] = item.split(":")[1];
+            data1.Labels[item.split(":")[0]] = item.split(":")[1];
           });
 
           data1.matchLabels = {};
@@ -540,28 +658,100 @@ export default {
           data1.templateLabelsCopy.forEach((item) => {
             data1.templateLabels[item.split(":")[0]] = item.split(":")[1];
           });
-
+          delete data1.deployLabelsCopy;
+          delete data1.matchLabels;
+          delete data1.matchLabelsCopy;
+          delete data1.templateLabels;
+          delete data1.templateLabelsCopy;
           this.$refs.deployForm2.validate((valid2) => {
             if (valid2) {
-              const data2 = this.deployForm2;
+              const data2 = JSON.parse(JSON.stringify(this.deployForm2));
+              let data2New = {
+                containers: [],
+                volumes: [],
+              };
+              if (!this.pvcSwitch) {
+                delete data2.data;
+                delete data2.dataName;
+              } else {
+                // 数据卷-pvc
+                data2.volume_mounts = [
+                  {
+                    name: data2.dataName,
+                    // claimName: data2.data,
+                    mount_path: data2.mount_path,
+                    // read_only: false,
+                  },
+                ];
+                data2New.volumes.push({
+                  name: data2.dataName,
+                  persistent_volume_claim_name: data2.data,
+                  persistent_volume_claim_read_only: false,
+                });
+                delete data2.data;
+                delete data2.dataName;
+                delete data2.mount_path;
+              }
               if (!this.cpulimitSwitch) {
                 delete data2.cpulimit;
               } else {
-                data2.limitCPU = `${data2.cpulimit.limit}m`;
-                data2.requestCPU = `${data2.cpulimit.request}m`;
+                if (data2.cpulimit.request) {
+                  data2.request.cpu = `${data2.cpulimit.request}m`;
+                }
+                if (data2.cpulimit.limit) {
+                  data2.limits.cpu = `${data2.cpulimit.limit}m`;
+                }
+                delete data2.cpulimit;
               }
               if (!this.memorylimitSwitch) {
                 delete data2.memorylimit;
               } else {
-                data2.requestMemory = `${data2.memorylimit.request}Mi`;
-                data2.limitMemory = `${data2.memorylimit.limit}Mi`;
+                if (data2.memorylimit.request) {
+                  data2.request.memory = `${data2.memorylimit.request}Mi`;
+                }
+                if (data2.memorylimit.limit) {
+                  data2.limits.memory = `${data2.memorylimit.limit}Mi`;
+                }
+                delete data2.memorylimit;
+              }
+              if (!data2.args) {
+                delete data2.args;
+              } else {
+                let a = data2.args;
+                data2.args = [];
+                data2.args.push(a.split("]")[0].split("[")[1]);
+              }
+              if (!data2.commands) {
+                delete data2.commands;
+              } else {
+                let a = data2.commands;
+                data2.commands = [];
+                data2.commands.push(a.split("]")[0].split("[")[1]);
               }
 
-              data2.containerPort = Number(data2.containerPort);
+              if (data2.containerPort) {
+                data2.port = {
+                  name: "http",
+                  container_port: Number(data2.containerPort),
+                };
+              }
+              delete data2.containerPort;
+              data2New.containers.push(data2);
 
-              const reBody = Object.assign(data1, data2);
-              this.createDeployItem(reBody);
+              if (this.deployForm3.parallelism) {
+                data2New.parallelism = this.deployForm3.parallelism;
+              }
+              if (this.deployForm3.backoffLimit) {
+                data2New.backoffLimit = this.deployForm3.backoffLimit;
+              }
+              if (this.deployForm3.completions) {
+                data2New.completions = this.deployForm3.completions;
+              }
+              data2New.restart_policy = this.deployForm3.restart_policy;
+              const reBody = Object.assign(data1, data2New);
               console.log(reBody, "reBody");
+
+              this.createDeployItem(reBody);
             } else {
               return false;
             }
@@ -574,13 +764,14 @@ export default {
     resetForm() {
       this.$refs.deployForm2.resetFields();
       this.$refs.deployForm1.resetFields();
+      this.$refs.deployForm3.resetFields();
 
       this.$router.push({
-        name: "deploy",
+        name: "task",
       });
     },
     clusterChange() {
-      this.getNamespace(this.deployForm1.clustername);
+      this.getNamespace(this.deployForm1.cluster_name);
     },
 
     namespaceChange() {
@@ -631,7 +822,7 @@ export default {
           items.value = items.label = items.name;
         });
 
-        this.getNamespace(this.deployForm1.clustername);
+        this.getNamespace(this.deployForm1.cluster_name);
       });
     },
 
@@ -668,11 +859,15 @@ export default {
     pvcSwitch: {
       handler(val) {
         var dataRule = (rule, value, callback) => {
-          if (rule.required) {
-            if (this.deployForm1.dataName == "") {
-              callback(new Error("请输入数据卷名称"));
-            } else if (this.deployForm1.data == "") {
-              callback(new Error("请选择PVC"));
+          if (val) {
+            if (rule.required) {
+              if (this.deployForm1.dataName == "") {
+                callback(new Error("请输入数据卷名称"));
+              } else if (this.deployForm1.data == "") {
+                callback(new Error("请选择PVC"));
+              } else {
+                callback();
+              }
             } else {
               callback();
             }
@@ -852,6 +1047,13 @@ export default {
           border-bottom-left-radius: 0;
         }
       }
+    }
+  }
+  .pvc-path {
+    margin-top: 16px;
+    /deep/.el-input-group__prepend {
+      font-size: 14px;
+      color: #2c2e33;
     }
   }
   .cus-input-item {

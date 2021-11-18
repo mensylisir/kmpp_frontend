@@ -63,16 +63,16 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/search.js";
 
-import { getDeployItem, updateDeploy } from "@/api/work-load/deploy";
-import YAML from "json2yaml";
+import { getJobItem, updateJob } from "@/api/work-load/task";
+// import YAML from "json2yaml";
 export default {
   name: "",
   components: {},
   props: {},
   data() {
     return {
-      getDeployItem,
-      updateDeploy,
+      getJobItem,
+      updateJob,
       jsonEditor: null,
       value: "", // 默认显示的值
       initing: false,
@@ -90,17 +90,18 @@ export default {
       const value = this.jsonEditor.getValue();
       const reBody = {
         cluster_name: this.$route.params.clusterName,
-        resource_type: "deployment",
-        resource_name: this.deployInfo.metadata.namespace,
-        namespace: this.deployInfo.metadata.namespace,
-        data: value,
+        name: this.deployInfo.name,
+        // resource_type: "deployment",
+        // resource_name: this.deployInfo.metadata.namespace,
+        namespace: this.deployInfo.json_data.metadata.namespace,
+        yaml_data: value,
       };
       this.updateDeployItem(reBody);
       //
     },
     resetForm() {
       this.$router.push({
-        name: "deployDetailsCheck",
+        name: "taskDetailsCheck",
         params: {
           clusterName: this.$route.params.clusterName,
           deployName: this.$route.params.deployName,
@@ -129,22 +130,22 @@ export default {
     // ajax
     async getDeploy() {
       this.initing = true;
-      const data = await this.getDeployItem(
+      const data = await this.getJobItem(
         this.$route.params.clusterName,
         this.$route.params.namespace,
         this.$route.params.deployName
       );
 
-      this.deployInfo = data || {};
+      this.deployInfo = data[0] || {};
 
-      this.value = YAML.stringify(data) || "";
+      this.value = data[0] ? data[0].yaml_data : "";
 
       this.editorInit();
       this.initing = false;
     },
 
     async updateDeployItem(data) {
-      await this.updateDeploy(data);
+      await this.updateJob(data);
       this.resetForm();
     },
   },

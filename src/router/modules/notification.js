@@ -2,7 +2,7 @@ import Layout from "@/business/app-layout/horizontal-layout"
 
 const notification = {
   path: "/notification",
-  sort: 3,
+  sort: 4,
   component: Layout,
   name: "Manifest",
   meta: {
