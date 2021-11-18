@@ -15,14 +15,14 @@
     >
       <template #header>
         <div>
-          <el-button
+          <!-- <el-button
             type="primary"
             icon="el-icon-plus"
             size="small"
             :disabled="provider === '' || buttonDisabled()"
             @click="create()"
             >{{ $t("commons.button.create") }}</el-button
-          >
+          > -->
           <!-- <el-button
             size="small"
             :disabled="
@@ -31,7 +31,7 @@
             @click="onDelete()"
             >{{ $t("commons.button.delete") }}</el-button
           > -->
-          <el-button
+          <!-- <el-button
             size="small"
             :disabled="selects.length < 1"
             @click="onCordon('cordon')"
@@ -42,7 +42,7 @@
             :disabled="selects.length < 1"
             @click="onCordon('uncordon')"
             >{{ $t("commons.button.active") }}</el-button
-          >
+          > -->
         </div>
       </template>
 

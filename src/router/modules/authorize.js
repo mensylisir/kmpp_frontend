@@ -2,7 +2,7 @@ import Layout from "@/business/app-layout/horizontal-layout"
 
 const Authorize = {
   path: "/authorize",
-  sort: 4,
+  sort: 3,
   component: Layout,
   name: "Manifest",
   meta: {
