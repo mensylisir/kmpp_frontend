@@ -6,7 +6,7 @@
       </div>
       <div
         :class="{ active: currType === 'timeTask' }"
-        @click="currType = 'timeTask'"
+       
       >
         定时任务
       </div>
