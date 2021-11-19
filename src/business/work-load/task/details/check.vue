@@ -61,7 +61,7 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/search.js";
 
-import { getJobItem } from "@/api/work-load/task";
+import { getJobItem, getCronjobItem } from "@/api/work-load/task";
 // import YAML from "json2yaml";
 export default {
   name: "",
@@ -69,6 +69,7 @@ export default {
   props: {},
   data() {
     return {
+      getCronjobItem,
       getJobItem,
       jsonEditor: null,
       value: "", // 默认显示的值
@@ -88,7 +89,7 @@ export default {
     };
   },
   created() {
-    console.log(this.$route.params.namespace, '22')
+    console.log(this.$route.params.namespace, "22");
     this.getDeploy();
   },
   mounted() {},
@@ -126,19 +127,36 @@ export default {
     // ajax
     async getDeploy() {
       this.initing = true;
-      const data = await this.getJobItem(
-        this.$route.params.clusterName,
-        this.$route.params.namespace,
-        this.$route.params.deployName
-      );
-      this.value = data[0]? data[0].yaml_data : "";
 
+      if (this.currType === "task") {
+        const data = await this.getJobItem(
+          this.$route.params.clusterName,
+          this.$route.params.namespace,
+          this.$route.params.deployName
+        );
+        this.value = data[0] ? data[0].yaml_data : "";
+      } else {
+        const data = await this.getCronjobItem(
+          this.$route.params.clusterName,
+          this.$route.params.namespace,
+          this.$route.params.deployName
+        );
+        this.value = data[0] ? data[0].yaml_data : "";
+      }
       this.editorInit();
       this.initing = false;
     },
   },
   filter: {},
-  computed: {},
+  computed: {
+    currType: {
+      get: function () {
+        let value = this.$route.params.currType;
+        return value;
+      },
+      set: function () {},
+    },
+  },
   watch: {},
 };
 </script>

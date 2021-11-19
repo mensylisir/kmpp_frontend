@@ -28,7 +28,10 @@
         >
       </div>
       <div v-if="opened">
-        <iframe style="width: 100%; height: 512px" :src="url"></iframe>
+        <iframe
+          style="width: 100%; height: calc(100vh - 250px)"
+          :src="url"
+        ></iframe>
       </div>
     </el-card>
   </div>
@@ -145,7 +148,7 @@ export default {
   box-shadow: unset;
   border-radius: unset;
   .el-card__header {
-    padding: 24px 20px 5px 0;
+    padding: 16px 20px 0 0;
     font-size: 16px;
     color: #2c2e33;
     line-height: 24px;

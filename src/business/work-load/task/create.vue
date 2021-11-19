@@ -2,7 +2,7 @@
   <div class="domain-manage">
     <div class="bread-crumb">
       <span class="bread-crumb-item" @click="resetForm">任务/</span
-      ><span>创建任务</span>
+      ><span>创建{{currType === 'task'? "任务": "定时任务"}}</span>
     </div>
     <div class="domain-page-title">添加任务</div>
     <div class="module-name">基本信息</div>
@@ -139,13 +139,14 @@
         </el-select>
       </el-form-item>
     </el-form>
-    <div class="module-name">Job设置</div>
+    <div class="module-name" v-if="currType === 'task'">Job设置</div>
     <el-form
       label-position="top"
       label-width="80px"
       :model="deployForm3"
       ref="deployForm3"
       :rules="rules3"
+      v-if="currType === 'task'"
     >
       <el-form-item label="执行成功次数" prop="completions">
         <el-input-number
@@ -181,6 +182,59 @@
         <el-select
           style="width: 100%"
           v-model="deployForm3.restart_policy"
+          placeholder="请选择失败重启策略"
+        >
+          <el-option label="Never" value="Never"> </el-option>
+          <el-option label="OnFailure" value="OnFailure"> </el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+
+    <div class="module-name" v-if="currType === 'timeTask'">
+      定时任务规则设置
+    </div>
+    <el-form
+      label-position="top"
+      label-width="80px"
+      :model="deployForm4"
+      ref="deployForm4"
+      :rules="rules4"
+      v-if="currType === 'timeTask'"
+    >
+      <el-form-item label="定时规则" prop="schedule">
+        <el-input
+          v-model="deployForm4.schedule"
+          placeholder="请输入定时规则"
+        ></el-input>
+      </el-form-item>
+      <el-form-item
+        label="保留完成Job数"
+        prop="successful_jobs_history_limit"
+      >
+        <el-input-number
+          :min="1"
+          style="margin-right: 12px"
+          v-model="deployForm4.successful_jobs_history_limit"
+          placeholder="请输入重试次数"
+        >
+        </el-input-number>
+      </el-form-item>
+      <el-form-item
+        label="保留失败Job数"
+        prop="failed_jobs_history_limit"
+      >
+        <el-input-number
+          :min="1"
+          style="margin-right: 12px"
+          v-model="deployForm4.failed_jobs_history_limit"
+          placeholder="请输入重试次数"
+        >
+        </el-input-number>
+      </el-form-item>
+      <el-form-item label="失败重启策略" prop="restart_policy">
+        <el-select
+          style="width: 100%"
+          v-model="deployForm4.restart_policy"
           placeholder="请选择失败重启策略"
         >
           <el-option label="Never" value="Never"> </el-option>
@@ -267,7 +321,7 @@
             v-model="deployForm2.data"
             placeholder="请选择PVC"
             class="cus-sel-data"
-            :disabled = "!deployForm1.namespace"
+            :disabled="!deployForm1.namespace"
           >
             <el-option
               v-for="item in pvcList"
@@ -385,7 +439,13 @@
 <script>
 import { searchClusters } from "@/api/cluster";
 import { listNamespace } from "@/api/cluster/namespace";
-import { createDeploy, createPvc, getStorageClass,getPvcList } from "@/api/work-load/task";
+import {
+  createDeploy,
+  createCronjob,
+  createPvc,
+  getStorageClass,
+  getPvcList,
+} from "@/api/work-load/task";
 import pvcModal from "./pvc-modal.vue";
 export default {
   name: "",
@@ -454,6 +514,7 @@ export default {
       }
     };
     return {
+      createCronjob,
       getPvcList,
       searchClusters,
       listNamespace,
@@ -600,9 +661,22 @@ export default {
         restart_policy: "Never",
       },
       rules3: {},
+      deployForm4: {
+        schedule: "",
+        failed_jobs_history_limit: 1,
+        successful_jobs_history_limit: 1,
+        restart_policy: "Never",
+      },
+      rules4: {
+        schedule: [
+          { required: true, message: "请输入定时规则", trigger: "blur" },
+        ],
+      },
+      currType: "task",
     };
   },
   created() {
+    this.currType = this.$route.params.currType;
     this.deployForm1.cluster_name = this.$route.params.cluster;
     this.getClusters();
   },
@@ -666,99 +740,119 @@ export default {
           delete data1.matchLabelsCopy;
           delete data1.templateLabels;
           delete data1.templateLabelsCopy;
-          this.$refs.deployForm2.validate((valid2) => {
-            if (valid2) {
-              const data2 = JSON.parse(JSON.stringify(this.deployForm2));
-              let data2New = {
-                containers: [],
-                volumes: [],
-              };
-              if (!this.pvcSwitch) {
-                delete data2.data;
-                delete data2.dataName;
+          if (this.currType == "task") {
+            this.validateContain(data1);
+          } else {
+            this.$refs.deployForm4.validate((valid4) => {
+              if (valid4) {
+                let data4 = JSON.parse(JSON.stringify(this.deployForm4));
+                let result = Object.assign(data1, data4);
+                this.validateContain(result);
               } else {
-                // 数据卷-pvc
-                data2.volume_mounts = [
-                  {
-                    name: data2.dataName,
-                    // claimName: data2.data,
-                    mount_path: data2.mount_path,
-                    // read_only: false,
-                  },
-                ];
-                data2New.volumes.push({
-                  name: data2.dataName,
-                  persistent_volume_claim_name: data2.data,
-                  persistent_volume_claim_read_only: false,
-                });
-                delete data2.data;
-                delete data2.dataName;
-                delete data2.mount_path;
+                return false;
               }
-              if (!this.cpulimitSwitch) {
-                delete data2.cpulimit;
-              } else {
-                if (data2.cpulimit.request) {
-                  data2.request.cpu = `${data2.cpulimit.request}m`;
-                }
-                if (data2.cpulimit.limit) {
-                  data2.limits.cpu = `${data2.cpulimit.limit}m`;
-                }
-                delete data2.cpulimit;
-              }
-              if (!this.memorylimitSwitch) {
-                delete data2.memorylimit;
-              } else {
-                if (data2.memorylimit.request) {
-                  data2.request.memory = `${data2.memorylimit.request}Mi`;
-                }
-                if (data2.memorylimit.limit) {
-                  data2.limits.memory = `${data2.memorylimit.limit}Mi`;
-                }
-                delete data2.memorylimit;
-              }
-              if (!data2.args) {
-                delete data2.args;
-              } else {
-                let a = data2.args;
-                data2.args = [];
-                data2.args.push(a.split("]")[0].split("[")[1]);
-              }
-              if (!data2.commands) {
-                delete data2.commands;
-              } else {
-                let a = data2.commands;
-                data2.commands = [];
-                data2.commands.push(a.split("]")[0].split("[")[1]);
-              }
-
-              if (data2.containerPort) {
-                data2.port = {
-                  name: "http",
-                  container_port: Number(data2.containerPort),
-                };
-              }
-              delete data2.containerPort;
-              data2New.containers.push(data2);
-
-              if (this.deployForm3.parallelism) {
-                data2New.parallelism = this.deployForm3.parallelism;
-              }
-              if (this.deployForm3.backoffLimit) {
-                data2New.backoffLimit = this.deployForm3.backoffLimit;
-              }
-              if (this.deployForm3.completions) {
-                data2New.completions = this.deployForm3.completions;
-              }
-              data2New.restart_policy = this.deployForm3.restart_policy;
-              const reBody = Object.assign(data1, data2New);
-              console.log(reBody, "reBody");
-
-              this.createDeployItem(reBody);
-            } else {
-              return false;
+            });
+          }
+        } else {
+          return false;
+        }
+      });
+    },
+    validateContain(data1) {
+      this.$refs.deployForm2.validate((valid2) => {
+        if (valid2) {
+          const data2 = JSON.parse(JSON.stringify(this.deployForm2));
+          let data2New = {
+            containers: [],
+          };
+          if (!this.pvcSwitch) {
+            delete data2.data;
+            delete data2.dataName;
+            delete data2.mount_path;
+          } else {
+            // 数据卷-pvc
+            data2.volume_mounts = [
+              {
+                name: data2.dataName,
+                // claimName: data2.data,
+                mount_path: data2.mount_path,
+                // read_only: false,
+              },
+            ];
+            (data2New.volumes = []),
+              data2New.volumes.push({
+                name: data2.dataName,
+                persistent_volume_claim_name: data2.data,
+                persistent_volume_claim_read_only: false,
+              });
+            delete data2.data;
+            delete data2.dataName;
+            delete data2.mount_path;
+          }
+          if (!this.cpulimitSwitch) {
+            delete data2.cpulimit;
+          } else {
+            if (data2.cpulimit.request) {
+              data2.request.cpu = `${data2.cpulimit.request}m`;
             }
-          });
+            if (data2.cpulimit.limit) {
+              data2.limits.cpu = `${data2.cpulimit.limit}m`;
+            }
+            delete data2.cpulimit;
+          }
+          if (!this.memorylimitSwitch) {
+            delete data2.memorylimit;
+          } else {
+            if (data2.memorylimit.request) {
+              data2.request.memory = `${data2.memorylimit.request}Mi`;
+            }
+            if (data2.memorylimit.limit) {
+              data2.limits.memory = `${data2.memorylimit.limit}Mi`;
+            }
+            delete data2.memorylimit;
+          }
+          if (!this.cpulimitSwitch && !this.memorylimitSwitch) {
+            delete data2.limits;
+            delete data2.request;
+          }
+          if (!data2.args) {
+            delete data2.args;
+          } else {
+            let a = data2.args;
+            data2.args = [];
+            data2.args.push(a.split("]")[0].split("[")[1]);
+          }
+          if (!data2.commands) {
+            delete data2.commands;
+          } else {
+            let a = data2.commands;
+            data2.commands = [];
+            data2.commands.push(a.split("]")[0].split("[")[1]);
+          }
+
+          if (data2.containerPort) {
+            data2.port = {
+              name: "http",
+              container_port: Number(data2.containerPort),
+            };
+          }
+          delete data2.containerPort;
+          data2New.containers.push(data2);
+
+          if (this.currType == "task" && this.deployForm3.parallelism) {
+            data2New.parallelism = this.deployForm3.parallelism;
+          }
+          if (this.currType == "task" && this.deployForm3.backoffLimit) {
+            data2New.backoffLimit = this.deployForm3.backoffLimit;
+          }
+          if (this.currType == "task" && this.deployForm3.completions) {
+            data2New.completions = this.deployForm3.completions;
+          }
+          data2New.restart_policy = this.deployForm3.restart_policy;
+          const reBody = Object.assign(data1, data2New);
+          console.log(reBody, "reBody");
+
+          this.createDeployItem(reBody);
         } else {
           return false;
         }
@@ -767,10 +861,17 @@ export default {
     resetForm() {
       this.$refs.deployForm2.resetFields();
       this.$refs.deployForm1.resetFields();
-      this.$refs.deployForm3.resetFields();
+      if (this.currType === "timeTask") {
+        this.$refs.deployForm4.resetFields();
+      } else {
+        this.$refs.deployForm3.resetFields();
+      }
 
       this.$router.push({
         name: "task",
+        params: {
+          currType: this.currType,
+        },
       });
     },
     clusterChange() {
@@ -785,8 +886,8 @@ export default {
       if (this.$route.params.type == "https") {
         // this.getServiceList();
       }
-      this.deployForm2.data = ""
-      this.getPvcOption()
+      this.deployForm2.data = "";
+      this.getPvcOption();
     },
 
     servicenameChange() {
@@ -844,19 +945,26 @@ export default {
     },
 
     async createDeployItem(data) {
-      await this.createDeploy(data);
+      if (this.currType == "task") {
+        await this.createDeploy(data);
+      } else {
+        await this.createCronjob(data);
+      }
       this.resetForm();
     },
 
     async createPvcItem(data) {
       const pvc = await this.createPvc(data);
-      console.log(pvc)
-      this.getPvcOption()
+      console.log(pvc);
+      this.getPvcOption();
       // this.pvcList.push(pvc);
     },
 
     async getPvcOption() {
-      const data = await this.getPvcList(this.deployForm1.cluster_name, this.deployForm1.namespace);
+      const data = await this.getPvcList(
+        this.deployForm1.cluster_name,
+        this.deployForm1.namespace
+      );
       this.pvcList = data.items || [];
     },
 

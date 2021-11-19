@@ -7,7 +7,7 @@
         <use xlink:href="#icon-joblogo"></use>
       </svg>
       <span class="deploy-name">{{ deployInfo.name }}</span>
-      <div class="job-count">
+      <div class="job-count" v-if="currType === 'task'">
         <div class="item">
           <div>
             {{
@@ -47,7 +47,7 @@
     </div>
     <div class="mod-two" v-if="load">
       <el-row :gutter="24">
-        <el-col :span="8">
+        <el-col :span="8" v-if="currType === 'task'">
           <span class="tag-name">运行状态：</span>
           <span v-if="deployInfo.json_data['status'].active">
             <i class="iconfont icon-refresh-fill" style="color: #5354bb"></i>
@@ -144,6 +144,23 @@
           </span>
           <span v-else>--</span>
         </el-col>
+        <el-col :span="8" v-else>
+          <span class="tag-name">运行状态：</span>
+          <span class="tag-content">
+            <span v-if="deployInfo.json_data['status'].active">
+              <i
+                style="color: #36b37e"
+                class="iconfont icon-checkbox-circle-fill2"
+              ></i>
+              活动中
+            </span>
+            <span v-else>
+              <!-- 已停止 -->
+              <i style="color: #f59326" class="iconfont icon-safe-warning"></i>
+              不活动
+            </span>
+          </span></el-col
+        >
         <el-col :span="8">
           <span class="tag-name">集群信息：</span
           ><span class="tag-content">{{
@@ -152,9 +169,15 @@
         >
         <el-col :span="8">
           <span class="tag-name">重启策略：</span
-          ><span class="tag-content">{{
-            deployInfo.json_data["spec"].template.spec.restartPolicy || "--"
-          }}</span></el-col
+          ><span class="tag-content"
+            >{{
+              currType === "task"
+                ? deployInfo.json_data["spec"].template.spec.restartPolicy ||
+                  "--"
+                : deployInfo.json_data["spec"].jobTemplate.spec.template.spec
+                    .restartPolicy
+            }}
+          </span></el-col
         >
       </el-row>
 
@@ -183,11 +206,27 @@
             )
           }}</span>
         </el-col>
-        <el-col :span="8">
+        <el-col :span="8" v-if="currType === 'task'">
           <span class="tag-name">重试次数：</span
           ><span class="tag-content">{{
             deployInfo.json_data["spec"]
               ? deployInfo.json_data["spec"].parallelism
+              : "--"
+          }}</span></el-col
+        >
+         <el-col :span="8" v-if="currType === 'timeTask'">
+          <span class="tag-name">保留完成Job数：</span
+          ><span class="tag-content">{{
+             deployInfo.successful_jobs_history_limit
+              ?  deployInfo.successful_jobs_history_limit
+              : "--"
+          }}</span></el-col
+        >
+         <el-col :span="8" v-if="currType === 'timeTask'">
+          <span class="tag-name">保留失败Job数：</span
+          ><span class="tag-content">{{
+            deployInfo.failed_jobs_history_limit
+              ?  deployInfo.failed_jobs_history_limit
               : "--"
           }}</span></el-col
         >
@@ -226,7 +265,10 @@
       <el-row :gutter="24">
         <el-col :span="24" class="cus-col">
           <span class="tag-name">Selector：</span>
-          <div class="tab-item-block">
+          <div
+            class="tab-item-block"
+            v-if="deployInfo.json_data['spec'].selector"
+          >
             <span
               class="tag-content tag-content-bg tag-ml"
               v-for="(value, key, index) in deployInfo.json_data['spec']
@@ -235,6 +277,7 @@
               >{{ key }}:{{ value }}</span
             >
           </div>
+          <div v-else>--</div>
         </el-col>
       </el-row>
     </div>
@@ -262,7 +305,7 @@
     <div class="split-8"></div>
     <div class="mod-title">实例内容器</div>
     <div class="mod-two" v-if="load">
-      <el-row :gutter="24">
+      <el-row :gutter="24" v-if="currType === 'task'">
         <el-col :span="8">
           <span class="tag-name">容器名称：</span
           ><span class="tag-content">{{
@@ -271,7 +314,7 @@
               : "--"
           }}</span>
         </el-col>
-         <el-col :span="8">
+        <el-col :span="8">
           <span class="tag-name">镜像：</span
           ><span class="tag-content">{{
             deployInfo.json_data["spec"].template.spec.containers[0].image
@@ -303,6 +346,34 @@
               : "-"
           }}</span></el-col
         > -->
+      </el-row>
+
+      <el-row :gutter="24" v-else>
+        <el-col :span="8">
+          <span class="tag-name">容器名称：</span
+          ><span class="tag-content">{{
+            deployInfo.json_data["spec"].jobTemplate.spec.template.spec
+              ? deployInfo.json_data["spec"].jobTemplate.spec.template.spec
+                  .containers[0].name
+              : "--"
+          }}</span>
+        </el-col>
+        <el-col :span="8">
+          <span class="tag-name">镜像：</span
+          ><span class="tag-content">{{
+            deployInfo.json_data["spec"].jobTemplate.spec.template.spec
+              .containers[0].image
+          }}</span
+          ><span
+            class="iconfont icon-copy-1"
+            v-clipboard:copy="
+              deployInfo.json_data['spec'].jobTemplate.spec.template.spec
+                .containers[0].image
+            "
+            v-clipboard:success="onCopy"
+            v-clipboard:error="onError"
+          ></span>
+        </el-col>
       </el-row>
       <!-- <el-row :gutter="16">
         <el-col :span="8">
@@ -372,7 +443,11 @@
 </template>
 
 <script>
-import { getJobItem, newGetDeployItem } from "@/api/work-load/task";
+import {
+  getJobItem,
+  newGetDeployItem,
+  getCronjobItem,
+} from "@/api/work-load/task";
 import moment from "moment";
 export default {
   name: "",
@@ -381,6 +456,7 @@ export default {
   data() {
     return {
       getJobItem,
+      getCronjobItem,
       newGetDeployItem,
       moment,
       tableData: [],
@@ -421,16 +497,29 @@ export default {
     // ajax
     async getJobDetail() {
       this.load = false;
-      const data = await this.getJobItem(
-        this.$route.params.clusterName,
-        this.$route.params.namespace,
-        this.$route.params.deployName
-      );
-      this.deployInfo = data[0] || {};
-      console.log(data[0], "detail");
-      this.tableData = this.deployInfo.json_data.spec.template.spec.volumes
-        ? this.deployInfo.json_data.spec.template.spec.volumes
-        : [];
+      if (this.currType === "task") {
+        const data = await this.getJobItem(
+          this.$route.params.clusterName,
+          this.$route.params.namespace,
+          this.$route.params.deployName
+        );
+        this.deployInfo = data[0] || {};
+        this.tableData = this.deployInfo.json_data.spec.template.spec.volumes
+          ? this.deployInfo.json_data.spec.template.spec.volumes
+          : [];
+      } else {
+        const data = await this.getCronjobItem(
+          this.$route.params.clusterName,
+          this.$route.params.namespace,
+          this.$route.params.deployName
+        );
+        this.deployInfo = data[0] || {};
+        this.tableData = this.deployInfo.json_data.spec.jobTemplate.spec
+          .template.spec
+          ? this.deployInfo.json_data.spec.jobTemplate.spec.template.spec
+              .volumes
+          : [];
+      }
       this.load = true;
       console.log(this.tableData, "deployInfo");
     },
@@ -454,20 +543,31 @@ export default {
     completeCount() {
       let result = 0;
       if (this.load && this.deployInfo.json_data["status"].conditions) {
-        result = this.deployInfo.json_data["status"].conditions.filter((item) => {
-          return item.status === "True" && item.type === "Complete";
-        }).length;
+        result = this.deployInfo.json_data["status"].conditions.filter(
+          (item) => {
+            return item.status === "True" && item.type === "Complete";
+          }
+        ).length;
       }
       return result;
     },
     failCount() {
       let result = 0;
       if (this.load && this.deployInfo.json_data["status"].conditions) {
-        result = this.deployInfo.json_data["status"].conditions.filter((item) => {
-          return item.status === "True" && item.type === "Failed";
-        }).length;
+        result = this.deployInfo.json_data["status"].conditions.filter(
+          (item) => {
+            return item.status === "True" && item.type === "Failed";
+          }
+        ).length;
       }
       return result;
+    },
+    currType: {
+      get: function () {
+        let value = this.$route.params.currType;
+        return value;
+      },
+      set: function () {},
     },
   },
   watch: {},
@@ -566,7 +666,7 @@ export default {
   align-items: center;
   margin-left: 24px;
   .item {
-    padding:0 16px;
+    padding: 0 16px;
     div {
       font-size: 16px;
       color: #2c2e33;

@@ -63,7 +63,12 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/search.js";
 
-import { getJobItem, updateJob } from "@/api/work-load/task";
+import {
+  getJobItem,
+  updateJob,
+  getCronjobItem,
+  updateCronjob,
+} from "@/api/work-load/task";
 // import YAML from "json2yaml";
 export default {
   name: "",
@@ -71,8 +76,10 @@ export default {
   props: {},
   data() {
     return {
+      getCronjobItem,
       getJobItem,
       updateJob,
+      updateCronjob,
       jsonEditor: null,
       value: "", // 默认显示的值
       initing: false,
@@ -130,27 +137,47 @@ export default {
     // ajax
     async getDeploy() {
       this.initing = true;
-      const data = await this.getJobItem(
-        this.$route.params.clusterName,
-        this.$route.params.namespace,
-        this.$route.params.deployName
-      );
-
-      this.deployInfo = data[0] || {};
-
-      this.value = data[0] ? data[0].yaml_data : "";
+      if (this.currType === "task") {
+        const data = await this.getJobItem(
+          this.$route.params.clusterName,
+          this.$route.params.namespace,
+          this.$route.params.deployName
+        );
+        this.deployInfo = data[0] || {};
+        this.value = data[0] ? data[0].yaml_data : "";
+      } else {
+        const data = await this.getCronjobItem(
+          this.$route.params.clusterName,
+          this.$route.params.namespace,
+          this.$route.params.deployName
+        );
+        this.deployInfo = data[0] || {};
+        this.value = data[0] ? data[0].yaml_data : "";
+      }
 
       this.editorInit();
       this.initing = false;
     },
 
     async updateDeployItem(data) {
-      await this.updateJob(data);
+      if (this.currType === "task") {
+        await this.updateJob(data);
+      } else {
+        await this.updateCronjob(data);
+      }
       this.resetForm();
     },
   },
   filter: {},
-  computed: {},
+  computed: {
+    currType: {
+      get: function () {
+        let value = this.$route.params.currType;
+        return value;
+      },
+      set: function () {},
+    },
+  },
   watch: {},
 };
 </script>

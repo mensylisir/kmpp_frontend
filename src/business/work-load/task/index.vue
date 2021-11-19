@@ -6,14 +6,15 @@
       </div>
       <div
         :class="{ active: currType === 'timeTask' }"
-       
+        @click="currType = 'timeTask'"
       >
         定时任务
       </div>
     </div>
     <div class="sel-action">
       <el-button type="primary" @click="createDeploy">
-        <i class="el-icon-plus" style="margin-right: 4px"></i>任务
+        <i class="el-icon-plus" style="margin-right: 4px"></i
+        >{{ currType === "task" ? "任务" : "定时任务" }}
       </el-button>
       <div>
         <el-select
@@ -50,9 +51,45 @@
           <div slot="prefix" class="sel-prefix">命名空间：</div>
         </el-select>
       </div>
+      <!-- <div v-show="currType === 'timeTask'">
+        <el-select
+          v-model="clusterCurrent1"
+          placeholder="请选择"
+          @change="clusterChange"
+          style="margin-right: 8px"
+          class="cus-select"
+        >
+          <el-option
+            v-for="item in clusterList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+
+          <div slot="prefix" class="sel-prefix">集群：</div>
+        </el-select>
+        <el-select
+          v-model="currentNamespace1"
+          placeholder="请选择"
+          @change="changeNamespace"
+          class="cus-select1"
+        >
+          <el-option
+            v-for="item in namespacesList"
+            :key="item['metadata'].name"
+            :label="item['metadata'].name"
+            :value="item['metadata'].name"
+          >
+          </el-option>
+
+          <div slot="prefix" class="sel-prefix">命名空间：</div>
+        </el-select>
+      </div> -->
     </div>
 
     <el-table
+      v-if="currType === 'task'"
       v-loading="loading"
       element-loading-text="正在删除，请稍后"
       :data="tableData"
@@ -167,30 +204,25 @@
           <span>{{ scope.row.json_data["metadata"].namespace }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="image"
-        label="镜像"
-        min-width="496"
-        v-if="currType === 'task'"
-      >
+      <el-table-column prop="image" label="镜像" min-width="496">
         <template slot-scope="scope">
           <span>{{
-            scope.row.json_data["spec"].template.spec.containers[0].image
+            scope.row.json_data["spec"].template.spec.containers
+              ? scope.row.json_data["spec"].template.spec.containers[0].image
+              : "--"
           }}</span>
           <span
+            v-if="scope.row.json_data['spec'].template.spec.containers"
             class="iconfont icon-copy-1 copy-icon"
-            v-clipboard:copy="scope.row.json_data['spec'].template.spec.containers[0].image"
+            v-clipboard:copy="
+              scope.row.json_data['spec'].template.spec.containers[0].image
+            "
             v-clipboard:success="onCopy"
             v-clipboard:error="onError"
           ></span>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="pod"
-        label="完成/期望Pod数量"
-        min-width="130"
-        v-if="currType === 'task'"
-      >
+      <el-table-column prop="pod" label="完成/期望Pod数量" min-width="130">
         <template slot-scope="scope">
           <span
             >{{
@@ -201,39 +233,81 @@
           >
         </template>
       </el-table-column>
+      <el-table-column label="操作" min-width="64">
+        <template slot-scope="scope">
+          <span
+            @click="handleClickEdit(scope.row)"
+            class="iconfont icon-edit-line action-icon"
+          ></span>
+          <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
+            ><span
+              class="iconfont icon-delete-line action-icon"
+              slot="reference"
+            ></span>
+          </el-popconfirm> </template
+      ></el-table-column>
+    </el-table>
+    <el-table
+      v-else
+      v-loading="loading"
+      element-loading-text="正在删除，请稍后"
+      :data="tableData"
+      style="width: 100%"
+      :header-cell-style="{ background: '#F9FAFC' }"
+    >
+      <el-table-column prop="domain" label="名称" min-width="200">
+        <template slot-scope="scope">
+          <span class="active-domain" @click="winOpen(scope.row)">{{
+            scope.row.json_data["metadata"].name
+          }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="host" label="状态" min-width="128">
+        <template slot-scope="scope">
+          <span v-if="scope.row.json_data['status'].active">
+            <i
+              style="color: #36b37e"
+              class="iconfont icon-checkbox-circle-fill2"
+            ></i>
+            活动中
+          </span>
+          <span v-else>
+            <!-- 已停止 -->
+            <i style="color: #f59326" class="iconfont icon-safe-warning"></i>
+            不活动
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="namespace" label="命名空间" min-width="130">
+        <template slot-scope="scope">
+          <span>{{ scope.row.json_data["metadata"].namespace }}</span>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="image"
         label="定时规则"
-        min-width="496"
+        min-width="180"
         v-if="currType === 'timeTask'"
       >
         <template slot-scope="scope">
+          <span>{{ scope.row.json_data["spec"].schedule }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="image" label="正在执行任务数" min-width="120">
+        <template slot-scope="scope">
           <span>{{
-            scope.row.json_data["spec"].template.spec.containers[0].image
+            scope.row.json_data["status"].active
+              ? scope.row.json_data["status"].active.length
+              : 0
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="image"
-        label="正在运行任务数"
-        min-width="300"
-        v-if="currType === 'timeTask'"
-      >
+      <el-table-column prop="image" label="上次调度时间" min-width="180">
         <template slot-scope="scope">
           <span>{{
-            scope.row.json_data["spec"].template.spec.containers[0].image
-          }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="image"
-        label="创建时间"
-        min-width="496"
-        v-if="currType === 'timeTask'"
-      >
-        <template slot-scope="scope">
-          <span>{{
-            scope.row.json_data["spec"].template.spec.containers[0].image
+            moment(scope.row.json_data["status"].lastScheduleTime).format(
+              "YYYY/MM/DD HH:mm:ss"
+            )
           }}</span>
         </template>
       </el-table-column>
@@ -270,18 +344,22 @@
 <script>
 import LayoutContent from "@/components/layout/LayoutContent";
 import { searchClusters } from "@/api/cluster";
-import { getJob, delJob } from "@/api/work-load/task";
+import { getJob, delJob, getCronjob, delCronjob } from "@/api/work-load/task";
 import { listNamespace } from "@/api/cluster/namespace";
 import "./index.scss";
+import moment from "moment";
 export default {
   name: "",
   components: { LayoutContent },
   props: {},
   data() {
     return {
+      moment,
       searchClusters,
       getJob,
+      getCronjob,
       delJob,
+      delCronjob,
       listNamespace,
       clusterList: [],
       clusterCurrent: "",
@@ -318,6 +396,7 @@ export default {
     };
   },
   created() {
+    this.currType = this.$route.params.currType || "task";
     this.getClusters();
   },
   mounted() {},
@@ -343,6 +422,7 @@ export default {
         name: "taskCreate",
         params: {
           cluster: this.clusterCurrent,
+          currType: this.currType,
         },
       });
     },
@@ -353,6 +433,7 @@ export default {
           clusterName: this.clusterCurrent,
           deployName: data.json_data["metadata"].name,
           namespace: data.json_data["metadata"].namespace,
+          currType: this.currType,
         },
       });
     },
@@ -387,7 +468,9 @@ export default {
     handleClickEdit(data) {
       this.$router.push({
         name:
-          this.disableNamespaceList.indexOf(data.json_data["metadata"].namespace) != -1
+          this.disableNamespaceList.indexOf(
+            data.json_data["metadata"].namespace
+          ) != -1
             ? "taskDetailsCheck"
             : "taskDetailsEdit",
         params: {
@@ -398,11 +481,20 @@ export default {
       });
     },
     async confirmDel(data) {
-      await this.delJob({
-        cluster_name: data.cluster_name,
-        namespace: data.namespace,
-        name: data.name,
-      });
+      if (this.currType === "task") {
+        await this.delJob({
+          cluster_name: data.cluster_name,
+          namespace: data.namespace,
+          name: data.name,
+        });
+      } else {
+        await this.delCronjob({
+          cluster_name: data.cluster_name,
+          namespace: data.namespace,
+          name: data.name,
+        });
+      }
+
       this.loading = true;
       setTimeout(() => {
         this.loading = false;
@@ -442,13 +534,21 @@ export default {
     },
 
     async getJobList(cluster, namespace) {
-      const data = await this.getJob(cluster, namespace);
-      this.tableDataAll = data || [];
+      if (this.currType === "task") {
+        const data = await this.getJob(cluster, namespace);
+        this.tableDataAll = data || [];
+      } else {
+        const data = await this.getCronjob(cluster, namespace);
+        this.tableDataAll = data || [];
+      }
+
       this.paginationConfig.total = this.tableDataAll.length;
+
       this.tableData = this.tableDataAll.slice(
         this.paginationConfig.currentPage - 1,
         this.paginationConfig.currentPage * this.paginationConfig.pageSize
       );
+      console.log(this.tableData);
     },
 
     async getNamespace() {
@@ -460,6 +560,7 @@ export default {
           name: "全部",
         },
       });
+      this.currentNamespace = "全部";
       // 获取列表
       this.getJobList(this.clusterCurrent, undefined);
     },
@@ -469,7 +570,6 @@ export default {
   watch: {
     currType: {
       handler: function () {
-        
         this.getClusters();
         console.log(this.currType);
       },
@@ -565,9 +665,9 @@ export default {
     border-radius: 4px;
   }
 }
-.copy-icon{
+.copy-icon {
   margin-left: 10px;
-  color:  #5354BB;
+  color: #5354bb;
   cursor: pointer;
 }
 

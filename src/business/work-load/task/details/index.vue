@@ -1,13 +1,24 @@
 <template>
   <div class="domain-manage">
     <div class="bread-crumb">
-      <span class="bread-crumb-item" @click="$router.push({ name: 'task' })"
+      <span
+        class="bread-crumb-item"
+        @click="
+          $router.push({
+            name: 'task',
+            params: {
+              currType: currType,
+            },
+          })
+        "
         >任务/</span
-      ><span>任务详情</span>
+      ><span>{{ currType === "task" ? "任务详情" : "定时任务详情" }}</span>
     </div>
     <div class="top">
       <div style="display: flex; align-items: center">
-        <div class="detail">任务详情</div>
+        <div class="detail">
+          {{ currType === "task" ? "任务详情" : "定时任务详情" }}
+        </div>
         <el-menu
           :default-active="activeKey"
           mode="horizontal"
@@ -46,6 +57,7 @@ export default {
             clusterName: this.$route.params.clusterName,
             deployName: this.$route.params.deployName,
             namespace: this.$route.params.namespace,
+            currType: this.currType,
           },
         });
       } else if (index === "yaml") {
@@ -59,6 +71,7 @@ export default {
             clusterName: this.$route.params.clusterName,
             deployName: this.$route.params.deployName,
             namespace: this.$route.params.namespace,
+            currType: this.currType,
           },
         });
       }
@@ -74,6 +87,13 @@ export default {
     activeKey: {
       get: function () {
         let value = this.$route.meta.activeKey;
+        return value;
+      },
+      set: function () {},
+    },
+    currType: {
+      get: function () {
+        let value = this.$route.params.currType;
         return value;
       },
       set: function () {},
