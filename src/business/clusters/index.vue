@@ -34,6 +34,8 @@
           <div v-if="row.status ==='Running'">
             <span class="iconfont icon-checkbox-circle-fill2" style="color: #32B350"></span>
             {{ $t("commons.status.running") }}
+                        <el-link type="info" @click="getStatus(row)">{{ $t("commons.status.failed") }}</el-link>
+
           </div>
           <div v-if="row.status === 'Failed'">
             <span class="iconfont icon-checkbox-circle-fill" style="color: #FA4147"></span> &nbsp; &nbsp; &nbsp;

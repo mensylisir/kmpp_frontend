@@ -37,6 +37,7 @@ export default {
   },
   methods: {
     init() {
+      alert(1)
       let terminalContainer = document.getElementById("terminal-container");
       this.term = new Terminal({
         disableStdin: true,

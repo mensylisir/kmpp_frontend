@@ -147,7 +147,7 @@ const Work = {
       }
     },
     {
-      path: "task-create/:cluster",
+      path: "task-create/:cluster/:currType ",
       hidden: true,
       name: "taskCreate",
       component: () => import("@/business/work-load/task/create"),
@@ -167,7 +167,7 @@ const Work = {
       },
       children: [
         {
-          path: "task-details-mod/:clusterName/:deployName/:namespace",
+          path: "task-details-mod/:clusterName/:deployName/:namespace/:currType",
           name: "taskDetailsMod",
           props: true,
           hidden: true,
@@ -179,7 +179,7 @@ const Work = {
           }
         },
         {
-          path: "task-details-check/:clusterName/:deployName/:namespace",
+          path: "task-details-check/:clusterName/:deployName/:namespace/:currType",
           name: "taskDetailsCheck",
           props: true,
           hidden: true,
@@ -191,7 +191,7 @@ const Work = {
           }
         },
         {
-          path: "task-details-edit/:clusterName/:deployName/:namespace",
+          path: "task-details-edit/:clusterName/:deployName/:namespace/:currType",
           name: "taskDetailsEdit",
           props: true,
           hidden: true,

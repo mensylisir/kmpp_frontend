@@ -7,8 +7,19 @@ export function getJob(clustername, namespace) {
   return get(url);
 }
 
+export function getCronjob(clustername, namespace) {
+  const url = namespace
+    ? `/api/v1/kubernetes/cronjob?clustername=${clustername}&namespace=${namespace}`
+    : `/api/v1/kubernetes/cronjob?clustername=${clustername}`;
+  return get(url);
+}
+
 export function createDeploy(data) {
   return post(`/api/v1/kubernetes/job`, data);
+}
+
+export function createCronjob(data) {
+  return post(`/api/v1/kubernetes/cronjob`, data);
 }
 
 // 删除Deploy
@@ -16,10 +27,22 @@ export function delJob(data) {
   return del(`/api/v1/kubernetes/job`, data);
 }
 
+// 删除Deploy
+export function delCronjob(data) {
+  return del(`/api/v1/kubernetes/cronjob`, data);
+}
+
 // 获取单个 Deploy 信息
 export function getJobItem(clustername, namespace, name) {
   return get(
     `/api/v1/kubernetes/job?clusterName=${clustername}&namespace=${namespace}&name=${name}`
+  );
+}
+
+// 获取单个 Deploy 信息
+export function getCronjobItem(clustername, namespace, name) {
+  return get(
+    `/api/v1/kubernetes/cronjob?clusterName=${clustername}&namespace=${namespace}&name=${name}`
   );
 }
 
@@ -31,6 +54,10 @@ export function getJobItem(clustername, namespace, name) {
 // Data              string                    `json:"data"` # deployment的yaml
 export function updateJob(data) {
   return post("/api/v1/kubernetes/job/update", data);
+}
+
+export function updateCronjob(data) {
+  return post("/api/v1/kubernetes/cronjob/update", data);
 }
 
 // {
