@@ -127,6 +127,7 @@
           v-model="deployForm1.namespace"
           placeholder="请选择Namespace"
           class="cus-sel2"
+          @change="namespaceChange"
         >
           <el-option
             v-for="item in namespacesList"
@@ -266,6 +267,7 @@
             v-model="deployForm2.data"
             placeholder="请选择PVC"
             class="cus-sel-data"
+            :disabled = "!deployForm1.namespace"
           >
             <el-option
               v-for="item in pvcList"
@@ -383,7 +385,7 @@
 <script>
 import { searchClusters } from "@/api/cluster";
 import { listNamespace } from "@/api/cluster/namespace";
-import { createDeploy, createPvc, getStorageClass } from "@/api/work-load/task";
+import { createDeploy, createPvc, getStorageClass,getPvcList } from "@/api/work-load/task";
 import pvcModal from "./pvc-modal.vue";
 export default {
   name: "",
@@ -452,6 +454,7 @@ export default {
       }
     };
     return {
+      getPvcList,
       searchClusters,
       listNamespace,
       createDeploy,
@@ -782,6 +785,8 @@ export default {
       if (this.$route.params.type == "https") {
         // this.getServiceList();
       }
+      this.deployForm2.data = ""
+      this.getPvcOption()
     },
 
     servicenameChange() {
@@ -845,7 +850,14 @@ export default {
 
     async createPvcItem(data) {
       const pvc = await this.createPvc(data);
-      this.pvcList.push(pvc);
+      console.log(pvc)
+      this.getPvcOption()
+      // this.pvcList.push(pvc);
+    },
+
+    async getPvcOption() {
+      const data = await this.getPvcList(this.deployForm1.cluster_name, this.deployForm1.namespace);
+      this.pvcList = data.items || [];
     },
 
     async getStorageClassList() {
