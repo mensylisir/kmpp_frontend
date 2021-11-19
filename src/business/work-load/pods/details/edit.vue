@@ -63,7 +63,7 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/search.js";
 
-import { getDeployItem, updateDeploy } from "@/api/work-load/deploy";
+import { getPodsItem, updatePods } from "@/api/work-load/pods";
 import YAML from "json2yaml";
 export default {
   name: "",
@@ -71,16 +71,16 @@ export default {
   props: {},
   data() {
     return {
-      getDeployItem,
-      updateDeploy,
+      getPodsItem,
+      updatePods,
       jsonEditor: null,
       value: "", // 默认显示的值
       initing: false,
-      deployInfo: {},
+      podsInfo: {},
     };
   },
   created() {
-    this.getDeploy();
+    this.getPods();
   },
   mounted() {},
   activited() {},
@@ -91,19 +91,19 @@ export default {
       const reBody = {
         cluster_name: this.$route.params.clusterName,
         resource_type: "deployment",
-        resource_name: this.deployInfo.metadata.name,
-        namespace: this.deployInfo.metadata.namespace,
+        resource_name: this.podsInfo.metadata.name,
+        namespace: this.podsInfo.metadata.namespace,
         data: value,
       };
-      this.updateDeployItem(reBody);
+      this.updatePodsItem(reBody);
       //
     },
     resetForm() {
       this.$router.push({
-        name: "deployDetailsCheck",
+        name: "podsDetailsCheck",
         params: {
           clusterName: this.$route.params.clusterName,
-          deployName: this.$route.params.deployName,
+          podsName: this.$route.params.podsName,
           namespace: this.$route.params.namespace,
         },
       });
@@ -129,15 +129,15 @@ export default {
     },
 
     // ajax
-    async getDeploy() {
+    async getPods() {
       this.initing = true;
-      const data = await this.getDeployItem(
+      const data = await this.getPodsItem(
         this.$route.params.clusterName,
         this.$route.params.namespace,
-        this.$route.params.deployName
+        this.$route.params.podsName
       );
 
-      this.deployInfo = data || {};
+      this.podsInfo = data || {};
 
       this.value = YAML.stringify(data) || "";
 
@@ -145,8 +145,8 @@ export default {
       this.initing = false;
     },
 
-    async updateDeployItem(data) {
-      await this.updateDeploy(data);
+    async updatePodsItem(data) {
+      await this.updatePods(data);
       this.resetForm();
     },
   },

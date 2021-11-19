@@ -63,7 +63,7 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/search.js";
 
-import { getDeployItem, updateDeploy } from "@/api/work-load/deploy";
+import { getServicesItem, updateServices } from "@/api/work-load/services";
 import YAML from "json2yaml";
 export default {
   name: "",
@@ -71,16 +71,16 @@ export default {
   props: {},
   data() {
     return {
-      getDeployItem,
-      updateDeploy,
+      getServicesItem,
+      updateServices,
       jsonEditor: null,
       value: "", // 默认显示的值
       initing: false,
-      deployInfo: {},
+      servicesInfo: {},
     };
   },
   created() {
-    this.getDeploy();
+    this.getServices();
   },
   mounted() {},
   activited() {},
@@ -90,20 +90,20 @@ export default {
       const value = this.jsonEditor.getValue();
       const reBody = {
         cluster_name: this.$route.params.clusterName,
-        resource_type: "deployment",
-        resource_name: this.deployInfo.metadata.name,
-        namespace: this.deployInfo.metadata.namespace,
+        resource_type: "service",
+        resource_name: this.servicesInfo.metadata.name,
+        namespace: this.servicesInfo.metadata.namespace,
         data: value,
       };
-      this.updateDeployItem(reBody);
+      this.updateServicesItem(reBody);
       //
     },
     resetForm() {
       this.$router.push({
-        name: "deployDetailsCheck",
+        name: "servicesDetailsCheck",
         params: {
           clusterName: this.$route.params.clusterName,
-          deployName: this.$route.params.deployName,
+          deployName: this.$route.params.servicesName,
           namespace: this.$route.params.namespace,
         },
       });
@@ -129,15 +129,15 @@ export default {
     },
 
     // ajax
-    async getDeploy() {
+    async getServices() {
       this.initing = true;
-      const data = await this.getDeployItem(
+      const data = await this.getServicesItem(
         this.$route.params.clusterName,
         this.$route.params.namespace,
-        this.$route.params.deployName
+        this.$route.params.servicesName
       );
 
-      this.deployInfo = data || {};
+      this.servicesInfo = data || {};
 
       this.value = YAML.stringify(data) || "";
 
@@ -145,8 +145,8 @@ export default {
       this.initing = false;
     },
 
-    async updateDeployItem(data) {
-      await this.updateDeploy(data);
+    async updateServicesItem(data) {
+      await this.updateServices(data);
       this.resetForm();
     },
   },

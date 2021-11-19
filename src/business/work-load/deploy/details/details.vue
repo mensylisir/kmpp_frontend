@@ -32,9 +32,11 @@
         >
         <el-col :span="8">
           <span class="tag-name">集群信息：</span
-          ><span class="tag-content">{{
-            $route.params.clusterName
-          }}</span></el-col
+          ><span class="tag-content"
+            >{{ $route.params.clusterName }}/{{
+              deployInfo["metadata"].namespace
+            }}</span
+          ></el-col
         >
       </el-row>
 
@@ -184,7 +186,9 @@
           }}</span
           ><span
             class="iconfont icon-copy-1"
-            v-clipboard:copy="content"
+            v-clipboard:copy="
+              deployInfo['spec'].template.spec.containers[0].image
+            "
             v-clipboard:success="onCopy"
             v-clipboard:error="onError"
           ></span>
@@ -205,7 +209,7 @@
         </el-col>
       </el-row> -->
       <el-row :gutter="24">
-        <el-col :span="24">
+        <el-col :span="8">
           <span class="tag-name">CPU request/limited：</span
           ><span class="tag-content"
             >{{
@@ -221,9 +225,7 @@
             }}</span
           >
         </el-col>
-      </el-row>
-      <el-row :gutter="24">
-        <el-col :span="24">
+        <el-col :span="8">
           <span class="tag-name">内存 request/limited：</span
           ><span class="tag-content"
             >{{
@@ -240,6 +242,24 @@
           >
         </el-col>
       </el-row>
+      <!-- <el-row :gutter="24">
+        <el-col :span="24">
+          <span class="tag-name">内存 request/limited：</span
+          ><span class="tag-content"
+            >{{
+              deployInfo["spec"].template.spec.containers[0].resources.requests
+                ? deployInfo["spec"].template.spec.containers[0].resources
+                    .requests.memory
+                : "-"
+            }}/{{
+              deployInfo["spec"].template.spec.containers[0].resources.limits
+                ? deployInfo["spec"].template.spec.containers[0].resources
+                    .limits.memory
+                : "-"
+            }}</span
+          >
+        </el-col>
+      </el-row> -->
     </div>
   </div>
 </template>
@@ -257,7 +277,6 @@ export default {
       newGetDeployItem,
       moment,
       tableData: [],
-      content: "sdfidshfoshfuishfsjihjio",
       deployInfo: {},
       load: false,
     };

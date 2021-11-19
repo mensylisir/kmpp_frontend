@@ -3,7 +3,10 @@
     <div class="split-8"></div>
     <div class="domain-page-title">
       <span class="page-title">YAML文件</span>
-      <el-button type="primary" disabled
+      <el-button
+        type="primary"
+        @click="submitForm"
+        :disabled="disableNamespaceList.indexOf($route.params.namespace) != -1"
         ><span class="iconfont icon-coding"></span>编辑YAML</el-button
       >
     </div>
@@ -13,14 +16,9 @@
     </div>
     <div class="temp-detail-editor">
       <textarea
-        ref="CodeMirror2"
+        ref="CodeMirror1"
         :style="initing ? 'opacity: 0;' : ''"
       ></textarea>
-    </div>
-
-    <div class="action-btn">
-      <el-button @click="resetForm">取消</el-button>
-      <el-button type="primary" @click="submitForm">保存</el-button>
     </div>
   </div>
 </template>
@@ -63,7 +61,7 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/search.js";
 
-import { getDeployItem, updateDeploy } from "@/api/work-load/deploy";
+import { getServicesItem } from "@/api/work-load/services";
 import YAML from "json2yaml";
 export default {
   name: "",
@@ -71,46 +69,44 @@ export default {
   props: {},
   data() {
     return {
-      getDeployItem,
-      updateDeploy,
+      getServicesItem,
       jsonEditor: null,
       value: "", // 默认显示的值
       initing: false,
-      deployInfo: {},
+      disableNamespaceList: [
+        "ingress-nginx",
+        "istio-system",
+        "kube-federation-system",
+        "kube-node-lease",
+        "kube-public",
+        "kube-system",
+        "kubeapps",
+        "loki-stack",
+        "monitoring",
+        "permission-manager",
+      ],
     };
   },
   created() {
-    this.getDeploy();
+    this.getServices();
   },
   mounted() {},
   activited() {},
   update() {},
   methods: {
     submitForm() {
-      const value = this.jsonEditor.getValue();
-      const reBody = {
-        cluster_name: this.$route.params.clusterName,
-        resource_type: "deployment",
-        resource_name: this.deployInfo.metadata.name,
-        namespace: this.deployInfo.metadata.namespace,
-        data: value,
-      };
-      this.updateDeployItem(reBody);
-      //
-    },
-    resetForm() {
       this.$router.push({
-        name: "deployDetailsCheck",
+        name: "servicesDetailsEdit",
         params: {
           clusterName: this.$route.params.clusterName,
-          deployName: this.$route.params.deployName,
+          deployName: this.$route.params.servicesName,
           namespace: this.$route.params.namespace,
         },
       });
     },
 
     async editorInit() {
-      this.jsonEditor = await CodeMirror.fromTextArea(this.$refs.CodeMirror2, {
+      this.jsonEditor = await CodeMirror.fromTextArea(this.$refs.CodeMirror1, {
         mode: "text/x-yaml",
         lineNumbers: true, // 行号
         lint: true,
@@ -119,7 +115,7 @@ export default {
         smartIndent: true, // 开启自动缩进
         tabSize: 2,
         theme: "default",
-        readOnly: false,
+        readOnly: true,
         // value:'',
         fixedGutter: false,
         lineWrapping: true, // CodeMirror是否可以滚动，默认为false ,true 可自动换行
@@ -129,25 +125,18 @@ export default {
     },
 
     // ajax
-    async getDeploy() {
+    async getServices() {
       this.initing = true;
-      const data = await this.getDeployItem(
+      const data = await this.getServicesItem(
         this.$route.params.clusterName,
         this.$route.params.namespace,
-        this.$route.params.deployName
+        this.$route.params.servicesName
       );
-
-      this.deployInfo = data || {};
 
       this.value = YAML.stringify(data) || "";
 
       this.editorInit();
       this.initing = false;
-    },
-
-    async updateDeployItem(data) {
-      await this.updateDeploy(data);
-      this.resetForm();
     },
   },
   filter: {},
@@ -158,6 +147,7 @@ export default {
 
 <style lang="scss" scoped>
 .deploy-edit {
+  // height: calc(100% - 32px);
   padding-bottom: 16px;
   .split-8 {
     height: 8px;
@@ -166,10 +156,10 @@ export default {
   .domain-page-title {
     padding: 16px 24px;
     padding-bottom: 0;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     .page-title {
       font-size: 16px;
       color: #2c2e33;
@@ -186,7 +176,6 @@ export default {
 
   .editor-header {
     margin: 0px 24px;
-
     background: #f9fafc;
     box-shadow: 0 1px 0 0 #e4e7f0;
 
@@ -213,24 +202,19 @@ export default {
       margin-right: 4px;
     }
   }
-
   .temp-detail-editor {
     font-size: 14px;
     line-height: 22px;
     font-weight: 400;
     // height: auto;
     margin: 0 24px;
-    margin-bottom: 16px;
     border: 1px solid #cbcfd9;
     // border-top: none;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
 
     /deep/.CodeMirror {
-      height: calc(
-        100vh - 56px - 37.6px - 56px - 8px - 52px - 40px - 32.8px - 16px - 16px -
-          12px - 2.5px
-      );
+      height: calc(100vh - 32px - 56px - 37.6px - 56px - 9px - 48px - 41.5px);
       .CodeMirror-scroll {
         .CodeMirror-sizer {
           padding-left: 16px;
@@ -253,10 +237,6 @@ export default {
         }
       }
     }
-  }
-
-  .action-btn {
-    padding: 0 24px;
   }
 }
 </style>

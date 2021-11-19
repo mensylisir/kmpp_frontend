@@ -12,6 +12,63 @@ const Work = {
   },
   children: [
     {
+      path: "pods",
+      component: () => import("@/business/work-load/pods/index"),
+      name: "pods",
+      meta: {
+        title: "Pods",
+        roles: ["ADMIN", "PROJECT_MANAGER"]
+      }
+    },
+    {
+      path: "pods-details",
+      hidden: true,
+      name: "podsDetails",
+      component: () => import("@/business/work-load/pods/details/index"),
+      meta: {
+        activeMenu: "/work/pods",
+        roles: ["ADMIN"]
+      },
+      children: [
+        {
+          path: "pods-details-mod/:clusterName/:podsName/:namespace",
+          name: "podsDetailsMod",
+          props: true,
+          hidden: true,
+          component: () => import("@/business/work-load/pods/details/details"),
+          meta: {
+            activeMenu: "/work/pods",
+            activeKey: "details",
+            action: "check"
+          }
+        },
+        {
+          path: "pods-details-check/:clusterName/:podsName/:namespace",
+          name: "podsDetailsCheck",
+          props: true,
+          hidden: true,
+          component: () => import("@/business/work-load/pods/details/check"),
+          meta: {
+            activeMenu: "/work/pods",
+            activeKey: "yaml",
+            action: "check"
+          }
+        },
+        {
+          path: "pods-details-edit/:clusterName/:podsName/:namespace",
+          name: "podsDetailsEdit",
+          props: true,
+          hidden: true,
+          component: () => import("@/business/work-load/pods/details/edit"),
+          meta: {
+            activeMenu: "/work/pods",
+            activeKey: "yaml",
+            action: "edit"
+          }
+        }
+      ]
+    },
+    {
       path: "deploy",
       component: () => import("@/business/work-load/deploy/index"),
       name: "deploy",
@@ -114,8 +171,7 @@ const Work = {
           name: "taskDetailsMod",
           props: true,
           hidden: true,
-          component: () =>
-            import("@/business/work-load/task/details/details"),
+          component: () => import("@/business/work-load/task/details/details"),
           meta: {
             activeMenu: "/work/task",
             activeKey: "details",
@@ -148,6 +204,75 @@ const Work = {
         }
       ]
     },
+    {
+      path: "services",
+      component: () => import("@/business/work-load/services/index"),
+      name: "services",
+      meta: {
+        title: "服务",
+        roles: ["ADMIN", "PROJECT_MANAGER"]
+      }
+    },
+    {
+      path: "services-create/:cluster",
+      hidden: true,
+      name: "servicesCreate",
+      component: () => import("@/business/work-load/services/create"),
+      meta: {
+        activeMenu: "/work/services",
+        roles: ["ADMIN"]
+      }
+    },
+    {
+      path: "services-details",
+      hidden: true,
+      name: "servicesDetails",
+      component: () => import("@/business/work-load/services/details/index"),
+      meta: {
+        activeMenu: "/work/services",
+        roles: ["ADMIN"]
+      },
+      children: [
+        {
+          path: "services-details-mod/:clusterName/:servicesName/:namespace",
+          name: "servicesDetailsMod",
+          props: true,
+          hidden: true,
+          component: () =>
+            import("@/business/work-load/services/details/details"),
+          meta: {
+            activeMenu: "/work/services",
+            activeKey: "details",
+            action: "check"
+          }
+        },
+        {
+          path: "services-details-check/:clusterName/:servicesName/:namespace",
+          name: "servicesDetailsCheck",
+          props: true,
+          hidden: true,
+          component: () =>
+            import("@/business/work-load/services/details/check"),
+          meta: {
+            activeMenu: "/work/services",
+            activeKey: "yaml",
+            action: "check"
+          }
+        },
+        {
+          path: "services-details-edit/:clusterName/:servicesName/:namespace",
+          name: "servicesDetailsEdit",
+          props: true,
+          hidden: true,
+          component: () => import("@/business/work-load/services/details/edit"),
+          meta: {
+            activeMenu: "/work/services",
+            activeKey: "yaml",
+            action: "edit"
+          }
+        }
+      ]
+    }
   ]
 };
 

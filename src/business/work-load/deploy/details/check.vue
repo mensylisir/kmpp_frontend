@@ -117,6 +117,8 @@ export default {
         theme: "default",
         readOnly: true,
         // value:'',
+        fixedGutter: false,
+        lineWrapping: true, // CodeMirror是否可以滚动，默认为false ,true 可自动换行
       });
 
       this.jsonEditor.setValue(this.value);
@@ -201,6 +203,9 @@ export default {
     }
   }
   .temp-detail-editor {
+    font-size: 14px;
+    line-height: 22px;
+    font-weight: 400;
     // height: auto;
     margin: 0 24px;
     border: 1px solid #cbcfd9;
