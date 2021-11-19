@@ -51,6 +51,16 @@ export function getStorageClass(clustername) {
   return get(url);
 }
 
+// 获取 pvclist
+export function getPvcList(clustername, namespace) {
+  const url = `/proxy/kubernetes/${clustername}/api/v1/namespaces/${namespace}/persistentvolumeclaims`;
+  return get(url);
+}
+
+
+
+
+
 export function newGetDeployItem(clustername, namespace) {
   return get(
     `/api/v1/kubernetes/resource?clustername=${clustername}&namespace=${namespace}&resourcetype=deployment&resourcename=xiang-deploy`

@@ -469,6 +469,7 @@ export default {
   watch: {
     currType: {
       handler: function () {
+        
         this.getClusters();
         console.log(this.currType);
       },
