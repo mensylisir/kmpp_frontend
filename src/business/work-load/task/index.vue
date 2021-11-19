@@ -6,7 +6,7 @@
       </div>
       <div
         :class="{ active: currType === 'timeTask' }"
-        @click="currType = 'timeTask'"
+       
       >
         定时任务
       </div>
@@ -469,6 +469,7 @@ export default {
   watch: {
     currType: {
       handler: function () {
+        
         this.getClusters();
         console.log(this.currType);
       },
