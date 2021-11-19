@@ -90,7 +90,11 @@
       </el-table-column>
       <el-table-column prop="hostIP" label="节点" min-width="178">
         <template slot-scope="scope">
-          <span>{{scope.row.spec.nodeName}}({{ scope.row["status"].hostIP }})</span>
+          <span
+            >{{ scope.row.spec.nodeName }}({{
+              scope.row["status"].hostIP
+            }})</span
+          >
         </template>
       </el-table-column>
       <el-table-column prop="image" label="镜像" min-width="400">
@@ -146,7 +150,7 @@
 <script>
 import LayoutContent from "@/components/layout/LayoutContent";
 import { searchClusters } from "@/api/cluster";
-import { getPods } from "@/api/work-load/pods";
+import { getPods, delPods } from "@/api/work-load/pods";
 import { listNamespace } from "@/api/cluster/namespace";
 import moment from "moment";
 import "./index.scss";
@@ -158,6 +162,7 @@ export default {
     return {
       searchClusters,
       getPods,
+      delPods,
       listNamespace,
       moment,
       clusterList: [],
@@ -267,8 +272,13 @@ export default {
       });
     },
 
-    confirmDel() {
-      // this.deleteIngress(data.clustername, data.namespace, data.ingressname);
+    confirmDel(data) {
+      const reBody = {
+        clusterName: this.clusterCurrent,
+        name: data.metadata.name,
+        namespace: data.metadata.namespace,
+      };
+      this.deletePods(reBody);
     },
 
     // ajax
@@ -330,6 +340,12 @@ export default {
 
       // 获取列表
       this.getPodsList(this.clusterCurrent, undefined);
+    },
+
+    async deletePods(data) {
+      await this.delPods(data);
+
+      this.changeNamespace();
     },
   },
   filter: {},
