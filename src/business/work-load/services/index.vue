@@ -133,7 +133,7 @@
 <script>
 import LayoutContent from "@/components/layout/LayoutContent";
 import { searchClusters } from "@/api/cluster";
-import { getServices } from "@/api/work-load/services";
+import { getServices, delServices } from "@/api/work-load/services";
 import { listNamespace } from "@/api/cluster/namespace";
 import "./index.scss";
 import moment from "moment";
@@ -145,6 +145,7 @@ export default {
     return {
       searchClusters,
       getServices,
+      delServices,
       listNamespace,
       moment,
       clusterList: [],
@@ -253,8 +254,13 @@ export default {
       });
     },
 
-    confirmDel() {
-      // this.deleteIngress(data.clustername, data.namespace, data.ingressname);
+    confirmDel(data) {
+      const reBody = {
+        clusterName: this.clusterCurrent,
+        name: data.metadata.name,
+        namespace: data.metadata.namespace,
+      };
+      this.deleteService(reBody);
     },
 
     // ajax
@@ -289,7 +295,7 @@ export default {
     async getServicesList(cluster, namespace) {
       const data = await this.getServices(cluster, namespace);
       this.tableDataAll = data || [];
-      console.log(data, "deploylist");
+      // console.log(data, "deploylist");
       this.paginationConfig.total = this.tableDataAll.length;
       this.tableData = this.tableDataAll.slice(
         this.paginationConfig.currentPage - 1,
@@ -309,6 +315,12 @@ export default {
 
       // 获取列表
       this.getServicesList(this.clusterCurrent, undefined);
+    },
+
+    async deleteService(data) {
+      await this.delServices(data);
+
+      this.changeNamespace();
     },
   },
   filter: {},

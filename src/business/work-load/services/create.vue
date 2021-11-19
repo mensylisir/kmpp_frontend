@@ -102,22 +102,17 @@
 
         <el-form-item
           label="标签选择器（选填）"
-          prop="selector"
+          prop="selectorCopy"
           class="cus-tags"
         >
-          <el-select
-            v-model="deployForm1.selector"
+          <el-cascader
+            v-model="deployForm1.selectorCopy"
             placeholder="请选择服务 label selector"
             style="width: 100%"
+            :options="deployList"
+            :show-all-levels="false"
           >
-            <el-option
-              v-for="(value, key, index) in deployList"
-              :key="index"
-              :label="value"
-              :value="key"
-            >
-            </el-option>
-          </el-select>
+          </el-cascader>
         </el-form-item>
 
         <el-form-item label="访问方式" prop="serviceType">
@@ -249,7 +244,7 @@ export default {
         clusterName: "",
         namespace: "",
         deployLabelsCopy: [""],
-        selector: "",
+        selectorCopy: [],
         serviceType: "ClusterIP",
       },
 
@@ -344,6 +339,13 @@ export default {
             item.nodePort = Number(item.nodePort);
           });
           data1.ports = this.tableData;
+          // 标签选择器（选填）
+          data1.selector = {};
+          if (this.deployForm1.selectorCopy.length > 1) {
+            data1.selector[this.deployForm1.selectorCopy[1].split(":")[0]] =
+              this.deployForm1.selectorCopy[1].split(":")[1];
+          }
+
           this.createServicesItem(data1);
 
           // TODO
@@ -366,10 +368,10 @@ export default {
     },
 
     namespaceChange() {
-      // this.getDeployList(
-      //   this.deployForm1.clusterName,
-      //   this.deployForm1.namespace
-      // );
+      this.getDeployList(
+        this.deployForm1.clusterName,
+        this.deployForm1.namespace
+      );
     },
 
     addPortInfo() {
@@ -421,10 +423,20 @@ export default {
       const data = await this.getDeploy(cluster, namespace);
       const list = data || [];
       list.forEach((item) => {
+        item.label = item.metadata.name;
+        item.value = item.metadata.name;
+        item.children = [];
         if (item.metadata.labels) {
-          this.deployList.push(item.metadata.labels);
+          const keys = Object.keys(item.metadata.labels);
+          keys.forEach((key) => {
+            item.children.push({
+              label: `${key}:${item.metadata.labels[key]}`,
+              value: `${key}:${item.metadata.labels[key]}`,
+            });
+          });
         }
       });
+      this.deployList = list;
       console.log(this.deployList, "this.deployList");
     },
 

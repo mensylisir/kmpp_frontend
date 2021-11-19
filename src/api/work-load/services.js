@@ -13,7 +13,7 @@ export function createServices(data) {
 
 // 删除Services
 export function delServices(data) {
-  return del(`/api/v1/certificates/ingress`, data);
+  return del(`/api/v1/kubeservice/service`, data);
 }
 
 // 获取单个 Services 信息

@@ -219,7 +219,7 @@ export default {
         this.$route.params.servicesName
       );
 
-      this.endpointList = data.subsets[0].addresses || [];
+      this.endpointList = data.subsets ? data.subsets[0].addresses : [];
     },
   },
   filter: {},

@@ -13,7 +13,7 @@ export function createPods(data) {
 
 // 删除Deploy
 export function delPods(data) {
-  return del(`/api/v1/certificates/ingress`, data);
+  return del(`/api/v1/kubepod/pod`, data);
 }
 
 // 获取单个 Deploy 信息
