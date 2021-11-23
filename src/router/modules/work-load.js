@@ -1,7 +1,7 @@
 import Layout from "@/business/app-layout/horizontal-layout";
 
 const Work = {
-  sort: 0,
+  sort: 1,
   path: "/work",
   component: Layout,
   name: "Work",

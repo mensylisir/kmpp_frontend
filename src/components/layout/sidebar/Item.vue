@@ -30,7 +30,7 @@ export default {
 
 <style scoped>
 .sub-el-icon {
-  font-size: 20px;
+  font-size: 15px;
   width: 20px;
   height: 20px;
 }

@@ -3,10 +3,7 @@
     <div class="split-8"></div>
     <div class="domain-page-title">
       <span class="page-title">YAML文件</span>
-      <el-button
-        type="primary"
-        @click="submitForm"
-        :disabled="disableNamespaceList.indexOf($route.params.namespace) != -1"
+      <el-button type="primary" disabled
         ><span class="iconfont icon-coding"></span>编辑YAML</el-button
       >
     </div>
@@ -16,9 +13,14 @@
     </div>
     <div class="temp-detail-editor">
       <textarea
-        ref="CodeMirror1"
+        ref="CodeMirror2"
         :style="initing ? 'opacity: 0;' : ''"
       ></textarea>
+    </div>
+
+    <div class="action-btn">
+      <el-button @click="resetForm">取消</el-button>
+      <el-button type="primary" @click="submitForm">保存</el-button>
     </div>
   </div>
 </template>
@@ -61,7 +63,12 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/search.js";
 
-import { getJobItem, getCronjobItem } from "@/api/work-load/task";
+import {
+  getJobItem,
+  updateJob,
+  getCronjobItem,
+  updateCronjob,
+} from "@/api/work-load/task";
 // import YAML from "json2yaml";
 export default {
   name: "",
@@ -71,21 +78,12 @@ export default {
     return {
       getCronjobItem,
       getJobItem,
+      updateJob,
+      updateCronjob,
       jsonEditor: null,
       value: "", // 默认显示的值
       initing: false,
-      disableNamespaceList: [
-        "ingress-nginx",
-        "istio-system",
-        "kube-federation-system",
-        "kube-node-lease",
-        "kube-public",
-        "kube-system",
-        "kubeapps",
-        "loki-stack",
-        "monitoring",
-        "permission-manager",
-      ],
+      deployInfo: {},
     };
   },
   created() {
@@ -96,8 +94,21 @@ export default {
   update() {},
   methods: {
     submitForm() {
+      const value = this.jsonEditor.getValue();
+      const reBody = {
+        cluster_name: this.$route.params.clusterName,
+        name: this.deployInfo.name,
+        // resource_type: "deployment",
+        // resource_name: this.deployInfo.metadata.namespace,
+        namespace: this.deployInfo.json_data.metadata.namespace,
+        yaml_data: value,
+      };
+      this.updateDeployItem(reBody);
+      //
+    },
+    resetForm() {
       this.$router.push({
-        name: "taskDetailsEdit",
+        name: "taskDetailsCheck",
         params: {
           clusterName: this.$route.params.clusterName,
           deployName: this.$route.params.deployName,
@@ -107,7 +118,7 @@ export default {
     },
 
     async editorInit() {
-      this.jsonEditor = await CodeMirror.fromTextArea(this.$refs.CodeMirror1, {
+      this.jsonEditor = await CodeMirror.fromTextArea(this.$refs.CodeMirror2, {
         mode: "text/x-yaml",
         lineNumbers: true, // 行号
         lint: true,
@@ -115,8 +126,8 @@ export default {
         indentUnit: 2, // 缩进
         smartIndent: true, // 开启自动缩进
         tabSize: 2,
-        theme: "base16-dark",
-        readOnly: true,
+        theme: "default",
+        readOnly: false,
         // value:'',
       });
 
@@ -126,13 +137,13 @@ export default {
     // ajax
     async getDeploy() {
       this.initing = true;
-
       if (this.currType === "task") {
         const data = await this.getJobItem(
           this.$route.params.clusterName,
           this.$route.params.namespace,
           this.$route.params.deployName
         );
+        this.deployInfo = data[0] || {};
         this.value = data[0] ? data[0].yaml_data : "";
       } else {
         const data = await this.getCronjobItem(
@@ -140,10 +151,21 @@ export default {
           this.$route.params.namespace,
           this.$route.params.deployName
         );
+        this.deployInfo = data[0] || {};
         this.value = data[0] ? data[0].yaml_data : "";
       }
+
       this.editorInit();
       this.initing = false;
+    },
+
+    async updateDeployItem(data) {
+      if (this.currType === "task") {
+        await this.updateJob(data);
+      } else {
+        await this.updateCronjob(data);
+      }
+      this.resetForm();
     },
   },
   filter: {},
@@ -162,7 +184,6 @@ export default {
 
 <style lang="scss" scoped>
 .deploy-edit {
-  // height: calc(100% - 32px);
   padding-bottom: 16px;
   .split-8 {
     height: 8px;
@@ -171,10 +192,10 @@ export default {
   .domain-page-title {
     padding: 16px 24px;
     padding-bottom: 0;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     .page-title {
       font-size: 16px;
       color: #2c2e33;
@@ -191,6 +212,7 @@ export default {
 
   .editor-header {
     margin: 0px 24px;
+
     background: #f9fafc;
     box-shadow: 0 1px 0 0 #e4e7f0;
 
@@ -217,16 +239,21 @@ export default {
       margin-right: 4px;
     }
   }
+
   .temp-detail-editor {
     // height: auto;
     margin: 0 24px;
+    margin-bottom: 16px;
     border: 1px solid #cbcfd9;
     // border-top: none;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
 
     /deep/.CodeMirror {
-      height: calc(100vh - 32px - 56px - 37.6px - 56px - 9px - 48px - 41.5px);
+      height: calc(
+        100vh - 56px - 37.6px - 56px - 8px - 52px - 40px - 32.8px - 16px - 16px -
+          12px - 2.5px
+      );
       .CodeMirror-scroll {
         .CodeMirror-sizer {
           padding-left: 16px;
@@ -242,13 +269,17 @@ export default {
           }
         }
         .CodeMirror-gutters {
-          // background: #e4e7f0;
+          background: #e4e7f0;
           .CodeMirror-gutter {
             width: 62px;
           }
         }
       }
     }
+  }
+
+  .action-btn {
+    padding: 0 24px;
   }
 }
 </style>
