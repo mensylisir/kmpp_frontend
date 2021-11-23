@@ -31,6 +31,7 @@ import "codemirror/lib/codemirror.css";
 // 引入主题后还需要在 options 中指定主题才会生效
 import "codemirror/theme/rubyblue.css";
 import "codemirror/theme/xq-light.css";
+import "codemirror/theme/darcula.css";
 
 // 需要引入具体的语法高亮库才会有对应的语法高亮效果
 // codemirror 官方其实支持通过 /addon/mode/loadmode.js 和 /mode/meta.js 来实现动态加载对应语法高亮库
@@ -114,7 +115,7 @@ export default {
         indentUnit: 2, // 缩进
         smartIndent: true, // 开启自动缩进
         tabSize: 2,
-        theme: "default",
+        theme: "darcula",
         readOnly: true,
         // value:'',
         fixedGutter: false,
@@ -176,15 +177,20 @@ export default {
 
   .editor-header {
     margin: 0px 24px;
-    background: #f9fafc;
-    box-shadow: 0 1px 0 0 #e4e7f0;
+    // background: #f9fafc;
+    background: #434343;
+    // box-shadow: 0 1px 0 0 #e4e7f0;
+    box-shadow: 0 1px 0 0 #555555;
+    // box-shadow: inset 0 -1px 0 0 #555555;
 
     font-size: 14px;
-    color: #2c2e33;
+    // color: #2c2e33;
+    color: #999;
     line-height: 22px;
     font-weight: 500;
 
-    border: 1px solid #cbcfd9;
+    // border: 1px solid #cbcfd9;
+    border: 1px solid #555;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     border-bottom: none;
@@ -208,7 +214,9 @@ export default {
     font-weight: 400;
     // height: auto;
     margin: 0 24px;
-    border: 1px solid #cbcfd9;
+    // border: 1px solid #cbcfd9;
+    border: 1px solid #555;
+
     // border-top: none;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
@@ -222,15 +230,16 @@ export default {
           .CodeMirror-gutter-wrapper {
             left: -99px !important;
             .CodeMirror-linenumber {
-              font-size: 14px;
-              color: #5354bb;
-              line-height: 22px;
-              font-weight: 400;
+              // font-size: 14px;
+              // color: #5354bb;
+              // line-height: 22px;
+              // font-weight: 400;
             }
           }
         }
         .CodeMirror-gutters {
-          background: #e4e7f0;
+          // background: #e4e7f0;
+          background: #434343;
           .CodeMirror-gutter {
             width: 62px;
           }

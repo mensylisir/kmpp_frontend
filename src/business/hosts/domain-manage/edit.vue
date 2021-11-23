@@ -30,6 +30,7 @@ import "codemirror/lib/codemirror.css";
 // 引入主题后还需要在 options 中指定主题才会生效
 import "codemirror/theme/rubyblue.css";
 import "codemirror/theme/xq-light.css";
+import "codemirror/theme/darcula.css";
 
 // 需要引入具体的语法高亮库才会有对应的语法高亮效果
 // codemirror 官方其实支持通过 /addon/mode/loadmode.js 和 /mode/meta.js 来实现动态加载对应语法高亮库
@@ -113,7 +114,7 @@ export default {
         indentUnit: 2, // 缩进
         smartIndent: true, // 开启自动缩进
         tabSize: 2,
-        theme: "default",
+        theme: "darcula",
         readOnly: false,
         // value:'',
         fixedGutter: false,
@@ -181,13 +182,14 @@ export default {
     font-weight: 400;
     // height: auto;
     margin: 0 24px;
-    border: 1px solid #cbcfd9;
+    // border: 1px solid #cbcfd9;
+    border: 1px solid #555;
     // border-top: none;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
 
     /deep/.CodeMirror {
-      height: calc(100vh - 32px - 56px - 21.6px - 65.8px);
+      height: calc(100vh - 32px - 56px - 21.6px - 65.8px - 1.3px);
       .CodeMirror-scroll {
         .CodeMirror-sizer {
           padding-left: 16px;
@@ -195,15 +197,16 @@ export default {
           .CodeMirror-gutter-wrapper {
             left: -99px !important;
             .CodeMirror-linenumber {
-              font-size: 14px;
-              color: #5354bb;
-              line-height: 22px;
-              font-weight: 400;
+              // font-size: 14px;
+              // color: #5354bb;
+              // line-height: 22px;
+              // font-weight: 400;
             }
           }
         }
         .CodeMirror-gutters {
-          background: #e4e7f0;
+          // background: #e4e7f0;
+          background: #434343;
           .CodeMirror-gutter {
             width: 62px;
           }
