@@ -4,12 +4,12 @@
     <complex-table :data="data" local-key="user_columns" :search-config="searchConfig"
                    :pagination-config="paginationConfig" @search="search" v-loading="loading"
                    :selects.sync="selects" :fit="true">
-      <template #toolbar>
-        <el-button-group>
-          <el-button size="small" @click="create()">{{ $t("commons.button.create") }}</el-button>
+      <template #header>
+        <div>
+          <el-button size="small" @click="create()" type="primary" icon="el-icon-plus">{{ $t("commons.button.create") }}</el-button>
           <el-button size="small" :disabled="selects.length===0" @click="del()">{{ $t("commons.button.delete") }}
           </el-button>
-        </el-button-group>
+        </div>
       </template>
       <el-table-column type="selection" fix></el-table-column>
       <el-table-column :label="$t('commons.table.name')" mix-width="120">
