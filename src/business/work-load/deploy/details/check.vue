@@ -204,7 +204,7 @@ export default {
 
     .icon-file-line {
       font-size: 16px !important;
-      color: #5354bb;
+      color: #999;
       margin-right: 4px;
     }
   }
