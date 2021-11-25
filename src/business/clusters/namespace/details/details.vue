@@ -4,7 +4,7 @@
     <div class="mod-title">基本信息</div>
     <div class="mod-one" v-if="load">
       <svg class="icon deploy-icon" aria-hidden="true">
-        <use xlink:href="#icon-servicelogo"></use>
+        <use xlink:href="#icon-namespacelogo"></use>
       </svg>
       <span class="deploy-name">{{ namespaceInfo["metadata"].name }}</span>
     </div>
