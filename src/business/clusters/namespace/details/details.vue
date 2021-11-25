@@ -411,4 +411,9 @@ export default {
   color: #5354bb;
   cursor: pointer;
 }
+
+.status-icon {
+  font-size: 16px !important;
+  margin-right: 4px;
+}
 </style>
