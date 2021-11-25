@@ -1,12 +1,12 @@
 import Layout from "@/business/app-layout/horizontal-layout";
 
 const configMap = {
-  sort: 1,
+  sort: 2,
   path: "/configMap",
   component: Layout,
   name: "configMap",
   meta: {
-    title: "configMap",
+    title: "配置",
     icon: "iconfont icon-config",
     roles: ["ADMIN", "PROJECT_MANAGER"]
   },
@@ -16,7 +16,7 @@ const configMap = {
       component: () => import("@/business/config-map/index"),
       name: "configMapIndex",
       meta: {
-        title: "configMap",
+        title: "配置",
         roles: ["ADMIN", "PROJECT_MANAGER"]
       }
     },
@@ -60,7 +60,6 @@ const configMap = {
           component: () => import("@/business/config-map/details/check"),
           meta: {
             activeMenu: "/configMap/index",
-
             activeKey: "yaml",
             action: "check"
           }
