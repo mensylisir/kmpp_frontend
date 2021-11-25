@@ -14,7 +14,7 @@
     <div class="temp-detail-editor">
       <textarea
         ref="CodeMirror2"
-        :style="initing ? 'opacity: 0;' : ''"
+        :style="initing ? 'opacity: 0' : ''"
       ></textarea>
     </div>
 
@@ -63,12 +63,7 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/search.js";
 
-import {
-  getJobItem,
-  updateJob,
-  getCronjobItem,
-  updateCronjob,
-} from "@/api/work-load/task";
+import { getConfigItem, updateJob } from "@/api/config-map";
 // import YAML from "json2yaml";
 export default {
   name: "",
@@ -76,10 +71,8 @@ export default {
   props: {},
   data() {
     return {
-      getCronjobItem,
-      getJobItem,
+      getConfigItem,
       updateJob,
-      updateCronjob,
       jsonEditor: null,
       value: "", // 默认显示的值
       initing: false,
@@ -98,17 +91,14 @@ export default {
       const reBody = {
         cluster_name: this.$route.params.clusterName,
         name: this.deployInfo.name,
-        // resource_type: "deployment",
-        // resource_name: this.deployInfo.metadata.namespace,
         namespace: this.deployInfo.json_data.metadata.namespace,
         yaml_data: value,
       };
       this.updateDeployItem(reBody);
-      //
     },
     resetForm() {
       this.$router.push({
-        name: "taskDetailsCheck",
+        name: "configDetailsCheck",
         params: {
           clusterName: this.$route.params.clusterName,
           deployName: this.$route.params.deployName,
@@ -128,7 +118,6 @@ export default {
         tabSize: 2,
         theme: "darcula",
         readOnly: false,
-        // value:'',
       });
 
       this.jsonEditor.setValue(this.value);
@@ -137,47 +126,25 @@ export default {
     // ajax
     async getDeploy() {
       this.initing = true;
-      if (this.currType === "task") {
-        const data = await this.getJobItem(
-          this.$route.params.clusterName,
-          this.$route.params.namespace,
-          this.$route.params.deployName
-        );
-        this.deployInfo = data[0] || {};
-        this.value = data[0] ? data[0].yaml_data : "";
-      } else {
-        const data = await this.getCronjobItem(
-          this.$route.params.clusterName,
-          this.$route.params.namespace,
-          this.$route.params.deployName
-        );
-        this.deployInfo = data[0] || {};
-        this.value = data[0] ? data[0].yaml_data : "";
-      }
+      const data = await this.getConfigItem(
+        this.$route.params.clusterName,
+        this.$route.params.namespace,
+        this.$route.params.deployName
+      );
+      this.deployInfo = data[0] || {};
+      this.value = data[0] ? data[0].yaml_data : "";
 
       this.editorInit();
       this.initing = false;
     },
 
     async updateDeployItem(data) {
-      if (this.currType === "task") {
-        await this.updateJob(data);
-      } else {
-        await this.updateCronjob(data);
-      }
+      await this.updateJob(data);
       this.resetForm();
     },
   },
   filter: {},
-  computed: {
-    currType: {
-      get: function () {
-        let value = this.$route.params.currType;
-        return value;
-      },
-      set: function () {},
-    },
-  },
+  computed: {},
   watch: {},
 };
 </script>
@@ -276,6 +243,10 @@ export default {
         }
       }
     }
+  }
+
+  .action-btn {
+    padding: 0 24px;
   }
 }
 </style>

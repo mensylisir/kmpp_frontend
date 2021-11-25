@@ -3,7 +3,10 @@
     <div class="split-8"></div>
     <div class="domain-page-title">
       <span class="page-title">YAML文件</span>
-      <el-button type="primary" disabled
+      <el-button
+        type="primary"
+        @click="submitForm"
+        :disabled="disableNamespaceList.indexOf($route.params.namespace) != -1"
         ><span class="iconfont icon-coding"></span>编辑YAML</el-button
       >
     </div>
@@ -13,14 +16,9 @@
     </div>
     <div class="temp-detail-editor">
       <textarea
-        ref="CodeMirror2"
+        ref="CodeMirror1"
         :style="initing ? 'opacity: 0;' : ''"
       ></textarea>
-    </div>
-
-    <div class="action-btn">
-      <el-button @click="resetForm">取消</el-button>
-      <el-button type="primary" @click="submitForm">保存</el-button>
     </div>
   </div>
 </template>
@@ -63,12 +61,7 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/search.js";
 
-import {
-  getJobItem,
-  updateJob,
-  getCronjobItem,
-  updateCronjob,
-} from "@/api/work-load/task";
+import { getConfigItem } from "@/api/config-map";
 // import YAML from "json2yaml";
 export default {
   name: "",
@@ -76,14 +69,22 @@ export default {
   props: {},
   data() {
     return {
-      getCronjobItem,
-      getJobItem,
-      updateJob,
-      updateCronjob,
+      getConfigItem,
       jsonEditor: null,
       value: "", // 默认显示的值
       initing: false,
-      deployInfo: {},
+      disableNamespaceList: [
+        "ingress-nginx",
+        "istio-system",
+        "kube-federation-system",
+        "kube-node-lease",
+        "kube-public",
+        "kube-system",
+        "kubeapps",
+        "loki-stack",
+        "monitoring",
+        "permission-manager",
+      ],
     };
   },
   created() {
@@ -94,21 +95,8 @@ export default {
   update() {},
   methods: {
     submitForm() {
-      const value = this.jsonEditor.getValue();
-      const reBody = {
-        cluster_name: this.$route.params.clusterName,
-        name: this.deployInfo.name,
-        // resource_type: "deployment",
-        // resource_name: this.deployInfo.metadata.namespace,
-        namespace: this.deployInfo.json_data.metadata.namespace,
-        yaml_data: value,
-      };
-      this.updateDeployItem(reBody);
-      //
-    },
-    resetForm() {
       this.$router.push({
-        name: "taskDetailsCheck",
+        name: "configDetailsEdit",
         params: {
           clusterName: this.$route.params.clusterName,
           deployName: this.$route.params.deployName,
@@ -118,7 +106,7 @@ export default {
     },
 
     async editorInit() {
-      this.jsonEditor = await CodeMirror.fromTextArea(this.$refs.CodeMirror2, {
+      this.jsonEditor = await CodeMirror.fromTextArea(this.$refs.CodeMirror1, {
         mode: "text/x-yaml",
         lineNumbers: true, // 行号
         lint: true,
@@ -127,7 +115,7 @@ export default {
         smartIndent: true, // 开启自动缩进
         tabSize: 2,
         theme: "darcula",
-        readOnly: false,
+        readOnly: true,
         // value:'',
       });
 
@@ -137,35 +125,16 @@ export default {
     // ajax
     async getDeploy() {
       this.initing = true;
-      if (this.currType === "task") {
-        const data = await this.getJobItem(
-          this.$route.params.clusterName,
-          this.$route.params.namespace,
-          this.$route.params.deployName
-        );
-        this.deployInfo = data[0] || {};
-        this.value = data[0] ? data[0].yaml_data : "";
-      } else {
-        const data = await this.getCronjobItem(
-          this.$route.params.clusterName,
-          this.$route.params.namespace,
-          this.$route.params.deployName
-        );
-        this.deployInfo = data[0] || {};
-        this.value = data[0] ? data[0].yaml_data : "";
-      }
+
+      const data = await this.getConfigItem(
+        this.$route.params.clusterName,
+        this.$route.params.namespace,
+        this.$route.params.deployName
+      );
+      this.value = data[0] ? data[0].yaml_data : "";
 
       this.editorInit();
       this.initing = false;
-    },
-
-    async updateDeployItem(data) {
-      if (this.currType === "task") {
-        await this.updateJob(data);
-      } else {
-        await this.updateCronjob(data);
-      }
-      this.resetForm();
     },
   },
   filter: {},
@@ -184,6 +153,7 @@ export default {
 
 <style lang="scss" scoped>
 .deploy-edit {
+  // height: calc(100% - 32px);
   padding-bottom: 16px;
   .split-8 {
     height: 8px;
@@ -192,10 +162,10 @@ export default {
   .domain-page-title {
     padding: 16px 24px;
     padding-bottom: 0;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     .page-title {
       font-size: 16px;
       color: #2c2e33;

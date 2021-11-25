@@ -1,7 +1,11 @@
 <template>
   <div class="complex-table">
-    <div class="complex-table__header" v-if="$slots.header || header">
-      <slot name="header">{{ header }}</slot>
+    <div
+      style="display: flex; justify-content: space-between; align-items: center"
+    >
+      <div class="complex-table__header" v-if="$slots.header || header">
+        <slot name="header">{{ header }}</slot>
+      </div>
       <div class="complex-table__toolbar" v-if="$slots.toolbar || searchConfig">
         <div>
           <slot name="toolbar"> </slot>
@@ -94,6 +98,7 @@ export default {
 
   .complex-table__toolbar {
     @include flex-row(space-between, center);
+    margin-bottom: 24px;
 
     .fu-search-bar {
       width: auto;

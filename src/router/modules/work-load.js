@@ -1,13 +1,13 @@
 import Layout from "@/business/app-layout/horizontal-layout";
 
 const Work = {
-  sort: 0,
+  sort: 1,
   path: "/work",
   component: Layout,
   name: "Work",
   meta: {
     title: "工作负载",
-    icon: "iconfont icon-resourcemanage",
+    icon: "iconfont icon-workloads",
     roles: ["ADMIN", "PROJECT_MANAGER"]
   },
   children: [

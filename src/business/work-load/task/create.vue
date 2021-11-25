@@ -2,7 +2,7 @@
   <div class="domain-manage">
     <div class="bread-crumb">
       <span class="bread-crumb-item" @click="resetForm">任务/</span
-      ><span>创建{{currType === 'task'? "任务": "定时任务"}}</span>
+      ><span>创建{{ currType === "task" ? "任务" : "定时任务" }}</span>
     </div>
     <div class="domain-page-title">添加任务</div>
     <div class="module-name">基本信息</div>
@@ -207,10 +207,7 @@
           placeholder="请输入定时规则"
         ></el-input>
       </el-form-item>
-      <el-form-item
-        label="保留完成Job数"
-        prop="successful_jobs_history_limit"
-      >
+      <el-form-item label="保留完成Job数" prop="successful_jobs_history_limit">
         <el-input-number
           :min="1"
           style="margin-right: 12px"
@@ -219,10 +216,7 @@
         >
         </el-input-number>
       </el-form-item>
-      <el-form-item
-        label="保留失败Job数"
-        prop="failed_jobs_history_limit"
-      >
+      <el-form-item label="保留失败Job数" prop="failed_jobs_history_limit">
         <el-input-number
           :min="1"
           style="margin-right: 12px"
@@ -360,7 +354,9 @@
 
       <el-form-item label="CPU限制（选填）" prop="cpulimit">
         <div slot="label" class="pvc-info">
-          <span class="pvc-title">CPU限制（选填）</span>
+          <span class="pvc-title" style="margin-right: 16px"
+            >CPU限制（选填）</span
+          >
           <el-switch v-model="cpulimitSwitch" active-text="添加CPU限制">
           </el-switch>
         </div>
