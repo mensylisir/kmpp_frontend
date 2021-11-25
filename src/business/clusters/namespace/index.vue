@@ -1,9 +1,9 @@
 <template>
-  <layout-content header="Pods">
+  <layout-content header="命名空间">
     <div class="sel-action">
-      <!-- <el-button type="primary" @click="createPods">
-        <i class="el-icon-plus" style="margin-right: 4px"></i>部署
-      </el-button> -->
+      <el-button type="primary" @click="createServices">
+        <i class="el-icon-plus" style="margin-right: 4px"></i>命名空间
+      </el-button>
       <div>
         <el-select
           v-model="clusterCurrent"
@@ -22,22 +22,6 @@
 
           <div slot="prefix" class="sel-prefix">集群：</div>
         </el-select>
-        <el-select
-          v-model="currentNamespace"
-          placeholder="请选择"
-          @change="changeNamespace"
-          class="cus-select1"
-        >
-          <el-option
-            v-for="item in namespacesList"
-            :key="item['metadata'].name"
-            :label="item['metadata'].name"
-            :value="item['metadata'].name"
-          >
-          </el-option>
-
-          <div slot="prefix" class="sel-prefix">命名空间：</div>
-        </el-select>
       </div>
     </div>
 
@@ -46,83 +30,35 @@
       style="width: 100%"
       :header-cell-style="{ background: '#F9FAFC' }"
     >
-      <el-table-column prop="name" label="名称" min-width="200">
+      <el-table-column prop="name" label="名称" min-width="410">
         <template slot-scope="scope">
           <span class="active-domain" @click="winOpen(scope.row)">{{
-            scope.row["metadata"].name
+            scope.row.name
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="状态" min-width="96">
+      <el-table-column prop="host" label="状态" min-width="239">
         <template slot-scope="scope">
           <span
-            class="iconfont icon-time status-icon"
-            style="color: #5354bb"
-            v-if="scope.row['status'].phase == 'Running'"
+            class="iconfont icon-checkbox-circle-fill2 icon-checkbox-circle"
           ></span
-          ><span
-            class="iconfont icon-safe-warning status-icon"
-            style="color: #f59326"
-            v-if="scope.row['status'].phase == 'Pending'"
-          ></span
-          ><span
-            class="iconfont icon-checkbox-circle-fill2 status-icon"
-            style="color: #36b37e"
-            v-if="scope.row['status'].phase == 'Completed'"
-          ></span
-          ><span>{{
-            scope.row["status"].phase == "Running"
-              ? "运行中"
-              : scope.row["status"].phase == "Pending"
-              ? "挂起"
-              : scope.row["status"].phase == "Completed"
-              ? "已完成"
-              : scope.row["status"].phase
-          }}</span>
+          ><span>{{ scope.row.status }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="container" label="运行容器" min-width="88">
+      <el-table-column prop="namespace" label="容器组数量" min-width="240">
         <template slot-scope="scope">
-          <span
-            >{{ scope.row.containerReday }}/{{ scope.row.containerTotal }}</span
-          >
+          <span>{{ scope.row.num }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="hostIP" label="节点" min-width="178">
-        <template slot-scope="scope">
-          <span
-            >{{ scope.row.spec.nodeName }}({{
-              scope.row["status"].hostIP
-            }})</span
-          >
-        </template>
-      </el-table-column>
-      <el-table-column prop="image" label="镜像" min-width="400">
-        <template slot-scope="scope">
-          <span>{{ scope.row["status"].containerStatuses[0].image }}</span>
-          <span
-            class="iconfont icon-copy-1"
-            v-clipboard:copy="scope.row['status'].containerStatuses[0].image"
-            v-clipboard:success="onCopy"
-            v-clipboard:error="onError"
-          ></span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="pod" label="创建时间" min-width="166">
+      <el-table-column prop="date" label="创建时间" min-width="239">
         <template slot-scope="scope">
           <span>{{
-            moment(scope.row["metadata"].creationTimestamp).format(
-              "YYYY/MM/DD HH:mm:ss"
-            )
+            moment(scope.row.create_time).format("YYYY/MM/DD HH:mm:ss")
           }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" min-width="64">
         <template slot-scope="scope">
-          <!-- <span
-            @click="handleClickEdit(scope.row)"
-            class="iconfont icon-edit-line action-icon"
-          ></span> -->
           <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
             ><span
               class="iconfont icon-delete-line action-icon"
@@ -144,26 +80,31 @@
       >
       </el-pagination>
     </div>
+    <NamespaceModal
+      :namespaceObj="namespaceObj"
+      @on-close="onClose"
+    ></NamespaceModal>
   </layout-content>
 </template>
 
 <script>
 import LayoutContent from "@/components/layout/LayoutContent";
 import { searchClusters } from "@/api/cluster";
-import { getPods, delPods } from "@/api/work-load/pods";
-import { listNamespace } from "@/api/cluster/namespace";
-import moment from "moment";
+import { getNamespaceList } from "@/api/cluster/namespace-details";
+import { deleteNamespace, createNamespace } from "@/api/cluster/namespace";
 import "./index.scss";
+import moment from "moment";
+import NamespaceModal from "./namespace-modal.vue";
 export default {
   name: "",
-  components: { LayoutContent },
+  components: { LayoutContent, NamespaceModal },
   props: {},
   data() {
     return {
       searchClusters,
-      getPods,
-      delPods,
-      listNamespace,
+      getNamespaceList,
+      deleteNamespace,
+      createNamespace,
       moment,
       clusterList: [],
       clusterCurrent: "",
@@ -189,6 +130,10 @@ export default {
         "monitoring",
         "permission-manager",
       ],
+      namespaceObj: {
+        dialogVisible: false,
+        cluster: "",
+      },
     };
   },
   created() {
@@ -198,36 +143,38 @@ export default {
   activited() {},
   update() {},
   methods: {
-    createPods() {
-      this.$router.push({
-        name: "deployCreate",
-        params: {
-          cluster: this.clusterCurrent,
-        },
-      });
+    createServices() {
+      this.namespaceObj.cluster = this.clusterCurrent;
+      this.namespaceObj.dialogVisible = true;
     },
     winOpen(data) {
       this.$router.push({
-        name: "podsDetailsMod",
+        name: "namespaceDetailsMod",
         params: {
-          clusterName: this.clusterCurrent,
-          podsName: data["metadata"].name,
-          namespace: data["metadata"].namespace,
+          clusterName: data.clusterName,
+          name: data.name,
         },
       });
     },
+    // 复制
+    onCopy: function () {
+      this.$message({
+        type: "success",
+        message: "复制成功!",
+      });
+      // alert("复制成功： " + e.text);
+    },
+    onError: function () {
+      this.$message({
+        type: "error",
+        message: "复制失败!",
+      });
+    },
     clusterChange() {
-      this.currentNamespace = "全部";
+      this.paginationConfig.currentPage = 1;
       this.getNamespace();
     },
-    changeNamespace() {
-      this.paginationConfig.currentPage = 1;
-      if (this.currentNamespace == "全部") {
-        this.getPodsList(this.clusterCurrent, undefined);
-      } else {
-        this.getPodsList(this.clusterCurrent, this.currentNamespace);
-      }
-    },
+
     handleSizeChange() {
       this.paginationConfig.currentPage = 1;
       this.tableData = this.tableDataAll.slice(
@@ -243,42 +190,25 @@ export default {
       );
     },
 
-    // 复制
-    onCopy: function () {
-      this.$message({
-        type: "success",
-        message: "复制成功!",
-      });
-      // alert("复制成功： " + e.text);
-    },
-    onError: function () {
-      this.$message({
-        type: "error",
-        message: "复制失败!",
-      });
-    },
-
-    handleClickEdit(data) {
-      this.$router.push({
-        name:
-          this.disableNamespaceList.indexOf(data["metadata"].namespace) != -1
-            ? "podsDetailsCheck"
-            : "podsDetailsEdit",
-        params: {
-          clusterName: this.clusterCurrent,
-          deployName: data["metadata"].name,
-          namespace: data["metadata"].namespace,
-        },
-      });
-    },
-
     confirmDel(data) {
-      const reBody = {
-        clusterName: this.clusterCurrent,
-        name: data.metadata.name,
-        namespace: data.metadata.namespace,
-      };
-      this.deletePods(reBody);
+      this.deleteNameSpaceItem(data);
+    },
+
+    onClose(flag, data) {
+      if (flag) {
+        // 请求namespace 列表数据
+        // TODO
+        console.log(data);
+        const reBody = {
+          apiVersion: "v1",
+          kind: "Namespace",
+          metadata: {
+            name: data.namespace,
+          },
+        };
+        this.createNamespaceItem(data.clustername, reBody);
+      }
+      this.namespaceObj.dialogVisible = false;
     },
 
     // ajax
@@ -310,21 +240,11 @@ export default {
       });
     },
 
-    async getPodsList(cluster, namespace) {
-      const data = await this.getPods(cluster, namespace);
+    async getNamespace() {
+      // this.loading = true;
+      const data = await this.getNamespaceList(this.clusterCurrent);
       this.tableDataAll = data || [];
-      this.tableDataAll.forEach((item) => {
-        item.containerTotal = item.status.containerStatuses
-          ? item.status.containerStatuses.length
-          : 0;
-        const arr = item.status.containerStatuses
-          ? item.status.containerStatuses.filter((con) => {
-              return con.ready == true;
-            })
-          : [];
-        item.containerReday = arr.length;
-      });
-      // console.log(data, "deploylist");
+
       this.paginationConfig.total = this.tableDataAll.length;
       this.tableData = this.tableDataAll.slice(
         this.paginationConfig.currentPage - 1,
@@ -332,24 +252,16 @@ export default {
       );
     },
 
-    async getNamespace() {
-      // this.loading = true;
-      const data = await this.listNamespace(this.clusterCurrent);
-      this.namespacesList = data.items || [];
-      this.namespacesList.unshift({
-        metadata: {
-          name: "全部",
-        },
-      });
+    async deleteNameSpaceItem(data) {
+      await this.deleteNamespace(data.clusterName, data.name);
 
-      // 获取列表
-      this.getPodsList(this.clusterCurrent, undefined);
+      this.clusterChange();
     },
 
-    async deletePods(data) {
-      await this.delPods(data);
+    async createNamespaceItem(clusterName, data) {
+      await this.createNamespace(clusterName, data);
 
-      this.changeNamespace();
+      this.clusterChange();
     },
   },
   filter: {},
@@ -361,7 +273,7 @@ export default {
 <style lang="scss" scoped>
 .sel-action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 
   margin-bottom: 16px;
   /deep/.cus-select {
@@ -397,6 +309,12 @@ export default {
   &:hover {
     color: #5354bb;
   }
+}
+
+.icon-checkbox-circle {
+  font-size: 16px !important;
+  color: #36b37e;
+  margin-right: 4px;
 }
 
 .page-con {
@@ -440,10 +358,5 @@ export default {
   color: #5354bb;
   cursor: pointer;
   margin-left: 8px;
-}
-
-.status-icon {
-  font-size: 16px !important;
-  margin-right: 4px;
 }
 </style>
