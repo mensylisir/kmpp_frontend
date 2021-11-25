@@ -339,8 +339,8 @@ const message = {
         cpu: "CPU 使用率",
         memory: "内存 使用率",
         docker: "容器组",
-        connect: "执行 WebKubeCtl 命令行",
-        download_kube_config: "下载 KubeConfig 文件",
+        connect: "控制台",
+        download_kube_config: "KubeConfig",
         open_in_new_windows: "在新的窗口中打开",
       },
       node: {

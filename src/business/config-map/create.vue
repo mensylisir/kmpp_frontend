@@ -99,9 +99,7 @@
       label-width="80px"
       :model="deployForm2"
       ref="deployForm2"
-      :rules="rules"
       class="block"
-      :gutter="24"
     >
       <el-row :gutter="24">
         <el-col :span="12" class="title">变量名称</el-col>
@@ -111,42 +109,49 @@
           :key="index"
           class="item-group"
         >
-          <div class="buttons">
-            <el-button @click="deleteItem(index)" v-show="index !== 0"
-              >删除</el-button
+          <el-col :span="12" class="item">
+            <el-form-item
+              label=""
+              :prop="`paramsList[${index}].label`"
+              :rules="{
+                required: true,
+                message: '输入项不能为空',
+                trigger: 'change',
+              }"
             >
-          </div>
-          <el-form-item
-            label="TEMPLATE"
-            :prop="`paramsList[${index}].key`"
-            :rules="{
-              required: true,
-              message: '输入项不能为空',
-              trigger: 'change',
-            }"
-          >
-            <el-input v-model="item.key" placeholder="请输入key值"></el-input>
-          </el-form-item>
-          <el-form-item
-            label=""
-            :rules="{
-              required: true,
-              message: '输入项不能为空',
-              trigger: 'change',
-            }"
-            :prop="`groupList[${index}].value`"
-          >
-            <el-input
-              v-model="item.value"
-              placeholder="请输入value值"
-            ></el-input>
-          </el-form-item>
+              <el-input
+                v-model.trim="item.label"
+                placeholder="请输入key值"
+              ></el-input> </el-form-item
+          ></el-col>
+          <el-col :span="12" class="item">
+            <el-form-item
+              label=""
+              :rules="{
+                required: true,
+                message: '输入项不能为空',
+                trigger: 'change',
+              }"
+              :prop="`paramsList[${index}].value`"
+            >
+              <el-input
+                style="width: calc(100% - 20px); margin-right: 6px"
+                v-model.trim="item.value"
+                placeholder="请输入value值"
+              ></el-input>
+              <span
+                class="iconfont icon-close-line close-icon"
+                v-if="deployForm2.paramsList.length > 1"
+                @click="delparams(index, 'd')"
+              ></span>
+            </el-form-item>
+          </el-col>
         </div>
       </el-row>
     </el-form>
     <el-button @click="resetForm">取消</el-button>
     <el-button @click="submitForm" type="primary">确定</el-button>
-    <pvc-modal :pvcObj="pvcObj" @on-close="onClose"></pvc-modal>
+    <upload-modal :uploadObj="uploadObj" @on-close="onClose"></upload-modal>
   </div>
 </template>
 
@@ -154,10 +159,10 @@
 import { searchClusters } from "@/api/cluster";
 import { listNamespace } from "@/api/cluster/namespace";
 import { createConfig } from "@/api/config-map";
-import pvcModal from "./pvc-modal.vue";
+import uploadModal from "./upload-modal.vue";
 export default {
   name: "",
-  components: { pvcModal },
+  components: { uploadModal },
   props: {},
   data() {
     var tagsRule = (rule, value, callback) => {
@@ -176,12 +181,13 @@ export default {
       servicesList: [], // 命名空间列表
       servicePortList: [], // 命名空间列表
       pvcList: [],
-      pvcSwitch: true,
+      file: {
+        content: "",
+      },
       memorylimitSwitch: false,
       cpulimitSwitch: false,
-      pvcObj: {
+      uploadObj: {
         dialogVisible: false,
-        storageClassListL: [],
       },
       deployForm1: {
         name: "",
@@ -191,6 +197,7 @@ export default {
         cluster_name: "",
         namespace: "",
       },
+      valid2: true,
       rules1: {
         name: [{ required: true, message: "请输入名称", trigger: "blur" }],
         deployLabelsCopy: [
@@ -241,9 +248,13 @@ export default {
         ],
       },
       deployForm2: {
-        paramsList: [],
+        paramsList: [
+          {
+            label: "",
+            value: "",
+          },
+        ],
       },
-      rules: {},
     };
   },
   created() {
@@ -251,16 +262,24 @@ export default {
     this.deployForm1.cluster_name = this.$route.params.cluster;
     this.getClusters();
   },
-  mounted() {
-    this.getStorageClassList();
-  },
+  mounted() {},
   activited() {},
   update() {},
   methods: {
     // 添加配置参数
-    addParams() {},
+    addParams() {
+      this.deployForm2.paramsList.push({
+        label: "",
+        value: "",
+      });
+    },
+    delparams(i) {
+      this.deployForm2.paramsList.splice(i, 1);
+    },
     // 文件上传
-    fileUpload() {},
+    fileUpload() {
+      this.uploadObj.dialogVisible = true;
+    },
     addTags(flag) {
       switch (flag) {
         case "d":
@@ -296,138 +315,35 @@ export default {
         if (valid1) {
           let data1 = JSON.parse(JSON.stringify(this.deployForm1));
 
-          data1.Labels = {};
+          data1.labels = {};
           data1.deployLabelsCopy.forEach((item) => {
-            data1.Labels[item.split(":")[0]] = item.split(":")[1];
-          });
-
-          data1.matchLabels = {};
-          data1.matchLabelsCopy.forEach((item) => {
-            data1.matchLabels[item.split(":")[0]] = item.split(":")[1];
-          });
-
-          data1.templateLabels = {};
-          data1.templateLabelsCopy.forEach((item) => {
-            data1.templateLabels[item.split(":")[0]] = item.split(":")[1];
+            data1.labels[item.split(":")[0]] = item.split(":")[1];
           });
           delete data1.deployLabelsCopy;
           delete data1.matchLabels;
           delete data1.matchLabelsCopy;
           delete data1.templateLabels;
           delete data1.templateLabelsCopy;
-          if (this.currType == "task") {
-            this.validateContain(data1);
+          if (this.file.content) {
+            data1.data = {}
+            data1.data[this.file.name] = this.file.content;
+            this.createDeployItem(data1);
           } else {
-            this.$refs.deployForm4.validate((valid4) => {
-              if (valid4) {
-                let data4 = JSON.parse(JSON.stringify(this.deployForm4));
-                let result = Object.assign(data1, data4);
-                this.validateContain(result);
+            this.$refs.deployForm2.validate((valid2) => {
+              if (valid2) {
+                this.valid2 = true;
+                const data2 = JSON.parse(JSON.stringify(this.deployForm2));
+                data1.data = {};
+                data2.paramsList.forEach((item) => {
+                  data1.data[item.label] = item.value;
+                });
+                this.createDeployItem(data1);
               } else {
+                this.valid2 = false;
                 return false;
               }
             });
           }
-        } else {
-          return false;
-        }
-      });
-    },
-    validateContain(data1) {
-      this.$refs.deployForm2.validate((valid2) => {
-        if (valid2) {
-          const data2 = JSON.parse(JSON.stringify(this.deployForm2));
-          let data2New = {
-            containers: [],
-          };
-          if (!this.pvcSwitch) {
-            delete data2.data;
-            delete data2.dataName;
-            delete data2.mount_path;
-          } else {
-            // 数据卷-pvc
-            data2.volume_mounts = [
-              {
-                name: data2.dataName,
-                // claimName: data2.data,
-                mount_path: data2.mount_path,
-                // read_only: false,
-              },
-            ];
-            (data2New.volumes = []),
-              data2New.volumes.push({
-                name: data2.dataName,
-                persistent_volume_claim_name: data2.data,
-                persistent_volume_claim_read_only: false,
-              });
-            delete data2.data;
-            delete data2.dataName;
-            delete data2.mount_path;
-          }
-          if (!this.cpulimitSwitch) {
-            delete data2.cpulimit;
-          } else {
-            if (data2.cpulimit.request) {
-              data2.request.cpu = `${data2.cpulimit.request}m`;
-            }
-            if (data2.cpulimit.limit) {
-              data2.limits.cpu = `${data2.cpulimit.limit}m`;
-            }
-            delete data2.cpulimit;
-          }
-          if (!this.memorylimitSwitch) {
-            delete data2.memorylimit;
-          } else {
-            if (data2.memorylimit.request) {
-              data2.request.memory = `${data2.memorylimit.request}Mi`;
-            }
-            if (data2.memorylimit.limit) {
-              data2.limits.memory = `${data2.memorylimit.limit}Mi`;
-            }
-            delete data2.memorylimit;
-          }
-          if (!this.cpulimitSwitch && !this.memorylimitSwitch) {
-            delete data2.limits;
-            delete data2.request;
-          }
-          if (!data2.args) {
-            delete data2.args;
-          } else {
-            let a = data2.args;
-            data2.args = [];
-            data2.args.push(a.split("]")[0].split("[")[1]);
-          }
-          if (!data2.commands) {
-            delete data2.commands;
-          } else {
-            let a = data2.commands;
-            data2.commands = [];
-            data2.commands.push(a.split("]")[0].split("[")[1]);
-          }
-
-          if (data2.containerPort) {
-            data2.port = {
-              name: "http",
-              container_port: Number(data2.containerPort),
-            };
-          }
-          delete data2.containerPort;
-          data2New.containers.push(data2);
-
-          if (this.currType == "task" && this.deployForm3.parallelism) {
-            data2New.parallelism = this.deployForm3.parallelism;
-          }
-          if (this.currType == "task" && this.deployForm3.backoffLimit) {
-            data2New.backoffLimit = this.deployForm3.backoffLimit;
-          }
-          if (this.currType == "task" && this.deployForm3.completions) {
-            data2New.completions = this.deployForm3.completions;
-          }
-          data2New.restart_policy = this.deployForm3.restart_policy;
-          const reBody = Object.assign(data1, data2New);
-          console.log(reBody, "reBody");
-
-          this.createDeployItem(reBody);
         } else {
           return false;
         }
@@ -453,26 +369,18 @@ export default {
         // this.getServiceList();
       }
       this.deployForm2.data = "";
-      this.getPvcOption();
-    },
-
-    servicenameChange() {
-      const arr = this.servicesList.filter((item) => {
-        return item.servicename == this.deployForm2.servicename;
-      });
-
-      this.servicePortList = arr[0].serviceports || [];
     },
 
     onClose(flag, data) {
       if (flag) {
-        // 请求pvc 列表数据
-        // TODO
-
-        data.requestStorage += "Gi";
-        this.createPvcItem(data);
+        // 请求pvc列表数据
+        this.file.name = data.fileName;
+        this.file.content = data.content;
+        if (!this.valid2) {
+          this.$refs.deployForm2.clearValidate();
+        }
       }
-      this.pvcObj.dialogVisible = false;
+      this.uploadObj.dialogVisible = false;
     },
 
     // ajax
@@ -514,59 +422,10 @@ export default {
       await this.createConfig(data);
       this.resetForm();
     },
-
-    async createPvcItem(data) {
-      const pvc = await this.createPvc(data);
-      console.log(pvc);
-      this.getPvcOption();
-      // this.pvcList.push(pvc);
-    },
-
-    async getPvcOption() {
-      const data = await this.getPvcList(
-        this.deployForm1.cluster_name,
-        this.deployForm1.namespace
-      );
-      this.pvcList = data.items || [];
-    },
-
-    async getStorageClassList() {
-      const data = await this.getStorageClass(this.$route.params.cluster);
-      this.pvcObj.storageClassList = data || [];
-    },
   },
   filter: {},
   computed: {},
-  watch: {
-    pvcSwitch: {
-      handler(val) {
-        var dataRule = (rule, value, callback) => {
-          if (val) {
-            if (rule.required) {
-              if (this.deployForm1.dataName == "") {
-                callback(new Error("请输入数据卷名称"));
-              } else if (this.deployForm1.data == "") {
-                callback(new Error("请选择PVC"));
-              } else {
-                callback();
-              }
-            } else {
-              callback();
-            }
-          } else {
-            callback();
-          }
-        };
-        this.$set(this.rules1, "data", [
-          {
-            required: val,
-            trigger: "change",
-            validator: dataRule,
-          },
-        ]);
-      },
-    },
-  },
+  watch: {},
 };
 </script>
 
@@ -764,23 +623,33 @@ export default {
     }
   }
 
-  .config {
+  /deep/.config {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /deep/.el-button--small {
+    .el-button--small {
       padding: 5px 8px;
     }
   }
-  .block {
+  /deep/.block {
     border: 1px solid #e4e7f0;
     margin-bottom: 32px;
-    // box-shadow: inset 0 -1px 0 0 #e4e7f0;
+    padding-bottom: 16px;
+
     .title {
       background: #f9fafc;
       padding: 11px 16px;
       box-shadow: inset 0 -1px 0 0 #e4e7f0;
     }
+    .el-form-item {
+      margin: 16px 0 0 0;
+    }
+    .close-icon {
+      cursor: pointer;
+    }
+  }
+  /deep/.el-row {
+    margin: 0 !important;
   }
 }
 </style>

@@ -7,7 +7,7 @@ const Work = {
   name: "Work",
   meta: {
     title: "工作负载",
-    icon: "iconfont icon-resourcemanage",
+    icon: "iconfont icon-workloads",
     roles: ["ADMIN", "PROJECT_MANAGER"]
   },
   children: [

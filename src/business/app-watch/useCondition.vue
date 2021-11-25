@@ -16,8 +16,8 @@
           <el-option value="1-h" label="最近1小时"> </el-option>
           <el-option value="12-h" label="最近12小时"> </el-option>
           <el-option value="1-day" label="最近1天"> </el-option>
-          <el-option value="3-day" label="最近3天"> </el-option>
-          <el-option value="7-day" label="最近7天"> </el-option>
+          <!-- <el-option value="3-day" label="最近3天"> </el-option>
+          <el-option value="7-day" label="最近7天"> </el-option> -->
         </el-select>
         <!-- <el-button
           icon="el-icon-refresh-right"

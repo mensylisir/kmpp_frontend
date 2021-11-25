@@ -29,7 +29,7 @@ import CodeMirror from "codemirror";
 // 核心样式
 import "codemirror/lib/codemirror.css";
 // 引入主题后还需要在 options 中指定主题才会生效
-import "codemirror/theme/rubyblue.css";
+import "codemirror/theme/darcula.css";
 import "codemirror/theme/xq-light.css";
 
 // 需要引入具体的语法高亮库才会有对应的语法高亮效果
@@ -61,7 +61,7 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/search.js";
 
-import { getJobItem, getCronjobItem } from "@/api/work-load/task";
+import { getConfigItem } from "@/api/config-map";
 // import YAML from "json2yaml";
 export default {
   name: "",
@@ -69,8 +69,7 @@ export default {
   props: {},
   data() {
     return {
-      getCronjobItem,
-      getJobItem,
+      getConfigItem,
       jsonEditor: null,
       value: "", // 默认显示的值
       initing: false,
@@ -97,7 +96,7 @@ export default {
   methods: {
     submitForm() {
       this.$router.push({
-        name: "taskDetailsEdit",
+        name: "configDetailsEdit",
         params: {
           clusterName: this.$route.params.clusterName,
           deployName: this.$route.params.deployName,
@@ -115,7 +114,7 @@ export default {
         indentUnit: 2, // 缩进
         smartIndent: true, // 开启自动缩进
         tabSize: 2,
-        theme: "base16-dark",
+        theme: "darcula",
         readOnly: true,
         // value:'',
       });
@@ -127,21 +126,13 @@ export default {
     async getDeploy() {
       this.initing = true;
 
-      if (this.currType === "task") {
-        const data = await this.getJobItem(
-          this.$route.params.clusterName,
-          this.$route.params.namespace,
-          this.$route.params.deployName
-        );
-        this.value = data[0] ? data[0].yaml_data : "";
-      } else {
-        const data = await this.getCronjobItem(
-          this.$route.params.clusterName,
-          this.$route.params.namespace,
-          this.$route.params.deployName
-        );
-        this.value = data[0] ? data[0].yaml_data : "";
-      }
+      const data = await this.getConfigItem(
+        this.$route.params.clusterName,
+        this.$route.params.namespace,
+        this.$route.params.deployName
+      );
+      this.value = data[0] ? data[0].yaml_data : "";
+
       this.editorInit();
       this.initing = false;
     },
@@ -191,15 +182,16 @@ export default {
 
   .editor-header {
     margin: 0px 24px;
-    background: #f9fafc;
-    box-shadow: 0 1px 0 0 #e4e7f0;
+
+    background: #313335;
+    box-shadow: 0 1px 0 0 #313335;
 
     font-size: 14px;
-    color: #2c2e33;
+    color: white;
     line-height: 22px;
     font-weight: 500;
 
-    border: 1px solid #cbcfd9;
+    border: 1px solid #313335;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     border-bottom: none;
@@ -213,20 +205,25 @@ export default {
 
     .icon-file-line {
       font-size: 16px !important;
-      color: #5354bb;
+      color: white;
       margin-right: 4px;
     }
   }
+
   .temp-detail-editor {
     // height: auto;
     margin: 0 24px;
-    border: 1px solid #cbcfd9;
+    margin-bottom: 16px;
+    box-shadow: inset 0 -1px 0 0 #555555;
     // border-top: none;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
 
     /deep/.CodeMirror {
-      height: calc(100vh - 32px - 56px - 37.6px - 56px - 9px - 48px - 41.5px);
+      height: calc(
+        100vh - 56px - 37.6px - 56px - 8px - 52px - 40px - 32.8px - 16px - 16px -
+          12px - 2.5px
+      );
       .CodeMirror-scroll {
         .CodeMirror-sizer {
           padding-left: 16px;
@@ -235,7 +232,7 @@ export default {
             left: -99px !important;
             .CodeMirror-linenumber {
               font-size: 14px;
-              color: #5354bb;
+              color: white;
               line-height: 22px;
               font-weight: 400;
             }

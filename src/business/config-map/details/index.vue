@@ -5,10 +5,7 @@
         class="bread-crumb-item"
         @click="
           $router.push({
-            name: 'task',
-            params: {
-              currType: currType,
-            },
+            name: 'configMapIndex',
           })
         "
         >ConfigMap/</span
@@ -16,9 +13,7 @@
     </div>
     <div class="top">
       <div style="display: flex; align-items: center">
-        <div class="detail">
-         ConfigMap详情
-        </div>
+        <div class="detail">ConfigMap</div>
         <el-menu
           :default-active="activeKey"
           mode="horizontal"
@@ -52,12 +47,11 @@ export default {
       if (index === "details") {
         // 用量排行
         this.$router.push({
-          name: "taskDetailsMod",
+          name: "configDetailsMod",
           params: {
             clusterName: this.$route.params.clusterName,
             deployName: this.$route.params.deployName,
             namespace: this.$route.params.namespace,
-            currType: this.currType,
           },
         });
       } else if (index === "yaml") {
@@ -65,13 +59,12 @@ export default {
         this.$router.push({
           name:
             this.$route.meta.action == "check"
-              ? "taskDetailsCheck"
-              : "taskDetailsEdit",
+              ? "configDetailsCheck"
+              : "configDetailsEdit",
           params: {
             clusterName: this.$route.params.clusterName,
             deployName: this.$route.params.deployName,
             namespace: this.$route.params.namespace,
-            currType: this.currType,
           },
         });
       }
