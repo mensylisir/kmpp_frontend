@@ -18,31 +18,16 @@ export function createConfig(data) {
   return post(`/api/v1/kubernetes/configmap`, data);
 }
 
-export function createCronjob(data) {
-  return post(`/api/v1/kubernetes/cronjob`, data);
-}
-
 // 删除Deploy
 export function delJob(data) {
-  return del(`/api/v1/kubernetes/job`, data);
+  return del(`/api/v1/kubernetes/configmap`, data);
 }
 
-// 删除Deploy
-export function delCronjob(data) {
-  return del(`/api/v1/kubernetes/cronjob`, data);
-}
 
 // 获取单个 Deploy 信息
-export function getJobItem(clustername, namespace, name) {
+export function getConfigItem(clustername, namespace, name) {
   return get(
-    `/api/v1/kubernetes/job?clusterName=${clustername}&namespace=${namespace}&name=${name}`
-  );
-}
-
-// 获取单个 Deploy 信息
-export function getCronjobItem(clustername, namespace, name) {
-  return get(
-    `/api/v1/kubernetes/cronjob?clusterName=${clustername}&namespace=${namespace}&name=${name}`
+    `/api/v1/kubernetes/configmap?clusterName=${clustername}&namespace=${namespace}&name=${name}`
   );
 }
 
@@ -53,21 +38,9 @@ export function getCronjobItem(clustername, namespace, name) {
 // Namespace         string                    `json:"namespace"` # 资源的namespace
 // Data              string                    `json:"data"` # deployment的yaml
 export function updateJob(data) {
-  return post("/api/v1/kubernetes/job/update", data);
+  return post("/api/v1/kubernetes/configmap/update", data);
 }
 
-export function updateCronjob(data) {
-  return post("/api/v1/kubernetes/cronjob/update", data);
-}
-
-// {
-//   "clusterName":"xiang-cluster",
-//   "pvcName": "xiang-test",
-//   "namespace" :"xiang",
-//   "accessMode": "ReadWriteOnce",
-//   "storageClassName": "nfs-client",
-//   "requestStorage": "12M"
-//   }
 export function createPvc(data) {
   return post(`/api/v1/kubepvc/pvc`, data);
 }
@@ -84,12 +57,3 @@ export function getPvcList(clustername, namespace) {
   return get(url);
 }
 
-
-
-
-
-export function newGetDeployItem(clustername, namespace) {
-  return get(
-    `/api/v1/kubernetes/resource?clustername=${clustername}&namespace=${namespace}&resourcetype=deployment&resourcename=xiang-deploy`
-  );
-}

@@ -6,7 +6,8 @@ const Users = {
   component: Layout,
   name: "User",
   meta: {
-    roles: ["ADMIN"]
+    roles: ["ADMIN"],
+    icon: "iconfont icon-usermanagement",
   },
   children: [
     {
@@ -15,7 +16,6 @@ const Users = {
       name: "UserList",
       meta: {
         title: "route.user",
-        icon: "el-icon-user",
         roles: ["ADMIN"]
       }
     },

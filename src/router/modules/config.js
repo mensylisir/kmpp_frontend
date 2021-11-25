@@ -11,7 +11,6 @@ const configMap = {
     roles: ["ADMIN", "PROJECT_MANAGER"]
   },
   children: [
-    // 任务
     {
       path: "index",
       component: () => import("@/business/config-map/index"),
@@ -29,49 +28,52 @@ const configMap = {
       meta: {
         activeMenu: "/configMap/index",
         roles: ["ADMIN"]
+      }
     },
     {
-      path: "details",
+      path: "config-details",
       hidden: true,
-      name: "details",
+      name: "configDetails",
       component: () => import("@/business/config-map/details/index"),
       meta: {
-        activeMenu: "/configMap",
+        activeMenu: "/configMap/index",
         roles: ["ADMIN"]
       },
       children: [
         {
-          path: "details-mod/:clusterName/:deployName/:namespace",
-          name: "taskDetailsMod",
+          path: "config-details-mod/:clusterName/:deployName/:namespace",
+          name: "configDetailsMod",
           props: true,
           hidden: true,
           component: () => import("@/business/config-map/details/details"),
           meta: {
-            activeMenu: "/configMap",
+            activeMenu: "/configMap/index",
             activeKey: "details",
             action: "check"
           }
         },
         {
-          path: "details-check/:clusterName/:deployName/:namespace",
-          name: "detailsCheck",
+          path: "config-details-check/:clusterName/:deployName/:namespace",
+          name: "configDetailsCheck",
           props: true,
           hidden: true,
           component: () => import("@/business/config-map/details/check"),
           meta: {
-            activeMenu: "/configMap",
+            activeMenu: "/configMap/index",
+
             activeKey: "yaml",
             action: "check"
           }
         },
         {
-          path: "details-edit/:clusterName/:deployName/:namespace",
-          name: "detailsEdit",
+          path: "config-details-edit/:clusterName/:deployName/:namespace",
+          name: "configDetailsEdit",
           props: true,
           hidden: true,
           component: () => import("@/business/config-map/details/edit"),
           meta: {
-            activeMenu: "/configMap",
+            activeMenu: "/configMap/index",
+
             activeKey: "yaml",
             action: "edit"
           }

@@ -31,7 +31,7 @@ import CodeMirror from "codemirror";
 // 核心样式
 import "codemirror/lib/codemirror.css";
 // 引入主题后还需要在 options 中指定主题才会生效
-import "codemirror/theme/rubyblue.css";
+import "codemirror/theme/darcula.css";
 import "codemirror/theme/xq-light.css";
 
 // 需要引入具体的语法高亮库才会有对应的语法高亮效果
@@ -126,7 +126,7 @@ export default {
         indentUnit: 2, // 缩进
         smartIndent: true, // 开启自动缩进
         tabSize: 2,
-        theme: "default",
+        theme: "darcula",
         readOnly: false,
         // value:'',
       });
@@ -213,15 +213,15 @@ export default {
   .editor-header {
     margin: 0px 24px;
 
-    background: #f9fafc;
-    box-shadow: 0 1px 0 0 #e4e7f0;
+    background: #313335;
+    box-shadow: 0 1px 0 0 #313335;
 
     font-size: 14px;
-    color: #2c2e33;
+    color: white;
     line-height: 22px;
     font-weight: 500;
 
-    border: 1px solid #cbcfd9;
+    border: 1px solid #313335;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     border-bottom: none;
@@ -235,7 +235,7 @@ export default {
 
     .icon-file-line {
       font-size: 16px !important;
-      color: #5354bb;
+      color: white;
       margin-right: 4px;
     }
   }
@@ -244,7 +244,7 @@ export default {
     // height: auto;
     margin: 0 24px;
     margin-bottom: 16px;
-    border: 1px solid #cbcfd9;
+    box-shadow: inset 0 -1px 0 0 #555555;
     // border-top: none;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
@@ -262,24 +262,20 @@ export default {
             left: -99px !important;
             .CodeMirror-linenumber {
               font-size: 14px;
-              color: #5354bb;
+              color: white;
               line-height: 22px;
               font-weight: 400;
             }
           }
         }
         .CodeMirror-gutters {
-          background: #e4e7f0;
+          // background: #e4e7f0;
           .CodeMirror-gutter {
             width: 62px;
           }
         }
       }
     }
-  }
-
-  .action-btn {
-    padding: 0 24px;
   }
 }
 </style>

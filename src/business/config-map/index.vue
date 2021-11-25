@@ -190,11 +190,11 @@ export default {
     },
     winOpen(data) {
       this.$router.push({
-        name: "detailsMod",
+        name: "configDetailsMod",
         params: {
           clusterName: this.clusterCurrent,
-          deployName: data.json_data["metadata"].name,
-          namespace: data.json_data["metadata"].namespace,
+          deployName: data.name,
+          namespace: data.namespace,
         },
       });
     },
@@ -230,14 +230,14 @@ export default {
       this.$router.push({
         name:
           this.disableNamespaceList.indexOf(
-            data.json_data["metadata"].namespace
+            data.namespace
           ) != -1
-            ? "taskDetailsCheck"
-            : "taskDetailsEdit",
+            ? "configDetailsMod"
+            : "configDetailsEdit",
         params: {
           clusterName: this.clusterCurrent,
-          deployName: data.json_data["metadata"].name,
-          namespace: data.json_data["metadata"].namespace,
+          deployName: data.name,
+          namespace: data.namespace,
         },
       });
     },
