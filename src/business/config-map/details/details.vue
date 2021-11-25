@@ -9,9 +9,9 @@
       <span class="deploy-name">{{ deployInfo.name }}</span>
     </div>
     <div class="mod-two" v-if="load">
-      <el-row :gutter="24">
+      <el-row :gutter="24">i
         <el-col :span="8">
-          <span>集群信息：</span
+          <span class="tag-name">集群信息：</span
           ><span class=""
             >{{ $route.params.namespace }}/{{ $route.params.clusterName }}</span
           ></el-col
@@ -199,7 +199,7 @@ export default {
   }
   .tag-content {
     font-size: 12px;
-    color: #2c2e33;
+    color: #4B5059;
     line-height: 20px;
     font-weight: 400;
 
