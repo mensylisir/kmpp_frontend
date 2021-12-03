@@ -8,7 +8,7 @@ const Host = {
   meta: {
     title: "route.host",
     icon: 'iconfont icon-resourcemanage',
-    roles: ['ADMIN', "PROJECT_MANAGER"]
+    roles: ['ADMIN', "PROJECT_MANAGER", "COMMON"]
   },
   children: [
     {
@@ -17,7 +17,7 @@ const Host = {
       name: "HostList",
       meta: {
         title: "计算",
-        roles: ['ADMIN', "PROJECT_MANAGER"]
+        roles: ['ADMIN', "PROJECT_MANAGER", "COMMON"]
       },
     },
     {
@@ -27,7 +27,7 @@ const Host = {
       component: () => import('@/business/hosts/create'),
       meta: {
         activeMenu: "/hosts/list",
-        roles: ['ADMIN']
+        // roles: ['ADMIN']
       },
     },
     {
@@ -37,7 +37,7 @@ const Host = {
       component: () => import('@/business/hosts/storage/create'),
       meta: {
         activeMenu: "/hosts/storage",
-        roles: ['ADMIN']
+        // roles: ['ADMIN']
       },
     },
     {
@@ -46,7 +46,7 @@ const Host = {
       name: "storage",
       meta: {
         title: "存储",
-        roles: ['ADMIN', "PROJECT_MANAGER"]
+        roles: ['ADMIN', "PROJECT_MANAGER", "COMMON"]
       },
     },
     {
@@ -57,7 +57,7 @@ const Host = {
       component: () => import("@/business/hosts/storage/detail/provisioner-create"),
       meta: {
         activeMenu: "/hosts/list",
-        roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"]
+        // roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"]
       }
     },
     {
@@ -68,7 +68,7 @@ const Host = {
       component: () => import("@/business/hosts/storage/detail/class-create"),
       meta: {
         activeMenu: "/hosts/list",
-        roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"]
+        // roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"]
       }
     },
     {
@@ -80,7 +80,7 @@ const Host = {
       meta: {
         title: "中间件",
         activeMenu: "/hosts/middle",
-        roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"],
+        roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER", "COMMON"],
         activeKey: "deploy"
       }
     },
@@ -93,7 +93,7 @@ const Host = {
       meta: {
         title: "中间件",
         activeKey: "deploy",
-        roles: ['ADMIN', "PROJECT_MANAGER"]
+        roles: ['ADMIN', "PROJECT_MANAGER", "COMMON"]
       },
       children: [{
         path: "deploy",
@@ -104,7 +104,7 @@ const Host = {
         meta: {
           title: "中间件",
           activeMenu: "/hosts/middle",
-          roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"],
+          roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER", "COMMON"],
           activeKey: "deploy"
         }
       },
@@ -117,7 +117,7 @@ const Host = {
         meta: {
           title: "中间件",
           activeMenu: "/hosts/middle",
-          roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"],
+          roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER", "COMMON"],
           activeKey: "store"
         }
       },
@@ -130,7 +130,7 @@ const Host = {
         meta: {
           title: "中间件",
           activeMenu: "/hosts/middle",
-          roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"],
+          roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER", "COMMON"],
           activeKey: "store"
         }
       }]
@@ -151,7 +151,7 @@ const Host = {
       name: "certification",
       meta: {
         title: "证书",
-        roles: ['ADMIN', "PROJECT_MANAGER"]
+        roles: ['ADMIN', "PROJECT_MANAGER", "COMMON"]
       },
     },
     {
@@ -161,7 +161,7 @@ const Host = {
       component: () => import('@/business/hosts/certification/create'),
       meta: {
         activeMenu: "/hosts/certification",
-        roles: ['ADMIN']
+        // roles: ['ADMIN']
       },
     },
     {
@@ -170,7 +170,7 @@ const Host = {
       name: "domain",
       meta: {
         title: "域名管理",
-        roles: ['ADMIN', "PROJECT_MANAGER"]
+        roles: ['ADMIN', "PROJECT_MANAGER", "COMMON"]
       },
     },
     {
@@ -180,7 +180,7 @@ const Host = {
       component: () => import('@/business/hosts/domain-manage/create'),
       meta: {
         activeMenu: "/hosts/domain",
-        roles: ['ADMIN']
+        // roles: ['ADMIN']
       },
     },
     {

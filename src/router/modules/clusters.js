@@ -8,7 +8,7 @@ const Cluster = {
   meta: {
     title: "集群管理",
     icon: "iconfont icon-clustermanage",
-    roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+    roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
   },
   children: [
     {
@@ -17,7 +17,7 @@ const Cluster = {
       name: "ClusterList",
       meta: {
         title: "集群",
-        roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+        roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
       }
     },
     {
@@ -58,7 +58,7 @@ const Cluster = {
       name: "ClusterDetail",
       meta: {
         activeMenu: "/clusters",
-        roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+        roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
       },
       children: [
         {
@@ -69,7 +69,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/overview"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -80,7 +80,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/node"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -91,7 +91,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/namespace"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -102,7 +102,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/tool"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -113,7 +113,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/monitor"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -124,7 +124,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/backup"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -135,7 +135,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/f5"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -146,7 +146,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/shell"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -157,7 +157,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/security"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -168,7 +168,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/log/logging"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -179,7 +179,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/log/loki"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -190,7 +190,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/istio"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -201,7 +201,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/event"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -212,7 +212,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/storage"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         },
         {
@@ -259,7 +259,7 @@ const Cluster = {
           component: () => import("@/business/clusters/detail/grade"),
           meta: {
             activeMenu: "/clusters",
-            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER"]
+            roles: ["ADMIN", "PROJECT_MANAGER", "CLUSTER_MANAGER", "COMMON"]
           }
         }
       ]
@@ -270,7 +270,7 @@ const Cluster = {
       name: "namespace",
       meta: {
         title: "命名空间",
-        roles: ["ADMIN", "PROJECT_MANAGER"]
+        roles: ["ADMIN", "PROJECT_MANAGER", "COMMON"]
       }
     },
     {
@@ -280,7 +280,7 @@ const Cluster = {
       component: () => import("@/business/clusters/namespace/details/index"),
       meta: {
         activeMenu: "/clusters/namespace",
-        roles: ["ADMIN"]
+        roles: ["ADMIN", "COMMON"]
       },
       children: [
         {

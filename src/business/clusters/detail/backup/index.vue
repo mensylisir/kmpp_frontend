@@ -11,7 +11,7 @@
         :label="$t('cluster.detail.backup.backup_recover')"
         :name="$t('cluster.detail.backup.backup_recover')"
       >
-        <el-row type="flex">
+        <el-row type="flex" v-permission="['ADMIN']">
           <el-col :span="12">
             <el-form
               :model="strategyForm"
@@ -186,7 +186,7 @@
           :selects.sync="selects"
         >
           <template #header>
-            <el-button-group>
+            <el-button-group v-permission="['ADMIN']">
               <el-button
                 size="small"
                 :disabled="selects.length !== 1"

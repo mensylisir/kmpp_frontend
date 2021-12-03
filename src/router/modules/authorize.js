@@ -7,7 +7,7 @@ const Authorize = {
   name: "Manifest",
   meta: {
     icon: "iconfont icon-task",
-    roles: ["ADMIN","PROJECT_MANAGER"]
+    roles: ["ADMIN","PROJECT_MANAGER", "COMMON"]
   },
   children: [
     {
@@ -25,7 +25,7 @@ const Authorize = {
       component: () => import('@/business/authorize/create'),
       meta: {
         activeMenu: "/authorize/list",
-        roles: ['ADMIN']
+        roles: ['ADMIN', "COMMON"]
       },
     },
   ]

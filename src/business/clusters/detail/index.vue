@@ -67,7 +67,7 @@
             :index="'/clusters/detail/' + name + '/grade'"
             >{{ $t("cluster.detail.tag.grade") }}
           </el-menu-item>
-          <el-menu-item :index="'/clusters/detail/' + name + '/shell'">
+          <el-menu-item :index="'/clusters/detail/' + name + '/shell'" v-permission="['ADMIN']">
             {{ $t("cluster.detail.overview.connect") }}
           </el-menu-item>
         </el-menu>

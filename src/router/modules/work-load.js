@@ -8,7 +8,7 @@ const Work = {
   meta: {
     title: "工作负载",
     icon: "iconfont icon-workloads",
-    roles: ["ADMIN", "PROJECT_MANAGER"]
+    roles: ["ADMIN", "PROJECT_MANAGER", "COMMON"]
   },
   children: [
     {
@@ -17,7 +17,7 @@ const Work = {
       name: "pods",
       meta: {
         title: "Pods",
-        roles: ["ADMIN", "PROJECT_MANAGER"]
+        roles: ["ADMIN", "PROJECT_MANAGER", "COMMON"]
       }
     },
     {
@@ -27,7 +27,7 @@ const Work = {
       component: () => import("@/business/work-load/pods/details/index"),
       meta: {
         activeMenu: "/work/pods",
-        roles: ["ADMIN"]
+        roles: ["ADMIN", "COMMON"]
       },
       children: [
         {
@@ -74,7 +74,7 @@ const Work = {
       name: "deploy",
       meta: {
         title: "部署",
-        roles: ["ADMIN", "PROJECT_MANAGER"]
+        roles: ["ADMIN", "PROJECT_MANAGER", "COMMON"]
       }
     },
     {
@@ -84,7 +84,7 @@ const Work = {
       component: () => import("@/business/work-load/deploy/create"),
       meta: {
         activeMenu: "/work/deploy",
-        roles: ["ADMIN"]
+        roles: ["ADMIN", "COMMON"]
       }
     },
     {
@@ -94,7 +94,7 @@ const Work = {
       component: () => import("@/business/work-load/deploy/details/index"),
       meta: {
         activeMenu: "/work/deploy",
-        roles: ["ADMIN"]
+        roles: ["ADMIN", "COMMON"]
       },
       children: [
         {
@@ -143,7 +143,7 @@ const Work = {
       name: "task",
       meta: {
         title: "任务",
-        roles: ["ADMIN", "PROJECT_MANAGER"]
+        roles: ["ADMIN", "PROJECT_MANAGER", "COMMON"]
       }
     },
     {
@@ -153,7 +153,7 @@ const Work = {
       component: () => import("@/business/work-load/task/create"),
       meta: {
         activeMenu: "/work/task",
-        roles: ["ADMIN"]
+        roles: ["ADMIN", "COMMON"]
       }
     },
     {
@@ -163,7 +163,7 @@ const Work = {
       component: () => import("@/business/work-load/task/details/index"),
       meta: {
         activeMenu: "/work/task",
-        roles: ["ADMIN"]
+        roles: ["ADMIN", "COMMON"]
       },
       children: [
         {
@@ -210,7 +210,7 @@ const Work = {
       name: "services",
       meta: {
         title: "服务",
-        roles: ["ADMIN", "PROJECT_MANAGER"]
+        roles: ["ADMIN", "PROJECT_MANAGER", "COMMON"]
       }
     },
     {
@@ -230,7 +230,7 @@ const Work = {
       component: () => import("@/business/work-load/services/details/index"),
       meta: {
         activeMenu: "/work/services",
-        roles: ["ADMIN"]
+        roles: ["ADMIN", "COMMON"]
       },
       children: [
         {

@@ -1,9 +1,15 @@
 <template>
   <layout-content header="ConfigMap">
     <div class="sel-action">
-      <el-button type="primary" @click="createDeploy">
-        <i class="el-icon-plus" style="margin-right: 4px"></i>ConfigMap
-      </el-button>
+      <div>
+        <el-button
+          type="primary"
+          @click="createDeploy"
+          v-permission="['ADMIN']"
+        >
+          <i class="el-icon-plus" style="margin-right: 4px"></i>ConfigMap
+        </el-button>
+      </div>
       <div>
         <el-select
           v-model="clusterCurrent"
@@ -78,19 +84,27 @@
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" min-width="64">
+      <el-table-column>
         <template slot-scope="scope">
           <span
+            v-permission="['ADMIN']"
             @click="handleClickEdit(scope.row)"
             class="iconfont icon-edit-line action-icon"
           ></span>
-          <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
+          <el-popconfirm
+            v-permission="['ADMIN']"
+            title="确定删除吗？"
+            @confirm="confirmDel(scope.row)"
             ><span
               class="iconfont icon-delete-line action-icon"
               slot="reference"
             ></span>
-          </el-popconfirm> </template
-      ></el-table-column>
+          </el-popconfirm>
+        </template>
+        <template slot-scope="" slot="header">
+          <span v-permission="['ADMIN']">操作</span>
+        </template>
+      </el-table-column>
     </el-table>
     <div class="page-con">
       <el-pagination
@@ -229,9 +243,7 @@ export default {
     handleClickEdit(data) {
       this.$router.push({
         name:
-          this.disableNamespaceList.indexOf(
-            data.namespace
-          ) != -1
+          this.disableNamespaceList.indexOf(data.namespace) != -1
             ? "configDetailsMod"
             : "configDetailsEdit",
         params: {
@@ -420,7 +432,14 @@ export default {
   color: #5354bb;
   cursor: pointer;
 }
-
+/deep/.cell {
+  span {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+  }
+}
 /deep/.el-table--small .el-table__cell {
   font-size: 14px;
   padding: 10.3px 0;
