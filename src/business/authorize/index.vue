@@ -27,10 +27,10 @@
       <template #header>
         <div>
           <el-button
+            v-permission="['ADMIN']"
             size="small"
             type="primary"
             @click="create()"
-            v-permission="['ADMIN']"
             icon="el-icon-plus"
             >{{ $t("commons.button.create") }}</el-button
           >
@@ -190,9 +190,9 @@ export default {
       searchClusters(currentPage, pageSize, "").then((data) => {
         this.loading = false;
         this.options = [...data.items];
-        this.options = this.options.filter(item => {
-          return item.source === 'local'
-        })
+        this.options = this.options.filter((item) => {
+          return item.source === "local";
+        });
         this.options.forEach((items) => {
           items.value = items.label = items.name;
         });

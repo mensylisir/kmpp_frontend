@@ -12,10 +12,17 @@
       </div>
     </div>
     <div class="sel-action">
-      <el-button type="primary" @click="createDeploy">
-        <i class="el-icon-plus" style="margin-right: 4px"></i
-        >{{ currType === "task" ? "任务" : "定时任务" }}
-      </el-button>
+      <div>
+        <el-button
+          type="primary"
+          @click="createDeploy"
+          v-permission="['ADMIN']"
+        >
+          <i class="el-icon-plus" style="margin-right: 4px"></i
+          >{{ currType === "task" ? "任务" : "定时任务" }}
+        </el-button>
+      </div>
+
       <div>
         <el-select
           v-model="clusterCurrent"
@@ -51,41 +58,6 @@
           <div slot="prefix" class="sel-prefix">命名空间：</div>
         </el-select>
       </div>
-      <!-- <div v-show="currType === 'timeTask'">
-        <el-select
-          v-model="clusterCurrent1"
-          placeholder="请选择"
-          @change="clusterChange"
-          style="margin-right: 8px"
-          class="cus-select"
-        >
-          <el-option
-            v-for="item in clusterList"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option>
-
-          <div slot="prefix" class="sel-prefix">集群：</div>
-        </el-select>
-        <el-select
-          v-model="currentNamespace1"
-          placeholder="请选择"
-          @change="changeNamespace"
-          class="cus-select1"
-        >
-          <el-option
-            v-for="item in namespacesList"
-            :key="item['metadata'].name"
-            :label="item['metadata'].name"
-            :value="item['metadata'].name"
-          >
-          </el-option>
-
-          <div slot="prefix" class="sel-prefix">命名空间：</div>
-        </el-select>
-      </div> -->
     </div>
 
     <el-table
@@ -233,19 +205,25 @@
           >
         </template>
       </el-table-column>
-      <el-table-column label="操作" min-width="64">
+      <el-table-column>
         <template slot-scope="scope">
-          <span
-            @click="handleClickEdit(scope.row)"
-            class="iconfont icon-edit-line action-icon"
-          ></span>
-          <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
-            ><span
-              class="iconfont icon-delete-line action-icon"
-              slot="reference"
+          <div v-permission="['ADMIN']">
+            <span
+              @click="handleClickEdit(scope.row)"
+              class="iconfont icon-edit-line action-icon"
             ></span>
-          </el-popconfirm> </template
-      ></el-table-column>
+            <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
+              ><span
+                class="iconfont icon-delete-line action-icon"
+                slot="reference"
+              ></span>
+            </el-popconfirm>
+          </div>
+        </template>
+        <template slot-scope="" slot="header">
+          <span v-permission="['ADMIN']">操作</span>
+        </template>
+      </el-table-column>
     </el-table>
     <el-table
       v-else
@@ -311,19 +289,25 @@
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" min-width="64">
+      <el-table-column>
         <template slot-scope="scope">
-          <span
-            @click="handleClickEdit(scope.row)"
-            class="iconfont icon-edit-line action-icon"
-          ></span>
-          <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
-            ><span
-              class="iconfont icon-delete-line action-icon"
-              slot="reference"
+          <span v-permission="['ADMIN']">
+            <span
+              @click="handleClickEdit(scope.row)"
+              class="iconfont icon-edit-line action-icon"
             ></span>
-          </el-popconfirm> </template
-      ></el-table-column>
+            <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
+              ><span
+                class="iconfont icon-delete-line action-icon"
+                slot="reference"
+              ></span>
+            </el-popconfirm>
+          </span>
+        </template>
+        <template slot="header">
+          <span v-permission="['ADMIN']">操作</span>
+        </template>
+      </el-table-column>
     </el-table>
     <div class="page-con">
       <el-pagination

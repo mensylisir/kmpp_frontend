@@ -7,7 +7,7 @@ const Manifest = {
   name: "Manifest",
   meta: {
     icon: "iconfont icon-apps-manage",
-    roles: ["ADMIN", "PROJECT_MANAGER"],
+    roles: ["ADMIN", "PROJECT_MANAGER", "COMMON"],
     title: "监控告警"
   },
   children: [

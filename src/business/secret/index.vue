@@ -1,5 +1,5 @@
 <template>
-  <layout-content header="部署">
+  <layout-content header="Secret">
     <div class="sel-action">
       <div>
         <el-button
@@ -7,10 +7,9 @@
           @click="createDeploy"
           v-permission="['ADMIN']"
         >
-          <i class="el-icon-plus" style="margin-right: 4px"></i>部署
+          <i class="el-icon-plus" style="margin-right: 4px"></i>Secret
         </el-button>
       </div>
-
       <div>
         <el-select
           v-model="clusterCurrent"
@@ -26,7 +25,6 @@
             :value="item.value"
           >
           </el-option>
-
           <div slot="prefix" class="sel-prefix">集群：</div>
         </el-select>
         <el-select
@@ -42,70 +40,64 @@
             :value="item['metadata'].name"
           >
           </el-option>
-
           <div slot="prefix" class="sel-prefix">命名空间：</div>
         </el-select>
       </div>
     </div>
-
     <el-table
+      v-loading="loading"
+      element-loading-text="正在删除，请稍后"
       :data="tableData"
       style="width: 100%"
       :header-cell-style="{ background: '#F9FAFC' }"
     >
-      <el-table-column type="index" width="50"> </el-table-column>
-      <el-table-column prop="domain" label="名称" min-width="200">
+      <el-table-column prop="name" label="名称" min-width="200">
         <template slot-scope="scope">
           <span class="active-domain" @click="winOpen(scope.row)">{{
-            scope.row["metadata"].name
+            scope.row.name
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="host" label="状态" min-width="128">
+      <el-table-column prop="namespace" label="命名空间" min-width="130">
         <template slot-scope="scope">
-          <span
-            v-if="scope.row['status'].conditions[0].status == 'True'"
-            style="margin-right: 6px"
-            >{{ scope.row["status"].conditions[0].type }}</span
-          >
-          <span v-if="scope.row['status'].conditions[1].status == 'True'">{{
-            scope.row["status"].conditions[1].type
-          }}</span>
+          <span>{{ scope.row.namespace }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="namespace" label="命名空间" min-width="152">
+      <el-table-column prop="image" label="Labels" min-width="496">
         <template slot-scope="scope">
-          <span>{{ scope.row["metadata"].namespace }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="image" label="镜像" min-width="496">
-        <template slot-scope="scope">
-          <span>{{ scope.row["spec"].template.spec.containers[0].image }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="pod" label="运行/期望Pod数量" min-width="152">
-        <template slot-scope="scope">
-          <span
-            >{{ scope.row["status"].readyReplicas }}/{{
-              scope.row["status"].replicas
-            }}</span
-          >
-        </template>
-      </el-table-column>
-      <el-table-column label="操作">
-        <template slot-scope="scope">
-          <div v-permission="['ADMIN']">
+          <span v-if="scope.row.labels">
             <span
-              @click="handleClickEdit(scope.row)"
-              class="iconfont icon-edit-line action-icon"
+              class="labels"
+              :key="item.label"
+              v-for="item in formatLabels(scope.row.labels)"
+            >
+              {{ item.label }}:{{ item.value }}
+            </span>
+          </span>
+          <span v-else>--</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="pod" label="创建时间" min-width="150">
+        <template slot-scope="scope">
+          <span>{{
+            moment(scope.row.create_time).format("YYYY/MM/DD HH:mm:ss")
+          }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column>
+        <template slot-scope="scope">
+          <span
+            v-permission="['ADMIN']"
+            @click="handleClickEdit(scope.row)"
+            class="iconfont icon-edit-line action-icon"
+          ></span>
+          <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
+            ><span
+              v-permission="['ADMIN']"
+              class="iconfont icon-delete-line action-icon"
+              slot="reference"
             ></span>
-            <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
-              ><span
-                class="iconfont icon-delete-line action-icon"
-                slot="reference"
-              ></span>
-            </el-popconfirm>
-          </div>
+          </el-popconfirm>
         </template>
         <template slot-scope="" slot="header">
           <span v-permission="['ADMIN']">操作</span>
@@ -131,17 +123,22 @@
 <script>
 import LayoutContent from "@/components/layout/LayoutContent";
 import { searchClusters } from "@/api/cluster";
-import { getDeploy } from "@/api/work-load/deploy";
+import { getSecret, delJob, getCronjob, delCronjob } from "@/api/secret";
 import { listNamespace } from "@/api/cluster/namespace";
 import "./index.scss";
+import moment from "moment";
 export default {
   name: "",
   components: { LayoutContent },
   props: {},
   data() {
     return {
+      moment,
       searchClusters,
-      getDeploy,
+      getSecret,
+      getCronjob,
+      delJob,
+      delCronjob,
       listNamespace,
       clusterList: [],
       clusterCurrent: "",
@@ -167,6 +164,13 @@ export default {
         "monitoring",
         "permission-manager",
       ],
+      statusMap: {
+        Running: "执行中",
+        Complete: "已完成",
+        Failed: "已停止",
+        Suspended: "已挂起",
+      },
+      loading: false,
     };
   },
   created() {
@@ -176,9 +180,21 @@ export default {
   activited() {},
   update() {},
   methods: {
+    formatLabels(val) {
+      let keys = Object.keys(val);
+      let values = Object.values(val);
+      let result = [];
+      keys.forEach((item, index) => {
+        result.push({
+          label: item,
+          value: values[index],
+        });
+      });
+      return result;
+    },
     createDeploy() {
       this.$router.push({
-        name: "deployCreate",
+        name: "secretCreate",
         params: {
           cluster: this.clusterCurrent,
         },
@@ -186,11 +202,11 @@ export default {
     },
     winOpen(data) {
       this.$router.push({
-        name: "deployDetailsMod",
+        name: "secretDetailsMod",
         params: {
           clusterName: this.clusterCurrent,
-          deployName: data["metadata"].name,
-          namespace: data["metadata"].namespace,
+          deployName: data.name,
+          namespace: data.namespace,
         },
       });
     },
@@ -201,9 +217,9 @@ export default {
     changeNamespace() {
       this.paginationConfig.currentPage = 1;
       if (this.currentNamespace == "全部") {
-        this.getDeployList(this.clusterCurrent, undefined);
+        this.getMapList(this.clusterCurrent, undefined);
       } else {
-        this.getDeployList(this.clusterCurrent, this.currentNamespace);
+        this.getMapList(this.clusterCurrent, this.currentNamespace);
       }
     },
     handleSizeChange() {
@@ -219,26 +235,38 @@ export default {
           this.paginationConfig.pageSize,
         this.paginationConfig.currentPage * this.paginationConfig.pageSize
       );
+      console.log(this.tableData, "22");
     },
 
     handleClickEdit(data) {
       this.$router.push({
         name:
-          this.disableNamespaceList.indexOf(data["metadata"].namespace) != -1
-            ? "deployDetailsCheck"
-            : "deployDetailsEdit",
+          this.disableNamespaceList.indexOf(data.namespace) != -1
+            ? "secretDetailsMod"
+            : "secretDetailsEdit",
         params: {
           clusterName: this.clusterCurrent,
-          deployName: data["metadata"].name,
-          namespace: data["metadata"].namespace,
+          deployName: data.name,
+          namespace: data.namespace,
         },
       });
     },
+    async confirmDel(data) {
+      await this.delJob({
+        cluster_name: data.cluster_name,
+        namespace: data.namespace,
+        name: data.name,
+      });
 
-    confirmDel() {
-      // this.deleteIngress(data.clustername, data.namespace, data.ingressname);
+      this.loading = true;
+      setTimeout(() => {
+        this.loading = false;
+        this.getMapList(
+          this.clusterCurrent,
+          this.currentNamespace === "全部" ? undefined : this.currentNamespace
+        );
+      }, 3000);
     },
-
     // ajax
     getClusters(condition) {
       this.tableDataAll = [];
@@ -268,10 +296,10 @@ export default {
       });
     },
 
-    async getDeployList(cluster, namespace) {
-      const data = await this.getDeploy(cluster, namespace);
+    async getMapList(cluster, namespace) {
+      const data = await this.getSecret(cluster, namespace);
       this.tableDataAll = data || [];
-      console.log(data, "deploylist");
+
       this.paginationConfig.total = this.tableDataAll.length;
       this.tableData = this.tableDataAll.slice(
         this.paginationConfig.currentPage - 1,
@@ -288,9 +316,9 @@ export default {
           name: "全部",
         },
       });
-
+      this.currentNamespace = "全部";
       // 获取列表
-      this.getDeployList(this.clusterCurrent, undefined);
+      this.getMapList(this.clusterCurrent, undefined);
     },
   },
   filter: {},
@@ -340,6 +368,17 @@ export default {
   }
 }
 
+.labels {
+  font-size: 12px;
+  color: #4b5059;
+  line-height: 20px;
+  font-weight: 400;
+  margin-right: 8px;
+  background: #eff1f5;
+  border-radius: 2px;
+  padding: 2px 6px;
+}
+
 .page-con {
   margin-top: 16px;
   text-align: right;
@@ -362,6 +401,34 @@ export default {
       }
     }
   }
+}
+
+.task-button {
+  background: #eff1f5;
+  border: 1px solid #cbcfd9;
+  border-radius: 4px;
+  display: flex;
+  width: 162px;
+  margin-bottom: 16px;
+  div {
+    font-size: 16px;
+    color: #797f8c;
+    line-height: 31px;
+    font-weight: 500;
+    width: 50%;
+    cursor: pointer;
+    text-align: center;
+  }
+  .active {
+    background: #ffffff;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+  }
+}
+.copy-icon {
+  margin-left: 10px;
+  color: #5354bb;
+  cursor: pointer;
 }
 
 /deep/.el-table--small .el-table__cell {

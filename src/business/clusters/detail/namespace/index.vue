@@ -7,21 +7,6 @@
       :pagination-config="paginationConfig"
     >
       <template #header>
-        <div>
-          <el-button
-            size="small"
-            type="primary"
-            @click="create()"
-            :disabled="true"
-            icon="el-icon-plus"
-            >{{ $t("commons.button.create") }}</el-button
-          >
-          <el-button size="small" :disabled="true">{{
-            $t("commons.button.delete")
-          }}</el-button>
-        </div>
-
-        <!-- <el-button size="small" :disabled="nsSelection.length < 1" @click="onDelete()">{{$t('commons.button.delete')}}</el-button> -->
       </template>
 
       <el-table-column

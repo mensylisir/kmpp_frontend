@@ -9,7 +9,7 @@
           @confirm="deleteMiddle"
           class="detete"
         >
-          <el-button type="danger" slot="reference">删除</el-button>
+          <el-button type="danger" slot="reference"  v-permission="['ADMIN']">删除</el-button>
         </el-popconfirm>
 
         <div class="title">

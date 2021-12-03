@@ -1,9 +1,15 @@
 <template>
   <layout-content header="服务">
     <div class="sel-action">
-      <el-button type="primary" @click="createServices">
-        <i class="el-icon-plus" style="margin-right: 4px"></i>服务
-      </el-button>
+      <div>
+        <el-button
+          type="primary"
+          @click="createServices"
+          v-permission="['ADMIN']"
+        >
+          <i class="el-icon-plus" style="margin-right: 4px"></i>服务
+        </el-button>
+      </div>
       <div>
         <el-select
           v-model="clusterCurrent"
@@ -100,19 +106,25 @@
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" min-width="90">
+      <el-table-column>
         <template slot-scope="scope">
-          <span
-            @click="handleClickEdit(scope.row)"
-            class="iconfont icon-edit-line action-icon"
-          ></span>
-          <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
-            ><span
-              class="iconfont icon-delete-line action-icon"
-              slot="reference"
+          <span v-permission="['ADMIN']">
+            <span
+              @click="handleClickEdit(scope.row)"
+              class="iconfont icon-edit-line action-icon"
             ></span>
-          </el-popconfirm> </template
-      ></el-table-column>
+            <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
+              ><span
+                class="iconfont icon-delete-line action-icon"
+                slot="reference"
+              ></span>
+            </el-popconfirm>
+          </span>
+        </template>
+        <template slot="header">
+          <span v-permission="['ADMIN']">操作</span>
+        </template>
+      </el-table-column>
     </el-table>
     <div class="page-con">
       <el-pagination

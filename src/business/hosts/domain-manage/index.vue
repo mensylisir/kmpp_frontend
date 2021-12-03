@@ -2,7 +2,7 @@
   <layout-content header="域名管理">
     <div class="sel-action">
       <el-dropdown @command="handleCommand">
-        <el-button type="primary">
+        <el-button type="primary" v-permission="['ADMIN']">
           <i class="el-icon-plus" style="margin-right: 4px"></i>添加域名<i
             class="el-icon-arrow-down el-icon--right"
           ></i>
@@ -50,10 +50,11 @@
       </el-table-column>
       <el-table-column prop="clustername" label="所属集群" min-width="224">
       </el-table-column>
-      <el-table-column label="操作" min-width="112">
+      <el-table-column>
         <template slot-scope="scope">
           <span
             @click="handleClickEdit(scope.row)"
+            v-permission="['ADMIN']"
             class="iconfont icon-edit-line action-icon"
           ></span>
           <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
@@ -61,8 +62,12 @@
               class="iconfont icon-delete-line action-icon"
               slot="reference"
             ></span>
-          </el-popconfirm> </template
-      ></el-table-column>
+          </el-popconfirm>
+        </template>
+        <template slot="header">
+          <span v-permission="['ADMIN']">操作</span>
+        </template></el-table-column
+      >
     </el-table>
     <div class="page-con">
       <el-pagination

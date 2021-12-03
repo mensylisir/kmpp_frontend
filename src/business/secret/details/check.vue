@@ -62,7 +62,7 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/search.js";
 
-import { getJobItem, getCronjobItem } from "@/api/work-load/task";
+import { getConfigItem } from "@/api/secret";
 // import YAML from "json2yaml";
 export default {
   name: "",
@@ -70,8 +70,7 @@ export default {
   props: {},
   data() {
     return {
-      getCronjobItem,
-      getJobItem,
+      getConfigItem,
       jsonEditor: null,
       value: "", // 默认显示的值
       initing: false,
@@ -98,7 +97,7 @@ export default {
   methods: {
     submitForm() {
       this.$router.push({
-        name: "taskDetailsEdit",
+        name: "secretDetailsEdit",
         params: {
           clusterName: this.$route.params.clusterName,
           deployName: this.$route.params.deployName,
@@ -128,21 +127,13 @@ export default {
     async getDeploy() {
       this.initing = true;
 
-      if (this.currType === "task") {
-        const data = await this.getJobItem(
-          this.$route.params.clusterName,
-          this.$route.params.namespace,
-          this.$route.params.deployName
-        );
-        this.value = data[0] ? data[0].yaml_data : "";
-      } else {
-        const data = await this.getCronjobItem(
-          this.$route.params.clusterName,
-          this.$route.params.namespace,
-          this.$route.params.deployName
-        );
-        this.value = data[0] ? data[0].yaml_data : "";
-      }
+      const data = await this.getConfigItem(
+        this.$route.params.clusterName,
+        this.$route.params.namespace,
+        this.$route.params.deployName
+      );
+      this.value = data[0] ? data[0].yaml_data : "";
+
       this.editorInit();
       this.initing = false;
     },

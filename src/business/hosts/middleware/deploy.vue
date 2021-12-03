@@ -97,7 +97,8 @@ export default {
             this.goDetail(result[0], true);
           }
         })
-        .catch(() => {});
+        .catch(() => {
+        });
     },
     // 获取我的部署
     getDeploy() {},

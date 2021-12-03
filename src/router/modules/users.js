@@ -20,7 +20,7 @@ const Users = {
       }
     },
     {
-      path: "create",
+      path: "create", 
       hidden: true,
       name: "UserCreate",
       component: () => import("@/business/users/create"),

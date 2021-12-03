@@ -14,36 +14,7 @@
       :pagination-config="paginationConfig"
     >
       <template #header>
-        <div>
-          <!-- <el-button
-            type="primary"
-            icon="el-icon-plus"
-            size="small"
-            :disabled="provider === '' || buttonDisabled()"
-            @click="create()"
-            >{{ $t("commons.button.create") }}</el-button
-          > -->
-          <!-- <el-button
-            size="small"
-            :disabled="
-              selects.length < 1 || provider === '' || buttonDisabled()
-            "
-            @click="onDelete()"
-            >{{ $t("commons.button.delete") }}</el-button
-          > -->
-          <!-- <el-button
-            size="small"
-            :disabled="selects.length < 1"
-            @click="onCordon('cordon')"
-            >{{ $t("commons.button.cordon") }}</el-button
-          >
-          <el-button
-            size="small"
-            :disabled="selects.length < 1"
-            @click="onCordon('uncordon')"
-            >{{ $t("commons.button.active") }}</el-button
-          > -->
-        </div>
+
       </template>
 
       <el-table-column type="selection" fix></el-table-column>

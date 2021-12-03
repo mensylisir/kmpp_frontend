@@ -350,7 +350,8 @@ export default {
       this.clusterName = this.$route.params.name;
       getClusterByName(this.clusterName).then((data) => {
         this.currentCluster = data;
-      });
+      }).catch(() => {
+        });
       this.loadNameSpaces();
       this.loadNodes();
       this.loadDeployments();
@@ -376,9 +377,12 @@ export default {
       });
     },
     loadNameSpaces() {
-      listNamespace(this.clusterName).then((data) => {
-        this.namespaces = data.items;
-      });
+      listNamespace(this.clusterName)
+        .then((data) => {
+          this.namespaces = data.items;
+        })
+        .catch(() => {
+        });
     },
     loadPods() {
       listPod(this.clusterName).then((data) => {
@@ -404,13 +408,15 @@ export default {
         });
         this.loadNodesUsages();
         this.loadPods();
-      });
+      }).catch(() => {
+        });
     },
     loadDeployments() {
       listDeployment(this.clusterName).then((data) => {
         this.deployments = data.items;
         this.paginationConfig.total = data.items.length;
-      });
+      }).catch(() => {
+        });
     },
     loadNodesUsages() {
       listNodesUsage(this.clusterName).then((data) => {
@@ -444,7 +450,8 @@ export default {
           );
         }
         this.loading_chart = false;
-      });
+      }).catch(() => {
+        });
     },
   },
   created() {

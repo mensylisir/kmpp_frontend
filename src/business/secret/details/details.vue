@@ -69,11 +69,7 @@
 </template>
 
 <script>
-import {
-  getConfigItem,
-  newGetDeployItem,
-  getCronjobItem,
-} from "@/api/config-map";
+import { getConfigItem, newGetDeployItem, getCronjobItem } from "@/api/secret";
 import moment from "moment";
 export default {
   name: "",
@@ -248,11 +244,18 @@ export default {
 }
 /deep/.el-col {
   white-space: nowrap;
-
   display: flex;
   align-items: center;
 }
 
+/deep/.cell {
+  span {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+  }
+}
 .cus-col {
   align-items: baseline;
 }

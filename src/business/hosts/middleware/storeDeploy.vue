@@ -25,7 +25,7 @@
         </div>
       </div>
     </div>
-    <div class="bottom">
+    <div class="bottom"  v-permission="['ADMIN']">
       <div
         style="
           display: flex;

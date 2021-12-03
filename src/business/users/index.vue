@@ -5,7 +5,7 @@
                    :pagination-config="paginationConfig" @search="search" v-loading="loading"
                    :selects.sync="selects" :fit="true">
       <template #header>
-        <div>
+        <div  v-permission="['ADMIN']">
           <el-button size="small" @click="create()" type="primary" icon="el-icon-plus">{{ $t("commons.button.create") }}</el-button>
           <el-button size="small" :disabled="selects.length===0" @click="del()">{{ $t("commons.button.delete") }}
           </el-button>
@@ -146,6 +146,8 @@ export default {
         this.loading = false
         this.data = data.items
         this.paginationConfig.total = data.total
+      }).catch((err) => {
+        alert(err)
       })
     },
     del (name) {

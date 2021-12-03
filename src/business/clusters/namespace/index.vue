@@ -1,9 +1,16 @@
 <template>
   <layout-content header="命名空间">
     <div class="sel-action">
-      <el-button type="primary" @click="createServices">
+      <div>
+      <el-button
+        type="primary"
+        @click="createServices"
+        v-permission="['ADMIN']"
+      >
         <i class="el-icon-plus" style="margin-right: 4px"></i>命名空间
       </el-button>
+      </div>
+
       <div>
         <el-select
           v-model="clusterCurrent"
@@ -57,15 +64,22 @@
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" min-width="64">
+      <el-table-column>
         <template slot-scope="scope">
-          <el-popconfirm title="确定删除吗？" @confirm="confirmDel(scope.row)"
+          <el-popconfirm
+            title="确定删除吗？"
+            v-permission="['ADMIN']"
+            @confirm="confirmDel(scope.row)"
             ><span
               class="iconfont icon-delete-line action-icon"
               slot="reference"
             ></span>
-          </el-popconfirm> </template
-      ></el-table-column>
+          </el-popconfirm>
+        </template>
+        <template slot-scope="" slot="header">
+          <span v-permission="['ADMIN']">操作</span>
+        </template>
+      </el-table-column>
     </el-table>
     <div class="page-con">
       <el-pagination

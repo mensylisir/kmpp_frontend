@@ -8,6 +8,7 @@ const notification = {
   meta: {
     title: "日志中心",
     icon: "iconfont icon-notification",
+    roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER", "COMMON"]
   },
   children: [
     {
@@ -18,7 +19,7 @@ const notification = {
       component: () => import("@/business/notification"),
       meta: {
         activeMenu: "/notification",
-        roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER"]
+        roles: ["ADMIN","PROJECT_MANAGER","CLUSTER_MANAGER", "COMMON"]
       }
     },
   ]

@@ -1,57 +1,142 @@
 <template>
   <layout-content header="集群管理">
-    <complex-table local-key="cluster_columns" :selects.sync="clusterSelection" @selection-change="selectChange" :search-config="searchConfig" :data="data" :pagination-config="paginationConfig" @search="search" v-loading="loading">
+    <complex-table
+      local-key="cluster_columns"
+      :selects.sync="clusterSelection"
+      @selection-change="selectChange"
+      :search-config="searchConfig"
+      :data="data"
+      :pagination-config="paginationConfig"
+      @search="search"
+      v-loading="loading"
+    >
       <template #header>
         <div>
-          <el-button type="primary"  @click="onCreate()" v-permission="['ADMIN','PROJECT_MANAGER']" icon="el-icon-plus">{{ $t("commons.button.create") }}</el-button>
-          <el-button size="small" @click="onImport()" v-permission="['ADMIN','PROJECT_MANAGER']">
+          <el-button
+            type="primary"
+            @click="onCreate()"
+            v-permission="['ADMIN', 'PROJECT_MANAGER']"
+            icon="el-icon-plus"
+            >{{ $t("commons.button.create") }}</el-button
+          >
+          <el-button
+            size="small"
+            @click="onImport()"
+            v-permission="['ADMIN', 'PROJECT_MANAGER']"
+          >
             {{ $t("commons.button.import") }}
           </el-button>
           <!-- <el-button size="small" :disabled="clusterSelection.length !== 1 || isDeleteButtonDisable" @click="onUpgrade()">
             {{ $t("commons.button.upgrade") }}
           </el-button> -->
-          <el-button size="small" :disabled="clusterSelection.length !== 1 || isDeleteButtonDisable" @click="onHealthCheck()">
+          <el-button
+            v-permission="['ADMIN']"
+            size="small"
+            :disabled="clusterSelection.length !== 1 || isDeleteButtonDisable"
+            @click="onHealthCheck()"
+          >
             {{ $t("commons.button.check") }}
           </el-button>
-          <el-button size="small" :disabled="clusterSelection.length < 1 || isDeleteButtonDisable" @click="onDelete()">
+          <el-button
+            v-permission="['ADMIN']"
+            size="small"
+            :disabled="clusterSelection.length < 1 || isDeleteButtonDisable"
+            @click="onDelete()"
+          >
             {{ $t("commons.button.delete") }}
           </el-button>
         </div>
       </template>
 
       <el-table-column type="selection" fix></el-table-column>
-      <el-table-column :label="$t('commons.table.name')" min-width="100" prop="name" fix>
-        <template v-slot:default="{row}">
-          <el-link v-if="row.status === 'Running'" type="info" @click="goForDetail(row)">{{ row.name }}</el-link>
+      <el-table-column
+        :label="$t('commons.table.name')"
+        min-width="100"
+        prop="name"
+        fix
+      >
+        <template v-slot:default="{ row }">
+          <el-link
+            v-if="row.status === 'Running'"
+            type="info"
+            @click="goForDetail(row)"
+            >{{ row.name }}</el-link
+          >
           <span v-if="row.status !== 'Running'">{{ row.name }}</span>
         </template>
       </el-table-column>
       <!-- <el-table-column :label="$t('cluster.project')" v-if="isAdmin" min-width="100" prop="projectName" fix /> -->
-      <el-table-column :label="$t('cluster.version')" min-width="80" prop="spec.version" fix />
-      <el-table-column :label="$t('cluster.node_size')" min-width="50" prop="nodeSize" />
-      <el-table-column :label="$t('commons.table.status')" min-width="100" prop="status">
-        <template v-slot:default="{row}">
-          <div v-if="row.status ==='Running'">
-            <span class="iconfont icon-checkbox-circle-fill2" style="color: #32B350"></span>
+      <el-table-column
+        :label="$t('cluster.version')"
+        min-width="80"
+        prop="spec.version"
+        fix
+      />
+      <el-table-column
+        :label="$t('cluster.node_size')"
+        min-width="50"
+        prop="nodeSize"
+      />
+      <el-table-column
+        :label="$t('commons.table.status')"
+        min-width="100"
+        prop="status"
+      >
+        <template v-slot:default="{ row }">
+          <div v-if="row.status === 'Running'">
+            <span
+              class="iconfont icon-checkbox-circle-fill2"
+              style="color: #32b350"
+            ></span>
             {{ $t("commons.status.running") }}
           </div>
           <div v-if="row.status === 'Failed'">
-            <span class="iconfont icon-checkbox-circle-fill" style="color: #FA4147"></span> &nbsp; &nbsp; &nbsp;
-            <el-link type="info" @click="getStatus(row)">{{ $t("commons.status.failed") }}</el-link>
+            <span
+              class="iconfont icon-checkbox-circle-fill"
+              style="color: #fa4147"
+            ></span>
+            &nbsp; &nbsp; &nbsp;
+            <el-link
+              v-permission="['ADMIN']"
+              type="info"
+              @click="getStatus(row)"
+              >{{ $t("commons.status.failed") }}</el-link
+            >
           </div>
           <div v-if="row.status === 'Initializing'">
             <i class="iconfont icon-refresh-fill" />&nbsp; &nbsp; &nbsp;
-            <el-link type="info" @click="getStatus(row)"> {{ $t("commons.status.initializing") }}</el-link>
+            <el-link
+              v-permission="['ADMIN']"
+              type="info"
+              @click="getStatus(row)"
+            >
+              {{ $t("commons.status.initializing") }}</el-link
+            >
           </div>
-          <div v-if="row.status === 'Upgrading' ">
+          <div v-if="row.status === 'Upgrading'">
             <i class="el-icon-loading" /> &nbsp; &nbsp; &nbsp;
-            <el-link @click="getStatus(row)" type="info"> {{ $t("commons.status.upgrading") }} </el-link>
+            <el-link
+              v-permission="['ADMIN']"
+              @click="getStatus(row)"
+              type="info"
+            >
+              {{ $t("commons.status.upgrading") }}
+            </el-link>
           </div>
-          <div v-if="row.status === 'Terminating' && row.provider==='bareMetal' ">
+          <div
+            v-if="row.status === 'Terminating' && row.provider === 'bareMetal'"
+          >
             <i class="el-icon-loading" /> &nbsp; &nbsp; &nbsp;
-            <el-link type="info" @click="getStatus(row)">{{ $t("commons.status.terminating") }} </el-link>
+            <el-link
+              v-permission="['ADMIN']"
+              type="info"
+              @click="getStatus(row)"
+              >{{ $t("commons.status.terminating") }}
+            </el-link>
           </div>
-          <div v-if="row.status === 'Terminating' && row.provider!=='bareMetal' ">
+          <div
+            v-if="row.status === 'Terminating' && row.provider !== 'bareMetal'"
+          >
             <i class="el-icon-loading" /> &nbsp; &nbsp; &nbsp;
             <span>{{ $t("commons.status.terminating") }} </span>
           </div>
@@ -61,20 +146,49 @@
         </template>
       </el-table-column>
       <el-table-column width="180px" :label="$t('commons.table.create_time')">
-        <template v-slot:default="{row}">
+        <template v-slot:default="{ row }">
           {{ row.createdAt | datetimeFormat }}
         </template>
       </el-table-column>
-      <fu-table-operations :buttons="buttons" :label="$t('commons.table.action')" fix />
+      <fu-table-operations
+        :buttons="buttons"
+        :label="$t('commons.table.action')"
+        fix
+        v-permission="['ADMIN']"
+      />
     </complex-table>
-
-    <el-dialog :before-close="closeDialogLog" @close="search()" :title="$t('cluster.condition.condition_detail')" width="50%" :visible.sync="dialogLogVisible">
-      <div class="dialog" v-loading="conditionLoading" :element-loading-text="$t('cluster.condition.condition_loading')" element-loading-spinner="el-icon-loading" element-loading-background="rgba(255, 255, 255, 1)" :style="{height: dialogHeight}">
-        <el-scrollbar style="height:100%">
-          <span v-if="log.conditions&&log.conditions.length === 0">{{ log.message | errorFormat }}</span>
+    <el-dialog
+      :before-close="closeDialogLog"
+      @close="search()"
+      :title="$t('cluster.condition.condition_detail')"
+      width="50%"
+      :visible.sync="dialogLogVisible"
+    >
+      <div
+        class="dialog"
+        v-loading="conditionLoading"
+        :element-loading-text="$t('cluster.condition.condition_loading')"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(255, 255, 255, 1)"
+        :style="{ height: dialogHeight }"
+      >
+        <el-scrollbar style="height: 100%">
+          <span v-if="log.conditions && log.conditions.length === 0">{{
+            log.message | errorFormat
+          }}</span>
           <div>
-            <el-steps :space="50" style="margin: 0 50px" direction="vertical" :active="activeName">
-              <el-step v-for="condition in log.conditions" :key="condition.name" :title="$t('cluster.condition.' +condition.name)" :description="condition.message | errorFormat ">
+            <el-steps
+              :space="50"
+              style="margin: 0 50px"
+              direction="vertical"
+              :active="activeName"
+            >
+              <el-step
+                v-for="condition in log.conditions"
+                :key="condition.name"
+                :title="$t('cluster.condition.' + condition.name)"
+                :description="condition.message | errorFormat"
+              >
                 <i :class="loadStepIcon(condition.status)" slot="icon"></i>
               </el-step>
             </el-steps>
@@ -82,45 +196,97 @@
         </el-scrollbar>
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button size="small" @click="goForLogs()">{{ $t("commons.button.log") }}</el-button>
-        <el-button size="small" v-if="log.phase === 'Failed'" :v-loading="retryLoadding" @click="onRetry()">
+        <el-button size="small" @click="goForLogs()">{{
+          $t("commons.button.log")
+        }}</el-button>
+        <el-button
+          size="small"
+          v-if="log.phase === 'Failed'"
+          :v-loading="retryLoadding"
+          @click="onRetry()"
+        >
           {{ $t("commons.button.retry") }}
         </el-button>
       </div>
     </el-dialog>
 
-    <el-dialog :title="$t('cluster.delete.delete_cluster')" width="30%" :visible.sync="dialogDeleteVisible">
+    <el-dialog
+      :title="$t('cluster.delete.delete_cluster')"
+      width="30%"
+      :visible.sync="dialogDeleteVisible"
+    >
       <el-form label-width="120px">
         <el-form-item :label="$t('cluster.delete.is_force')">
           <el-switch v-model="isForce" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="small" @click="dialogDeleteVisible = false">{{ $t("commons.button.cancel") }}</el-button>
-        <el-button size="small" :v-loading="deleteLoadding" @click="submitDelete()">
+        <el-button size="small" @click="dialogDeleteVisible = false">{{
+          $t("commons.button.cancel")
+        }}</el-button>
+        <el-button
+          size="small"
+          :v-loading="deleteLoadding"
+          @click="submitDelete()"
+        >
           {{ $t("commons.button.submit") }}
         </el-button>
       </div>
     </el-dialog>
 
-    <el-dialog :title="$t('cluster.health_check.health_check')" width="50%" :visible.sync="dialogCheckVisible">
+    <el-dialog
+      :title="$t('cluster.health_check.health_check')"
+      width="50%"
+      :visible.sync="dialogCheckVisible"
+    >
       <div align="center" style="margin-top: 15px">
-        <el-table v-loading="checkLoading" :data="checkData.hooks" v-if="!isRecover" border style="width: 90%">
+        <el-table
+          v-loading="checkLoading"
+          :data="checkData.hooks"
+          v-if="!isRecover"
+          border
+          style="width: 90%"
+        >
           <el-table-column prop="name" :label="$t('commons.table.name')" />
-          <el-table-column prop="level" :label="$t('cluster.health_check.level')" />
-          <el-table-column prop="msg" :label="$t('cluster.health_check.message')" />
+          <el-table-column
+            prop="level"
+            :label="$t('cluster.health_check.level')"
+          />
+          <el-table-column
+            prop="msg"
+            :label="$t('cluster.health_check.message')"
+          />
         </el-table>
       </div>
       <div align="center" style="margin-top: 15px">
-        <el-table v-loading="checkLoading" :data="recoverItems" v-if="isRecover" border style="width: 90%">
+        <el-table
+          v-loading="checkLoading"
+          :data="recoverItems"
+          v-if="isRecover"
+          border
+          style="width: 90%"
+        >
           <el-table-column prop="hookName" :label="$t('commons.table.name')" />
-          <el-table-column prop="name" :label="$t('cluster.health_check.method')" />
-          <el-table-column prop="result" :label="$t('cluster.health_check.result')" />
-          <el-table-column prop="msg" :label="$t('cluster.health_check.message')" />
+          <el-table-column
+            prop="name"
+            :label="$t('cluster.health_check.method')"
+          />
+          <el-table-column
+            prop="result"
+            :label="$t('cluster.health_check.result')"
+          />
+          <el-table-column
+            prop="msg"
+            :label="$t('cluster.health_check.message')"
+          />
         </el-table>
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button size="small" v-if="checkData.level=='error'" @click="onRecover()">
+        <el-button
+          size="small"
+          v-if="checkData.level == 'error'"
+          @click="onRecover()"
+        >
           {{ $t("cluster.health_check.recover") }}
         </el-button>
       </div>
@@ -129,11 +295,20 @@
 </template>
 
 <script>
-import LayoutContent from "@/components/layout/LayoutContent"
-import ComplexTable from "@/components/complex-table"
-import { getClusterStatus, initCluster, upgradeCluster, openLogger, deleteCluster, healthCheck, clusterRecover, searchClusters } from "@/api/cluster"
-import { listRegistryAll } from "@/api/system-setting"
-import { checkPermission } from "@/utils/permisstion"
+import LayoutContent from "@/components/layout/LayoutContent";
+import ComplexTable from "@/components/complex-table";
+import {
+  getClusterStatus,
+  initCluster,
+  upgradeCluster,
+  openLogger,
+  deleteCluster,
+  healthCheck,
+  clusterRecover,
+  searchClusters,
+} from "@/api/cluster";
+import { listRegistryAll } from "@/api/system-setting";
+import { checkPermission } from "@/utils/permisstion";
 
 export default {
   name: "ClusterList",
@@ -145,30 +320,30 @@ export default {
           label: this.$t("commons.button.upgrade"),
           icon: "iconfont icon-update-line",
           click: (row) => {
-            this.onUpgrade(row)
+            this.onUpgrade(row);
           },
           disabled: (row) => {
-            return row.status !== "Running"
+            return this.getRole() || row.status !== "Running";
           },
         },
         {
           label: this.$t("commons.button.check"),
           icon: "iconfont icon-diagnostics-line",
           click: (row) => {
-            this.onHealthCheck(row)
+            this.onHealthCheck(row);
           },
           disabled: (row) => {
-            return row.status !== "Running" && row.status !== "Failed"
+            return this.getRole() || (row.status !== "Running" && row.status !== "Failed");
           },
         },
         {
           label: this.$t("commons.button.delete"),
           icon: "iconfont icon-delete-line",
           click: (row) => {
-            this.onDelete(row)
+            this.onDelete(row);
           },
           disabled: (row) => {
-            return row.status !== "Running" && row.status !== "Failed"
+            return this.getRole() || (row.status !== "Running" && row.status !== "Failed");
           },
         },
       ],
@@ -213,280 +388,316 @@ export default {
       searchConfig: {
         quickPlaceholder: this.$t("commons.search.quickSearch"),
         components: [
-          { field: "name", label: this.$t("commons.table.name"), component: "FuComplexInput", defaultOperator: "eq" },
-          { field: "created_at", label: this.$t("commons.table.create_time"), component: "FuComplexDateTime", valueFormat: "yyyy-MM-dd HH:mm:ss" },
+          {
+            field: "name",
+            label: this.$t("commons.table.name"),
+            component: "FuComplexInput",
+            defaultOperator: "eq",
+          },
+          {
+            field: "created_at",
+            label: this.$t("commons.table.create_time"),
+            component: "FuComplexDateTime",
+            valueFormat: "yyyy-MM-dd HH:mm:ss",
+          },
         ],
       },
       loading: false,
       timer: {},
       timer2: {},
-    }
+    };
   },
   methods: {
-    search(condition) {
-      this.loading = true
-      const { currentPage, pageSize } = this.paginationConfig
-      searchClusters(currentPage, pageSize, condition).then((data) => {
-        this.loading = false
-        this.data = data.items
-        this.paginationConfig.total = data.total
+    getRole(){
+      const roles = this.$store.getters && this.$store.getters.roles
+      let permissionRoles = ["ADMIN"]
+      const hasPermission = roles.some(role => {
+        return permissionRoles.includes(role)
       })
+      return hasPermission? false : true
+    },
+    search(condition) {
+      this.loading = true;
+      const { currentPage, pageSize } = this.paginationConfig;
+      searchClusters(currentPage, pageSize, condition).then((data) => {
+        this.loading = false;
+        this.data = data.items;
+        this.paginationConfig.total = data.total;
+      });
     },
     searchForPolling(condition) {
-      const { currentPage, pageSize } = this.paginationConfig
+      const { currentPage, pageSize } = this.paginationConfig;
       searchClusters(currentPage, pageSize, condition).then((data) => {
-        this.data = data.items
-        this.paginationConfig.total = data.total
-      })
+        this.data = data.items;
+        this.paginationConfig.total = data.total;
+      });
     },
     onCreate() {
-      this.$router.push({ name: "ClusterCreate" })
+      this.$router.push({ name: "ClusterCreate" });
     },
     onImport() {
-      this.$router.push({ name: "ClusterImport" })
+      this.$router.push({ name: "ClusterImport" });
     },
     onUpgrade(row) {
       if (!row) {
-        row = this.clusterSelection[0]
+        row = this.clusterSelection[0];
       }
-      this.$router.push({ name: "ClusterUpgrade", params: { name: row.name } })
+      this.$router.push({ name: "ClusterUpgrade", params: { name: row.name } });
     },
     goForDetail(row) {
       listRegistryAll().then((data) => {
-        let repoList = data.items === null ? [] : data.items
+        let repoList = data.items === null ? [] : data.items;
         switch (row.spec.architectures) {
           case "amd64":
             for (const repo of repoList) {
               if (repo.architecture === "x86_64") {
-                break
+                break;
               }
             }
-            break
+            break;
           case "arm64":
             for (const repo of repoList) {
               if (repo.architecture === "aarch64") {
-                break
+                break;
               }
             }
-            break
+            break;
           case "all":
             for (const repo of repoList) {
               if (repo.architecture === "x86_64") {
-                continue
+                continue;
               }
               if (repo.architecture === "aarch64") {
-                continue
+                continue;
               }
             }
-            break
+            break;
         }
-          this.$router.push({ name: "ClusterOverview", params: { name: row.name } })
-
-      })
+        this.$router.push({
+          name: "ClusterOverview",
+          params: { name: row.name },
+        });
+      });
     },
     selectChange() {
-      let isOk = true
+      let isOk = true;
       if (this.clusterSelection.length === 0) {
-        this.isDeleteButtonDisable = true
-        return
+        this.isDeleteButtonDisable = true;
+        return;
       }
       for (const item of this.clusterSelection) {
         if (item.status !== "Running" && item.status !== "Failed") {
-          isOk = false
-          break
+          isOk = false;
+          break;
         }
       }
-      this.isDeleteButtonDisable = !isOk
+      this.isDeleteButtonDisable = !isOk;
     },
     onDelete(row) {
-      this.isForce = false
-      this.dialogDeleteVisible = true
+      this.isForce = false;
+      this.dialogDeleteVisible = true;
       if (row) {
-        this.deleteName = row.name
+        this.deleteName = row.name;
       }
     },
     submitDelete() {
-      this.deleteLoadding = true
-      this.$confirm(this.$t("commons.confirm_message.delete"), this.$t("commons.message_box.prompt"), {
-        confirmButtonText: this.$t("commons.button.confirm"),
-        cancelButtonText: this.$t("commons.button.cancel"),
-        type: "warning",
-      }).then(() => {
-        const ps = []
+      this.deleteLoadding = true;
+      this.$confirm(
+        this.$t("commons.confirm_message.delete"),
+        this.$t("commons.message_box.prompt"),
+        {
+          confirmButtonText: this.$t("commons.button.confirm"),
+          cancelButtonText: this.$t("commons.button.cancel"),
+          type: "warning",
+        }
+      ).then(() => {
+        const ps = [];
         if (this.deleteName) {
-          ps.push(deleteCluster(this.deleteName, this.isForce))
+          ps.push(deleteCluster(this.deleteName, this.isForce));
         } else {
           for (const item of this.clusterSelection) {
-            ps.push(deleteCluster(item.name, this.isForce))
+            ps.push(deleteCluster(item.name, this.isForce));
           }
         }
         Promise.all(ps)
           .then(() => {
-            this.search()
+            this.search();
             this.$message({
               type: "success",
               message: this.$t("commons.msg.op_success"),
-            })
-            this.dialogDeleteVisible = false
-            this.deleteLoadding = false
+            });
+            this.dialogDeleteVisible = false;
+            this.deleteLoadding = false;
           })
           .catch(() => {
-            this.search()
-            this.dialogDeleteVisible = false
-            this.deleteLoadding = false
-          })
-      })
+            this.search();
+            this.dialogDeleteVisible = false;
+            this.deleteLoadding = false;
+          });
+      });
     },
 
     // cluster health check
     onHealthCheck(row) {
       if (!row) {
-        row = this.clusterSelection[0]
+        row = this.clusterSelection[0];
       }
-      this.currentCluster = row
-      this.dialogCheckVisible = true
-      this.checkLoading = true
-      this.isRecover = false
-      this.recoverItems = []
+      this.currentCluster = row;
+      this.dialogCheckVisible = true;
+      this.checkLoading = true;
+      this.isRecover = false;
+      this.recoverItems = [];
       healthCheck(this.currentCluster.name).then((data) => {
-        this.checkData = data
-        this.checkLoading = false
-      })
+        this.checkData = data;
+        this.checkLoading = false;
+      });
     },
     onRecover() {
-      this.checkLoading = true
-      this.isRecover = true
-      this.checkData = { hooks: [], level: "" }
+      this.checkLoading = true;
+      this.isRecover = true;
+      this.checkData = { hooks: [], level: "" };
       clusterRecover(this.currentCluster.name).then((data) => {
-        this.recoverItems = data
-        this.checkLoading = false
-      })
+        this.recoverItems = data;
+        this.checkLoading = false;
+      });
     },
 
     // cluster logs
     getStatus(row) {
-      this.dialogHeight = row.status === "Terminating" ? "100px" : "400px"
-      this.currentCluster = row
-      this.dialogLogVisible = true
-      this.clusterName = row.name
-      this.dialogPolling()
+      this.dialogHeight = row.status === "Terminating" ? "100px" : "400px";
+      this.currentCluster = row;
+      this.dialogLogVisible = true;
+      this.clusterName = row.name;
+      this.dialogPolling();
       getClusterStatus(row.name).then((data) => {
-        this.log = data
-        this.activeName = this.log.conditions.length + 1
-      })
+        this.log = data;
+        this.activeName = this.log.conditions.length + 1;
+      });
     },
     loadStepIcon(status) {
       switch (status) {
         case "True":
-          return "el-icon-check"
+          return "el-icon-check";
         case "False":
-          return "el-icon-close"
+          return "el-icon-close";
         case "Unknown":
-          return "el-icon-loading"
+          return "el-icon-loading";
       }
     },
     goForLogs() {
-      openLogger(this.clusterName)
+      openLogger(this.clusterName);
     },
     onRetry() {
-      this.retryLoadding = true
+      this.retryLoadding = true;
       switch (this.log.prePhase) {
         case "Upgrading":
-          upgradeCluster(this.clusterName, this.currentCluster.spec.upgradeVersion).then(() => {
-            this.retryLoadding = false
-            this.log.phase = "Upgrading"
-          })
-          break
+          upgradeCluster(
+            this.clusterName,
+            this.currentCluster.spec.upgradeVersion
+          ).then(() => {
+            this.retryLoadding = false;
+            this.log.phase = "Upgrading";
+          });
+          break;
         case "Initializing":
           initCluster(this.clusterName).then(() => {
-            this.retryLoadding = false
-            this.log.phase = "Initializing"
-          })
-          break
+            this.retryLoadding = false;
+            this.log.phase = "Initializing";
+          });
+          break;
         case "Terminating":
           deleteCluster(this.clusterName, true).then(() => {
-            this.retryLoadding = false
-            this.log.phase = "Terminating"
-          })
-          break
+            this.retryLoadding = false;
+            this.log.phase = "Terminating";
+          });
+          break;
         case "Creating":
           initCluster(this.clusterName).then(() => {
-            this.retryLoadding = false
-            this.dialogLogVisible = false
-            this.log.phase = "Creating"
-          })
-          break
+            this.retryLoadding = false;
+            this.dialogLogVisible = false;
+            this.log.phase = "Creating";
+          });
+          break;
         case "Waiting":
           initCluster(this.clusterName).then(() => {
-            this.retryLoadding = false
-            this.log.phase = "Waiting"
-          })
-          break
+            this.retryLoadding = false;
+            this.log.phase = "Waiting";
+          });
+          break;
       }
     },
     closeDialogLog() {
-      clearInterval(this.timer2)
-      this.dialogLogVisible = false
+      clearInterval(this.timer2);
+      this.dialogLogVisible = false;
     },
     dialogPolling() {
       this.timer2 = setInterval(() => {
-        if(this.log.conditions.length !== 0 || this.currentCluster.status === "Failed") {
-          this.conditionLoading = false
+        if (
+          this.log.conditions.length !== 0 ||
+          this.currentCluster.status === "Failed"
+        ) {
+          this.conditionLoading = false;
         }
         if (this.log.phase !== "Running" && this.log.phase !== "Failed") {
           getClusterStatus(this.clusterName)
             .then((data) => {
-              this.activeName = this.log.conditions.length + 1
-              this.log.conditions = data.conditions
+              this.activeName = this.log.conditions.length + 1;
+              this.log.conditions = data.conditions;
               if (this.log.phase !== data.phase) {
-                this.log.phase = data.phase
+                this.log.phase = data.phase;
               }
               if (this.log.prePhase !== data.prePhase) {
-                this.log.prePhase = data.prePhase
+                this.log.prePhase = data.prePhase;
               }
             })
             .catch(() => {
-              this.dialogLogVisible = false
-              clearInterval(this.timer2)
-            })
+              this.dialogLogVisible = false;
+              clearInterval(this.timer2);
+            });
         }
-      }, 3000)
+      }, 3000);
     },
     polling() {
       this.timer = setInterval(() => {
-        let flag = false
-        const needPolling = ["Initializing", "Terminating", "Creating", "Waiting", "Upgrading"]
+        let flag = false;
+        const needPolling = [
+          "Initializing",
+          "Terminating",
+          "Creating",
+          "Waiting",
+          "Upgrading",
+        ];
         for (const item of this.data) {
           if (needPolling.indexOf(item.status) !== -1) {
-            flag = true
-            break
+            flag = true;
+            break;
           }
         }
         if (flag) {
-          this.searchForPolling()
+          this.searchForPolling();
         }
-      }, 10000)
+      }, 10000);
     },
   },
   mounted() {
-    this.search()
-    this.polling()
+    this.search();
+    this.polling();
   },
   destroyed() {
-    clearInterval(this.timer)
-    clearInterval(this.timer2)
+    clearInterval(this.timer);
+    clearInterval(this.timer2);
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
-.complex-table__header{
+.complex-table__header {
   justify-content: space-between;
 }
-/deep/ .el-button--mini.is-circle{
+/deep/ .el-button--mini.is-circle {
   border: none;
-  i{
-    color: #BCC0CC;
+  i {
+    color: #bcc0cc;
   }
 }
 </style>

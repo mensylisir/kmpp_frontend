@@ -79,25 +79,26 @@ export default {
     getCluester() {
       searchClusters(1, 1000, "")
         .then((data) => {
-          let result = data.items.filter((item) => {
-            return item.source === "local";
-          });
-          result.forEach((item) => {
-            item.label = item.value = item.name;
-            item.leaf = false;
-            item.children = [];
-          });
-          if (result.length > 0) {
-            this.getNamespace(
-              this.$route.params.monitor
-                ? this.$route.params.cluster
-                : result[0].name
-            );
+          if (data) {
+            let result = data.items.filter((item) => {
+              return item.source === "local";
+            });
+            result.forEach((item) => {
+              item.label = item.value = item.name;
+              item.leaf = false;
+              item.children = [];
+            });
+            if (result.length > 0) {
+              this.getNamespace(
+                this.$route.params.monitor
+                  ? this.$route.params.cluster
+                  : result[0].name
+              );
+            }
+            this.clusterList = result;
           }
-          this.clusterList = result;
         })
         .catch(() => {
-          return [];
         });
     },
     // 获取namespace

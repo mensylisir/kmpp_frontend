@@ -4,6 +4,7 @@
     <div class="domain-page-title">
       <span class="page-title">YAML文件</span>
       <el-button
+         v-permission="['ADMIN']"
         type="primary"
         @click="submitForm"
         :disabled="disableNamespaceList.indexOf($route.params.namespace) != -1"
